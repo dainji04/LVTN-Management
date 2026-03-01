@@ -131,6 +131,13 @@ const togglePasswordVisibility = () => {
                 <Button block size="large" type="primary" :loading="isLoading" @click="submitForm">Sign In</Button>
             </form>
 
+            <div class="signup-link">
+                <p>
+                    Don't have an account?
+                    <router-link to="/register">Sign Up</router-link>
+                </p>
+            </div>
+
             <div class="success-message" id="successMessage">
                 <div class="success-icon">✓</div>
                 <h3>Login Successful!</h3>
