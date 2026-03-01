@@ -15,6 +15,22 @@ const routes = [
         component: () => import('./views/Login.vue'),
         meta: { requiresGuest: true }
     },
+    { 
+        path: '/register', 
+        name: 'Register', 
+        component: () => import('./views/Register.vue'),
+        meta: { requiresGuest: true }
+    },
+    { 
+        path: '/terms', 
+        name: 'Terms', 
+        component: () => import('./views/Terms.vue')
+    },
+    { 
+        path: '/privacy', 
+        name: 'Privacy', 
+        component: () => import('./views/Privacy.vue')
+    },
     {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
