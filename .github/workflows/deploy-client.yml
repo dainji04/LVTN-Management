@@ -39,4 +39,4 @@ jobs:
         # Đường dẫn tới thư mục dist vừa build xong
         local-dir: ./client/dist/
         # Đường dẫn thư mục trên server mà domain đang trỏ tới (ví dụ: /domains/social.dainji.id.vn/)
-        server-dir: /domains/social.dainji.id.vn/
+        server-dir: ./
