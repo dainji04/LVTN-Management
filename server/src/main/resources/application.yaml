@@ -1,3 +1,8 @@
 spring:
+  datasource:
+#    url: "jdbc:mysql://localhost:3306/QuanLyVuaCa"  ##Chỗ này để link DB, không có chạy không được
+    username: root
+    password: root
   application:
     name: group-10
+
