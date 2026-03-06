@@ -40,25 +40,28 @@ public class UsersService {
     }
 
     public UsersResponse createUser(UsersRequest request) {
-        Users user = Users.builder()
-                .ho(request.getHo())
-                .ten(request.getTen())
-                .email(request.getEmail())
-                .matKhau(request.getMatKhau()) // nên hash password ở đây
-                .ngayTao(Instant.now())
-                .ngayCapNhat(Instant.now())
-                .build();
-        return toResponse(repository.save(user));
+        if (repository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại: " + request.getEmail());
+        }
+
+        Users user = mapper.toTaikhoan(request);
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+//        user.setMatKhau(passwordEncoder.encode(request.getMatKhau()));
+        user.setMatKhau(request.getMatKhau());
+        user.setNgayTao(Instant.now());
+        user.setNgayCapNhat(Instant.now());
+
+        return mapper.toTaikhoanResponse(repository.save(user));
     }
 
     public UsersResponse updateUser(Integer id, UsersRequest request) {
         Users user = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
-        user.setHo(request.getHo());
-        user.setTen(request.getTen());
-        user.setEmail(request.getEmail());
+
+        mapper.updateTaikhoan(user, request); // mapper update trực tiếp vào entity
         user.setNgayCapNhat(Instant.now());
-        return toResponse(repository.save(user));
+
+        return mapper.toTaikhoanResponse(repository.save(user));
     }
 
     public void deleteUser(Integer id) {

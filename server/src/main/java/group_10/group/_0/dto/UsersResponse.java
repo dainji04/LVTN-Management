@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -17,6 +18,15 @@ public class UsersResponse {
     Integer maNguoiDung;
     String ho;
     String ten;
+    String bietDanh;
     String email;
+    String anhDaiDien;
+    String anhNen;
+    Instant ngaySinh;
+    String gioiThieu;
+    String noiLamViec;
+    String noiHocTap;
+    String soDienThoai;
     Instant ngayTao;
+    Instant ngayCapNhat;
 }

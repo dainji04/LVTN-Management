@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,4 +30,13 @@ public class UsersRequest {
     @NotBlank(message = "Mat khau không được để trống")
     @Size(min = 6, message = "Mat khau tối thiểu 6 ký tự")
     String matKhau;
+
+    String bietDanh;
+    String anhDaiDien;
+    String anhNen;
+    Instant ngaySinh;       // chỉ cần date, không cần time
+    String gioiThieu;
+    String noiLamViec;
+    String noiHocTap;
+    String soDienThoai;
 }
