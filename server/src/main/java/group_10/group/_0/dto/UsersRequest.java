@@ -1,0 +1,30 @@
+package group_10.group._0.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UsersRequest {
+
+    @NotBlank(message = "Ho không được để trống")
+    String ho;
+
+    @NotBlank(message = "Ten không được để trống")
+    String ten;
+
+    @Email(message = "Email không hợp lệ")
+    @NotBlank(message = "Email không được để trống")
+    String email;
+
+    @NotBlank(message = "Mat khau không được để trống")
+    @Size(min = 6, message = "Mat khau tối thiểu 6 ký tự")
+    String matKhau;
+}
