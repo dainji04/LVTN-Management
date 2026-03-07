@@ -1,7 +1,7 @@
 package group_10.group._0.mapper;
 
-import group_10.group._0.dto.UsersRequest;
-import group_10.group._0.dto.UsersResponse;
+import group_10.group._0.dto.request.UsersRequest;
+import group_10.group._0.dto.response.UsersResponse;
 import group_10.group._0.entity.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

@@ -1,7 +1,7 @@
 package group_10.group._0.service;
 
-import group_10.group._0.dto.UsersRequest;
-import group_10.group._0.dto.UsersResponse;
+import group_10.group._0.dto.request.UsersRequest;
+import group_10.group._0.dto.response.UsersResponse;
 import group_10.group._0.entity.Users;
 import group_10.group._0.mapper.UsersMapper;
 import group_10.group._0.repository.UsersRepository;
@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -45,9 +47,8 @@ public class UsersService {
         }
 
         Users user = mapper.toTaikhoan(request);
-//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-//        user.setMatKhau(passwordEncoder.encode(request.getMatKhau()));
-        user.setMatKhau(request.getMatKhau());
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setMatKhau(passwordEncoder.encode(request.getMatKhau()));
         user.setNgayTao(Instant.now());
         user.setNgayCapNhat(Instant.now());
 

@@ -1,7 +1,8 @@
 package group_10.group._0.controller;
 
-import group_10.group._0.dto.UsersRequest;
-import group_10.group._0.dto.UsersResponse;
+import group_10.group._0.dto.request.UsersRequest;
+import group_10.group._0.dto.response.ApiResponse;
+import group_10.group._0.dto.response.UsersResponse;
 import group_10.group._0.service.UsersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,34 +21,49 @@ public class UsersController {
 
     // Lấy tất cả users
     @GetMapping
-    public ResponseEntity<List<UsersResponse>> getAllUsers() {
-        return ResponseEntity.ok(usersService.getAllUsers());
+    public ApiResponse<List<UsersResponse>> getAllUsers() {
+        return ApiResponse.<List<UsersResponse>>builder()
+//                .code(200)
+                .data(usersService.getAllUsers())
+                .build();
     }
 
     // Lấy user theo ID
     @GetMapping("/{id}")
-    public ResponseEntity<UsersResponse> getUserById(@PathVariable Integer id) {
-        return ResponseEntity.ok(usersService.getUserById(id));
+    public ApiResponse<UsersResponse> getUserById(@PathVariable Integer id) {
+        return ApiResponse.<UsersResponse>builder()
+                .data(usersService.getUserById(id))
+                .build();
     }
 
     // Đăng ký user mới
     @PostMapping("/register")
-    public ResponseEntity<UsersResponse> register(@RequestBody @Valid UsersRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(usersService.createUser(request));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<UsersResponse> register(@RequestBody @Valid UsersRequest request) {
+        return ApiResponse.<UsersResponse>builder()
+                .code(201)
+                .data(usersService.createUser(request))
+                .build();
     }
 
     // Cập nhật user
     @PutMapping("/{id}")
-    public ResponseEntity<UsersResponse> updateUser(
+    public ApiResponse<UsersResponse> updateUser(
             @PathVariable Integer id,
             @RequestBody @Valid UsersRequest request) {
-        return ResponseEntity.ok(usersService.updateUser(id, request));
+        return ApiResponse.<UsersResponse>builder()
+                .message("Da update user co id: "+id)
+                .data(usersService.updateUser(id, request))
+                .build();
     }
 
     // Xóa user
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ApiResponse<Void> deleteUser(@PathVariable Integer id) {
         usersService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.<Void>builder()
+                .message("Da xoa user")
+                .build();
     }
 }
