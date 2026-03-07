@@ -21,8 +21,8 @@ public class Users {
     @Column(name = "MaNguoiDung", nullable = false)
     private Integer id;
 
-    @Size(max = 10)
-    @Column(name = "Ho", length = 10)
+    @Size(max = 50)
+    @Column(name = "Ho", length = 50)
     private String ho;
 
     @Size(max = 10)
@@ -64,8 +64,8 @@ public class Users {
     @Column(name = "SoDienThoai", length = 10)
     private String soDienThoai;
 
-    @Size(max = 30)
-    @Column(name = "MatKhau", length = 30)
+    @Size(max = 255)
+    @Column(name = "MatKhau", length = 255)
     private String matKhau;
 
     @Column(name = "NgayTao")
