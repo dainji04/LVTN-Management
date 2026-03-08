@@ -1,85 +1,318 @@
 name: Deploy Spring Boot to cPanel
 
-# Tự động chạy khi push code lên nhánh main
 on:
   push:
     branches:
       - main
+      - master  # Nếu bạn dùng nhánh master
+    paths:
+      - 'server/**'
+      - '.github/workflows/deploy-server.yml'
+  workflow_dispatch:  # Cho phép chạy thủ công
+
+env:
+  JAVA_VERSION: '21'
+  SERVER_DIR: './server'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-    # 1. Lấy mã nguồn về
-    - name: Checkout Code
+    # ==========================================
+    # 1. CHECKOUT CODE
+    # ==========================================
+    - name: 📥 Checkout Code
       uses: actions/checkout@v4
 
-    # 2. Cài đặt Java
-    - name: Setup Java
+    # ==========================================
+    # 2. SETUP JAVA ENVIRONMENT
+    # ==========================================
+    - name: ☕ Setup Java ${{ env.JAVA_VERSION }}
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
+        cache: 'maven'
 
-    # 3. Build Spring Boot thành file JAR
-    - name: Build with Maven
+    # ==========================================
+    # 3. VALIDATE POM.XML
+    # ==========================================
+    - name: 🔍 Validate Maven Project
+      working-directory: ${{ env.SERVER_DIR }}
       run: |
-        cd server
-        mvn clean package -DskipTests
+        if [ ! -f "pom.xml" ]; then
+          echo "❌ pom.xml not found in ${{ env.SERVER_DIR }}"
+          exit 1
+        fi
+        echo "✅ pom.xml found"
+        mvn validate
 
-    # 4. Tạo thư mục trên cPanel server (nếu chưa có)
-    - name: Create app directory on cPanel
+    # ==========================================
+    # 4. BUILD SPRING BOOT APPLICATION
+    # ==========================================
+    - name: 🔨 Build Spring Boot with Maven
+      working-directory: ${{ env.SERVER_DIR }}
+      run: |
+        echo "=========================================="
+        echo "Building Spring Boot Application..."
+        echo "=========================================="
+        mvn clean package -DskipTests -B
+        
+        echo ""
+        echo "✅ Build completed successfully!"
+        echo ""
+        echo "JAR files in target/:"
+        ls -lh target/*.jar
+        echo ""
+
+    # ==========================================
+    # 5. GET JAR FILE INFO
+    # ==========================================
+    - name: 📦 Get JAR File Information
+      id: jar-info
+      working-directory: ${{ env.SERVER_DIR }}
+      run: |
+        # Tìm file JAR (loại bỏ file .original)
+        JAR_FILE=$(find target -name "*.jar" -not -name "*-original.jar" | head -1)
+        JAR_NAME=$(basename "$JAR_FILE")
+        JAR_SIZE=$(du -h "$JAR_FILE" | cut -f1)
+        
+        echo "jar_file=$JAR_FILE" >> $GITHUB_OUTPUT
+        echo "jar_name=$JAR_NAME" >> $GITHUB_OUTPUT
+        echo "jar_size=$JAR_SIZE" >> $GITHUB_OUTPUT
+        
+        echo "=========================================="
+        echo "JAR Information:"
+        echo "File: $JAR_NAME"
+        echo "Size: $JAR_SIZE"
+        echo "Path: $JAR_FILE"
+        echo "=========================================="
+
+    # ==========================================
+    # 6. CREATE REMOTE DIRECTORY
+    # ==========================================
+    - name: 📁 Create App Directory on cPanel
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.CPANEL_HOST }}
         username: ${{ secrets.CPANEL_USERNAME }}
         password: ${{ secrets.CPANEL_PASSWORD }}
-        port: ${{ secrets.CPANEL_SSH_PORT }}
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
         script: |
-          mkdir -p ~/app
-          mkdir -p ~/app/logs
+          APP_DIR="${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
+          echo "Creating directory structure..."
+          mkdir -p $APP_DIR
+          mkdir -p $APP_DIR/logs
+          mkdir -p $APP_DIR/backups
+          echo "✅ Directories created:"
+          echo "  - $APP_DIR"
+          echo "  - $APP_DIR/logs"
+          echo "  - $APP_DIR/backups"
 
-    # 5. Upload file JAR lên cPanel qua SCP
-    - name: Deploy JAR to cPanel via SCP
+    # ==========================================
+    # 7. DEPLOY JAR TO CPANEL VIA SCP
+    # ==========================================
+    - name: 🚀 Deploy JAR to cPanel via SCP
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.CPANEL_HOST }}
         username: ${{ secrets.CPANEL_USERNAME }}
         password: ${{ secrets.CPANEL_PASSWORD }}
-        port: ${{ secrets.CPANEL_SSH_PORT }}
-        source: "server/target/*.jar"
-        target: "~/app/"
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+        source: "${{ env.SERVER_DIR }}/target/*.jar"
+        target: "${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
         strip_components: 2
         overwrite: true
+        rm: false
 
-    # 6. Restart ứng dụng Spring Boot trên cPanel
-    - name: Restart Spring Boot Application
+    # ==========================================
+    # 8. VERIFY UPLOAD
+    # ==========================================
+    - name: ✅ Verify JAR Upload
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.CPANEL_HOST }}
+        username: ${{ secrets.CPANEL_USERNAME }}
+        password: ${{ secrets.CPANEL_PASSWORD }}
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+        script: |
+          APP_DIR="${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
+          cd $APP_DIR
+          
+          echo "Files in $APP_DIR:"
+          ls -lh *.jar 2>/dev/null || {
+            echo "❌ ERROR: No JAR files found in $APP_DIR"
+            exit 1
+          }
+          echo "✅ JAR file uploaded successfully"
+
+    # ==========================================
+    # 9. BACKUP OLD VERSION & RESTART APP
+    # ==========================================
+    - name: 🔄 Restart Spring Boot Application
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FPT_PASSWORD }}
-        port: ${{ secrets.SSH_PORT }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
         script: |
-          # Dừng ứng dụng cũ (nếu đang chạy)
-          pkill -f "group-10-0.0.1-SNAPSHOT.jar" || true
-          sleep 5
+          APP_DIR="${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
+          APP_PORT="${{ secrets.APP_PORT || 8080 }}"
+          SPRING_PROFILE="${{ secrets.SPRING_PROFILE || 'prod' }}"
           
-          # Tìm file JAR mới nhất
-          JAR_FILE=$(ls -t ~/app/*.jar | head -1)
+          cd $APP_DIR
           
-          # Chạy ứng dụng mới
-          nohup java -jar $JAR_FILE \
-            --spring.profiles.active=prod \
-            --server.port=8080 \
-            > ~/app/logs/app.log 2>&1 &
+          echo "=========================================="
+          echo "🔄 Starting Deployment Process"
+          echo "=========================================="
+          echo "App Directory: $APP_DIR"
+          echo "Spring Profile: $SPRING_PROFILE"
+          echo "Server Port: $APP_PORT"
+          echo ""
           
-          # Kiểm tra ứng dụng đã chạy chưa
-          sleep 3
-          if pgrep -f ".jar" > /dev/null; then
-            echo "✅ Application started successfully!"
-          else
-            echo "❌ Application failed to start. Check logs at ~/app/logs/app.log"
+          # Tìm JAR file mới nhất
+          JAR_FILE=$(ls -t *.jar 2>/dev/null | grep -v "backup" | head -1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "❌ ERROR: No JAR file found"
             exit 1
           fi
+          echo "📦 JAR File: $JAR_FILE"
+          echo ""
+          
+          # Backup old JAR if exists
+          if [ -f "current.jar" ] && [ "current.jar" != "$JAR_FILE" ]; then
+            BACKUP_NAME="backups/backup_$(date +%Y%m%d_%H%M%S).jar"
+            echo "💾 Backing up current version..."
+            cp current.jar "$BACKUP_NAME"
+            echo "✅ Backup saved: $BACKUP_NAME"
+            
+            # Keep only last 5 backups
+            ls -t backups/*.jar 2>/dev/null | tail -n +6 | xargs rm -f || true
+          fi
+          
+          # Create symlink to current version
+          ln -sf "$JAR_FILE" current.jar
+          echo "🔗 Symlink created: current.jar -> $JAR_FILE"
+          echo ""
+          
+          # Stop old process
+          echo "🛑 Stopping old application..."
+          OLD_PID=$(ps aux | grep -E "java.*\.jar" | grep -v grep | awk '{print $2}' | head -1)
+          
+          if [ ! -z "$OLD_PID" ]; then
+            echo "Found running process (PID: $OLD_PID)"
+            kill -15 $OLD_PID || true
+            
+            # Wait up to 30 seconds for graceful shutdown
+            for i in {1..30}; do
+              if ! ps -p $OLD_PID > /dev/null 2>&1; then
+                echo "✅ Process stopped gracefully"
+                break
+              fi
+              echo "Waiting for shutdown... ($i/30)"
+              sleep 1
+            done
+            
+            # Force kill if still running
+            if ps -p $OLD_PID > /dev/null 2>&1; then
+              echo "⚠️  Force killing process $OLD_PID"
+              kill -9 $OLD_PID || true
+              sleep 2
+            fi
+          else
+            echo "No running process found"
+          fi
+          echo ""
+          
+          # Start new application
+          echo "🚀 Starting new application..."
+          
+          # Java options
+          JAVA_OPTS="-Xms512m -Xmx1024m"
+          JAVA_OPTS="$JAVA_OPTS -Dspring.profiles.active=$SPRING_PROFILE"
+          JAVA_OPTS="$JAVA_OPTS -Dserver.port=$APP_PORT"
+          
+          # Additional options from secrets (if provided)
+          if [ ! -z "${{ secrets.JAVA_OPTS }}" ]; then
+            JAVA_OPTS="$JAVA_OPTS ${{ secrets.JAVA_OPTS }}"
+          fi
+          
+          nohup java $JAVA_OPTS -jar current.jar \
+            > logs/app.log 2>&1 &
+          
+          NEW_PID=$!
+          echo $NEW_PID > app.pid
+          echo "Process started with PID: $NEW_PID"
+          echo ""
+          
+          # Wait for application to start
+          echo "⏳ Waiting for application to start..."
+          sleep 8
+          
+          # Verify process is running
+          if ps -p $NEW_PID > /dev/null 2>&1; then
+            echo ""
+            echo "=========================================="
+            echo "✅ DEPLOYMENT SUCCESSFUL!"
+            echo "=========================================="
+            echo "PID: $NEW_PID"
+            echo "JAR: $JAR_FILE"
+            echo "Profile: $SPRING_PROFILE"
+            echo "Port: $APP_PORT"
+            echo "Log: $APP_DIR/logs/app.log"
+            echo "=========================================="
+            echo ""
+            echo "📋 Last 20 lines of log:"
+            tail -n 20 logs/app.log || true
+          else
+            echo ""
+            echo "=========================================="
+            echo "❌ DEPLOYMENT FAILED!"
+            echo "=========================================="
+            echo "Application failed to start"
+            echo ""
+            echo "📋 Last 50 lines of log:"
+            tail -n 50 logs/app.log || true
+            exit 1
+          fi
+
+    # ==========================================
+    # 10. HEALTH CHECK (Optional)
+    # ==========================================
+    - name: 🏥 Health Check
+      if: success()
+      run: |
+        echo "=========================================="
+        echo "Deployment Summary"
+        echo "=========================================="
+        echo "✅ Build: Success"
+        echo "✅ Upload: Success"
+        echo "✅ Deploy: Success"
+        echo "📦 JAR: ${{ steps.jar-info.outputs.jar_name }}"
+        echo "💾 Size: ${{ steps.jar-info.outputs.jar_size }}"
+        echo "🕐 Time: $(date)"
+        echo "=========================================="
+        echo ""
+        echo "🔗 Next steps:"
+        echo "1. Verify application at: http://YOUR_DOMAIN:${{ secrets.APP_PORT || 8080 }}"
+        echo "2. Check logs: ssh to server and run: tail -f ~/lvtn-app/logs/app.log"
+        echo "3. Check process: ssh to server and run: ps aux | grep java"
+        echo ""
+
+    # ==========================================
+    # 11. NOTIFY ON FAILURE
+    # ==========================================
+    - name: 🚨 Notify Failure
+      if: failure()
+      run: |
+        echo "=========================================="
+        echo "❌ DEPLOYMENT FAILED"
+        echo "=========================================="
+        echo "Please check the logs above for details"
+        echo "=========================================="
