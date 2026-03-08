@@ -95,9 +95,9 @@ jobs:
     - name: 📁 Create App Directory on cPanel
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.CPANEL_HOST }}
-        username: ${{ secrets.CPANEL_USERNAME }}
-        password: ${{ secrets.CPANEL_PASSWORD }}
+        host: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
         port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
         script: |
@@ -117,9 +117,9 @@ jobs:
     - name: 🚀 Deploy JAR to cPanel via SCP
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.CPANEL_HOST }}
-        username: ${{ secrets.CPANEL_USERNAME }}
-        password: ${{ secrets.CPANEL_PASSWORD }}
+        host: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
         port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
         source: "${{ env.SERVER_DIR }}/target/*.jar"
@@ -134,9 +134,9 @@ jobs:
     - name: ✅ Verify JAR Upload
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.CPANEL_HOST }}
-        username: ${{ secrets.CPANEL_USERNAME }}
-        password: ${{ secrets.CPANEL_PASSWORD }}
+        host: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
         port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
         script: |
