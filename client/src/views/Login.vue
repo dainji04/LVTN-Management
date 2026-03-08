@@ -1,13 +1,13 @@
 <template>
     <div class="login-container w-full px-[100px] py-[20px]">
-        <div class="login-card flex flex-col justify-center h-[90%] grid grid-cols-[3fr_2fr]">
-            <div class="left h-full bg-[#FFF0F4] flex justify-space-between items-center gap-4 px-8">
+        <div class="login-card h-screen grid grid-cols-[3fr_2fr]">
+            <div class="left h-screen bg-[#FFF0F4] flex justify-space-between items-center gap-4 px-8">
                 <h1 class="text-4xl font-bold leading-normal">
                     {{ $t('welcomeToOurSocialApp') }}
                 </h1>
                 <img class="h-[90%] object-cover" src="../assets/thumbnail-login.png" />
             </div>
-            <div class="right flex flex-col justify-center px-20">
+            <div class="right h-screen flex flex-col justify-center px-20">
 
                 <h1 class="text-2xl font-bold text-center mb-4">
                     {{ $t('welcomeBack') }}
@@ -39,7 +39,7 @@
 
                 <!-- register -->
                 <Button :classes="'w-full round py-2 px-4 mt-12'" :border="true" :type="'secondary'">
-                    <span>{{ $t('createNewAccount') }}</span>
+                    <router-link to="/register">{{ $t('createNewAccount') }}</router-link>
                 </Button>
             </div>
         </div>
