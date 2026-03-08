@@ -29,6 +29,19 @@ jobs:
         cd server
         mvn clean package -DskipTests
 
+
+    # 3.1 Tạo thư mục trên server để chứa file JAR (nếu chưa có)
+    - name: Create app directory on Server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          mkdir -p ~/app
+
+
     # 4. Đẩy file JAR lên server qua FTP/SFTP
     - name: Deploy JAR to Server
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -54,15 +67,9 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}
         port: ${{ secrets.SSH_PORT }}
         script: |
-          # Dừng process cũ nếu đang chạy
-          pkill -f "your-app-name.jar" || true
-
-          # Đợi 3 giây cho process dừng hẳn
+          pkill -f "group-10-0.0.1-SNAPSHOT.jar" || true
           sleep 3
-
-          # Chạy lại với file JAR mới (thay your-app-name bằng tên file JAR thực tế)
-          nohup java -jar ~/app/your-app-name.jar \
+          nohup java -jar ~/app/group-10-0.0.1-SNAPSHOT.jar \
             --spring.profiles.active=prod \
             > ~/app/app.log 2>&1 &
-
           echo "App restarted successfully!"
