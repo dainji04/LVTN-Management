@@ -49,9 +49,9 @@
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { helperApi } from '../helpers/apiHelper';
+// import { helperApi } from '../helpers/apiHelper';
 import { notificationHelper } from '../helpers/notificationHelper';
-import { authHelper } from '../helpers/authHelper';
+// import { authHelper } from '../helpers/authHelper';
 import Button from '../components/button.vue';
 
 import { useI18n } from 'vue-i18n';
@@ -148,13 +148,13 @@ const submitForm = async() => {
     }
 }
 
-const togglePasswordVisibility = () => {
-    if (typePassword.value === 'password') {
-        typePassword.value = 'text';
-    } else {
-        typePassword.value = 'password';
-    }
-}
+// const togglePasswordVisibility = () => {
+//     if (typePassword.value === 'password') {
+//         typePassword.value = 'text';
+//     } else {
+//         typePassword.value = 'password';
+//     }
+// }
 
 </script>
 
