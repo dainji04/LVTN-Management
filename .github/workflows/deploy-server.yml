@@ -29,6 +29,19 @@ jobs:
         cd server
         mvn clean package -DskipTests
 
+
+    # 3.1 Tạo thư mục trên server để chứa file JAR (nếu chưa có)
+    - name: Create app directory on Server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          mkdir -p ~/app
+
+
     # 4. Đẩy file JAR lên server qua FTP/SFTP
     - name: Deploy JAR to Server
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
