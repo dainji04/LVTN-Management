@@ -26,6 +26,7 @@ jobs:
     # (Lưu ý: Thay đổi đường dẫn cd vào thư mục backend của bạn nếu cần, ví dụ: cd server)
     - name: Build with Maven
       run: |
+        cd server
         mvn clean package -DskipTests
 
     # 4. Đẩy file JAR lên server qua FTP/SFTP
@@ -36,7 +37,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         # Đường dẫn tới file JAR vừa build xong
-        local-dir: ./target/
+        local-dir: ./server/target/
         # Chỉ đẩy file .jar, bỏ qua các file khác trong target/
         exclude: |
           **/
