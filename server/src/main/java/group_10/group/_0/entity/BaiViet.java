@@ -17,7 +17,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "BaiViet", indexes = {
-        @Index(name = "idx_BaiViet_User", columnList = "MaNguoiDung")
+        @Index(name = "idx_BaiViet_User", columnList = "maNguoiDung")
 })
 public class BaiViet {
     @Id

@@ -27,12 +27,10 @@ public class UsersService {
     UsersMapper mapper;
 
     public List<UsersResponse> getAllUsers() {
-        List<Users> taikhoans = repository.findAll();
-        List<UsersResponse> responses = new ArrayList<>();
-        for (Users tk : taikhoans) {
-            responses.add(mapper.toTaikhoanResponse(tk));
-        }
-        return responses;
+        return repository.findAll()
+                .stream()
+                .map(mapper::toTaikhoanResponse)
+                .toList();
     }
 
     public UsersResponse getUserById(Integer id) {
@@ -75,7 +73,7 @@ public class UsersService {
     // Map Entity -> Response DTO
     private UsersResponse toResponse(Users user) {
         return UsersResponse.builder()
-                .maNguoiDung(user.getId())
+                .maNguoiDung(user.getMaNguoiDung())
                 .ho(user.getHo())
                 .ten(user.getTen())
                 .email(user.getEmail())

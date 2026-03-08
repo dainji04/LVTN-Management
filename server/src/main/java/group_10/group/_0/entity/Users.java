@@ -19,7 +19,8 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaNguoiDung", nullable = false)
-    private Integer id;
+    private Integer maNguoiDung;
+
 
     @Size(max = 50)
     @Column(name = "Ho", length = 50)
