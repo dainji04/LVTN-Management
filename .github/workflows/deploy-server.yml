@@ -67,15 +67,9 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}
         port: ${{ secrets.SSH_PORT }}
         script: |
-          # Dừng process cũ nếu đang chạy
-          pkill -f "your-app-name.jar" || true
-
-          # Đợi 3 giây cho process dừng hẳn
+          pkill -f "group-10-0.0.1-SNAPSHOT.jar" || true
           sleep 3
-
-          # Chạy lại với file JAR mới (thay your-app-name bằng tên file JAR thực tế)
-          nohup java -jar ~/app/your-app-name.jar \
+          nohup java -jar ~/app/group-10-0.0.1-SNAPSHOT.jar \
             --spring.profiles.active=prod \
             > ~/app/app.log 2>&1 &
-
           echo "App restarted successfully!"
