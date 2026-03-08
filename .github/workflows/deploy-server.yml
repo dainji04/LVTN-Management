@@ -99,7 +99,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
-        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+        port: ${{ secrets.SSH_PORT || 22 }}
         script: |
           APP_DIR="${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
           echo "Creating directory structure..."
@@ -121,7 +121,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
-        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+        port: ${{ secrets.SSH_PORT || 22 }}
         source: "${{ env.SERVER_DIR }}/target/*.jar"
         target: "${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
         strip_components: 2
@@ -138,7 +138,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
-        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+        port: ${{ secrets.SSH_PORT || 22 }}
         script: |
           APP_DIR="${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
           cd $APP_DIR
@@ -160,7 +160,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
-        port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+        port: ${{ secrets.SSH_PORT || 22 }}
         script: |
           APP_DIR="${{ secrets.CPANEL_APP_DIR || '~/lvtn-app' }}"
           APP_PORT="${{ secrets.APP_PORT || 8080 }}"
