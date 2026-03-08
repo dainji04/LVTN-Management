@@ -9,6 +9,8 @@ import group_10.group._0.dto.response.ApiResponse;
 import group_10.group._0.dto.response.AuthenticationResponse;
 import group_10.group._0.dto.response.IntrospectResponse;
 import group_10.group._0.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,12 +26,14 @@ import java.text.ParseException;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Authentication", description = "API xác thực người dùng (đăng nhập, token, logout)")
 public class AuthenticationController {
     @Autowired
     AuthenticationService service;
 
     //login
     @PostMapping("/token")
+    @Operation(summary = "Đăng nhập", description = "Xác thực tài khoản và trả về JWT token")
     ApiResponse<AuthenticationResponse> taoToken(@RequestBody AuthenticationRequest request) {
         var result = service.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
@@ -37,8 +41,9 @@ public class AuthenticationController {
                 .build();
     }
 
-//    Kiểm tra token
+    //    Kiểm tra token
     @PostMapping("/introspect")
+    @Operation(summary = "Kiểm tra token", description = "Kiểm tra JWT token có hợp lệ hay không")
     ApiResponse<IntrospectResponse> kiemTraToken(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
         var result = service.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
@@ -47,6 +52,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Đăng xuất", description = "Hủy JWT token hiện tại, thêm vào danh sách token không hợp lệ")
     ApiResponse<Void> logout(@RequestBody LogoutRequest request)
             throws ParseException, JOSEException {
         service.logout(request);
@@ -56,6 +62,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Làm mới token", description = "Dùng refresh token để lấy JWT token mới")
     ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest request)
             throws ParseException, JOSEException {
         var result = service.refreshToken(request);
