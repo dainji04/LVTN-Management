@@ -21,7 +21,9 @@ import java.time.Instant;
 public class HinhAnh {
     @Id
     @Column(name = "MaHinhAnh", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // thêm dòng này
+    private Integer maHinhAnh;
+
 
     @NotNull
     @Column(name = "MaDoiTuong", nullable = false)

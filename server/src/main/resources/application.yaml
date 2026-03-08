@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /SocialMedia
 
+
 spring:
   datasource:
     url: "jdbc:mysql://26.90.29.70:3306/SocialMedia?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
