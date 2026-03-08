@@ -181,7 +181,6 @@
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
-import Button from '../components/button.vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();

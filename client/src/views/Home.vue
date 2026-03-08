@@ -198,9 +198,7 @@ import SidebarNavItem from '../components/SidebarNavItem.vue';
 import Story from '../components/Story.vue';
 import Post from '../components/Post.vue';
 import SuggestionItem from '../components/SuggestionItem.vue';
-import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
 </script>
 
 <style scoped>

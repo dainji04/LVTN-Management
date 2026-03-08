@@ -23,7 +23,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import Button from './button.vue';
 
 const props = defineProps<{
     username: string;

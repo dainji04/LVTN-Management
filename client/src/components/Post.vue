@@ -68,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { MoreOutlined } from '@ant-design/icons-vue';
 import PostActions from './PostActions.vue';
 

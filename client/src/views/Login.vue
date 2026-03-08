@@ -52,7 +52,6 @@ import { useRouter } from 'vue-router';
 // import { helperApi } from '../helpers/apiHelper';
 import { notificationHelper } from '../helpers/notificationHelper';
 // import { authHelper } from '../helpers/authHelper';
-import Button from '../components/button.vue';
 
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
@@ -62,7 +61,7 @@ const router = useRouter();
 const emailError = ref('');
 const passwordError = ref('');
 
-const typePassword = ref('password');
+// const typePassword = ref('password');
 
 const emailTouched = ref(false);
 const passwordTouched = ref(false);
