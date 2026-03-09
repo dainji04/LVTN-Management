@@ -15,7 +15,7 @@ spring:
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?ssl-mode=REQUIRED"
     username: avnadmin
-    password: AVNS__cZFTBZi9dYoz1fRlYX
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
