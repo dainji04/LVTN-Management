@@ -226,11 +226,11 @@ const fetchUserDetail = async () => {
             user.value = response.data.data;
         } else {
             error.value = response.data.message || 'Không thể tải thông tin người dùng';
-            notificationHelper('error', error.value);
+            notificationHelper('error', error.value || 'Không thể tải thông tin người dùng');
         }
     } catch (err: any) {
         error.value = err.response?.data?.message || err.message || 'Đã xảy ra lỗi khi tải thông tin người dùng';
-        notificationHelper('error', error.value);
+        notificationHelper('error', error.value || 'Đã xảy ra lỗi khi tải thông tin người dùng');
         console.error('Error fetching user detail:', err);
     } finally {
         isLoading.value = false;
@@ -257,7 +257,7 @@ const formatDate = (dateString: string | null): string => {
     });
 };
 
-const formatDateTime = (dateString: string): string => {
+const formatDateTime = (dateString: string | null | undefined): string => {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleString('vi-VN', {

@@ -309,18 +309,18 @@ const fetchUser = async () => {
             formData.matKhau = ''; // Don't populate password
         } else {
             error.value = response.data.message || 'Không thể tải thông tin người dùng';
-            notificationHelper('error', error.value);
+            notificationHelper('error', error.value || 'Không thể tải thông tin người dùng');
         }
     } catch (err: any) {
         error.value = err.response?.data?.message || err.message || 'Đã xảy ra lỗi khi tải thông tin người dùng';
-        notificationHelper('error', error.value);
+        notificationHelper('error', error.value || 'Đã xảy ra lỗi khi tải thông tin người dùng');
         console.error('Error fetching user:', err);
     } finally {
         isLoading.value = false;
     }
 };
 
-const formatDateForInput = (dateString: string): string => {
+const formatDateForInput = (dateString: string | null | undefined): string => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -341,19 +341,36 @@ const submitForm = async () => {
     isSubmitting.value = true;
     
     try {
-        // Prepare payload - remove empty strings and convert to null
-        const payload: any = {
+        // Prepare payload - convert empty strings to null
+        const toNullIfEmpty = (value: string): string | null => {
+            return value.trim() === '' ? null : value;
+        };
+        
+        const payload: {
+            ho: string;
+            ten: string;
+            email: string;
+            matKhau?: string;
+            bietDanh: string | null;
+            anhDaiDien: string | null;
+            anhNen: string | null;
+            ngaySinh: string | null;
+            gioiThieu: string | null;
+            noiLamViec: string | null;
+            noiHocTap: string | null;
+            soDienThoai: string | null;
+        } = {
             ho: formData.ho,
             ten: formData.ten,
             email: formData.email,
-            bietDanh: formData.bietDanh || null,
-            anhDaiDien: formData.anhDaiDien || null,
-            anhNen: formData.anhNen || null,
+            bietDanh: toNullIfEmpty(formData.bietDanh),
+            anhDaiDien: toNullIfEmpty(formData.anhDaiDien),
+            anhNen: toNullIfEmpty(formData.anhNen),
             ngaySinh: formData.ngaySinh ? new Date(formData.ngaySinh).toISOString() : null,
-            gioiThieu: formData.gioiThieu || null,
-            noiLamViec: formData.noiLamViec || null,
-            noiHocTap: formData.noiHocTap || null,
-            soDienThoai: formData.soDienThoai || null,
+            gioiThieu: toNullIfEmpty(formData.gioiThieu),
+            noiLamViec: toNullIfEmpty(formData.noiLamViec),
+            noiHocTap: toNullIfEmpty(formData.noiHocTap),
+            soDienThoai: toNullIfEmpty(formData.soDienThoai),
         };
 
         // Only include password if it's not empty
@@ -392,4 +409,5 @@ onMounted(() => {
     font-family: system-ui, -apple-system, sans-serif;
 }
 </style>
+
 
