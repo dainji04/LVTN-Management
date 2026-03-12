@@ -12,7 +12,7 @@ interface options {
 }
 
 // Get API URL from environment variable or use default
-let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/SocialMedia';
 
 // Ensure the URL has a protocol
 if (!apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
@@ -56,6 +56,13 @@ axiosInstance.interceptors.response.use(
     }
 );
 
+// Export axios instance for direct use
+export { axiosInstance };
+
+// Export default axios instance
+export default axiosInstance;
+
+// Helper function for API calls
 export const helperApi = async (collection: string, options: options = {}) => {
     const { method = 'GET', body, headers = {}, params, withCredentials = false } = options;
 
