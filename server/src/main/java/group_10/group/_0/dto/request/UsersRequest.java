@@ -26,7 +26,6 @@ public class UsersRequest {
     @NotBlank(message = "Email không được để trống")
     String email;
 
-    @NotBlank(message = "Mat khau không được để trống")
     @Size(min = 6, message = "Mat khau tối thiểu 6 ký tự")
     String matKhau;
 

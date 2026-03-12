@@ -57,9 +57,15 @@ public class UsersService {
         Users user = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
 
-        mapper.updateTaikhoan(user, request); // mapper update trực tiếp vào entity
-        user.setNgayCapNhat(Instant.now());
+        mapper.updateTaikhoan(user, request);
 
+        // Chỉ update mật khẩu nếu có giá trị
+        if (request.getMatKhau() != null && !request.getMatKhau().isBlank()) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            user.setMatKhau(passwordEncoder.encode(request.getMatKhau()));
+        }
+
+        user.setNgayCapNhat(Instant.now());
         return mapper.toTaikhoanResponse(repository.save(user));
     }
 
