@@ -98,6 +98,7 @@ public class AuthenticationService {
                         Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 tieng
                 .jwtID(UUID.randomUUID().toString())
 //                .claim("role", buildScope(taikhoan))
+                .claim("id", taikhoan.getMaNguoiDung())
                 .build();
 
 
