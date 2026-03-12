@@ -31,6 +31,21 @@ const routes = [
         name: 'Privacy', 
         component: () => import('./views/Privacy.vue')
     },
+    { 
+        path: '/users', 
+        name: 'Users', 
+        component: () => import('./views/Users.vue')
+    },
+    { 
+        path: '/users/:id', 
+        name: 'UserDetail', 
+        component: () => import('./views/UserDetail.vue')
+    },
+    { 
+        path: '/users/:id/edit', 
+        name: 'UserEdit', 
+        component: () => import('./views/UserEdit.vue')
+    },
     {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
