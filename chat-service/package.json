@@ -2,16 +2,16 @@
   "name": "chat-service",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "v1/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "test-socket": "nodemon src/test-socket.js"
+    "v1": "nodemon v1/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
