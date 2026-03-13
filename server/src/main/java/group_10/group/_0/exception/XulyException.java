@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 @Slf4j
 public class XulyException {
@@ -55,16 +57,34 @@ public class XulyException {
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse> xulyValidation (MethodArgumentNotValidException exception){
-        String enumKey = exception.getFieldError().getDefaultMessage();
-        ErrorCode errorCode=ErrorCode.valueOf(enumKey);
+    ResponseEntity<ApiResponse> xulyValidation(MethodArgumentNotValidException exception) {
 
-        return ResponseEntity.status(errorCode.getStatus()).body(
-                ApiResponse.builder()
-                        .code(errorCode.getCode())
-                        .message(errorCode.getMessage())
-                        .build()
-        );
+        // Thử parse ErrorCode trước, nếu không có thì lấy message gốc
+        String enumKey = exception.getFieldError().getDefaultMessage();
+
+        try {
+            ErrorCode errorCode = ErrorCode.valueOf(enumKey);
+            return ResponseEntity.status(errorCode.getStatus()).body(
+                    ApiResponse.builder()
+                            .code(errorCode.getCode())
+                            .message(errorCode.getMessage())
+                            .build()
+            );
+        } catch (IllegalArgumentException e) {
+            // Không tìm thấy ErrorCode → trả message gốc
+            String message = exception.getBindingResult()
+                    .getFieldErrors()
+                    .stream()
+                    .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .code(400)
+                            .message(message)
+                            .build()
+            );
+        }
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

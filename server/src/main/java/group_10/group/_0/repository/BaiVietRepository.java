@@ -1,0 +1,15 @@
+package group_10.group._0.repository;
+
+import group_10.group._0.entity.BaiViet;
+import group_10.group._0.entity.Users;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface BaiVietRepository extends JpaRepository<BaiViet, Integer> {
+    // Lấy tất cả bài viết của 1 user
+    List<BaiViet> findByMaNguoiDung_MaNguoiDung(Integer maNguoiDung);
+}
