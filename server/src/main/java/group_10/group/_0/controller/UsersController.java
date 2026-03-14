@@ -1,8 +1,13 @@
 package group_10.group._0.controller;
 
+import com.nimbusds.jose.JOSEException;
+import group_10.group._0.dto.request.AuthenticationRequest;
+import group_10.group._0.dto.request.LogoutRequest;
 import group_10.group._0.dto.request.UsersRequest;
 import group_10.group._0.dto.response.ApiResponse;
+import group_10.group._0.dto.response.AuthenticationResponse;
 import group_10.group._0.dto.response.UsersResponse;
+import group_10.group._0.service.AuthenticationService;
 import group_10.group._0.service.UsersService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -21,6 +27,28 @@ import java.util.List;
 public class UsersController {
 
     final UsersService usersService;
+    final AuthenticationService authService;
+
+    //login
+    @PostMapping("/login")
+    @Operation(summary = "Đăng nhập", description = "Đăng nhập (Xác thực tài khoản và trả về JWT token)")
+    ApiResponse<AuthenticationResponse> taoToken(@RequestBody AuthenticationRequest request) {
+        var result = authService.authenticate(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .data(result)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Đăng xuất", description = "Đăng xuất (Hủy JWT token hiện tại, thêm vào danh sách token không hợp lệ)")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authService.logout(request);
+        return ApiResponse.<Void>builder()
+                .message("Da logout")
+                .build();
+    }
+
 
     // Lấy tất cả users
     @GetMapping
@@ -31,6 +59,9 @@ public class UsersController {
                 .data(usersService.getAllUsers())
                 .build();
     }
+
+
+
 
     // Lấy user theo ID
     @GetMapping("/{id}")

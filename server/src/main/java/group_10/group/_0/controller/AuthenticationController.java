@@ -31,15 +31,7 @@ public class AuthenticationController {
     @Autowired
     AuthenticationService service;
 
-    //login
-    @PostMapping("/token")
-    @Operation(summary = "Đăng nhập", description = "Xác thực tài khoản và trả về JWT token")
-    ApiResponse<AuthenticationResponse> taoToken(@RequestBody AuthenticationRequest request) {
-        var result = service.authenticate(request);
-        return ApiResponse.<AuthenticationResponse>builder()
-                .data(result)
-                .build();
-    }
+
 
     //    Kiểm tra token
     @PostMapping("/introspect")
