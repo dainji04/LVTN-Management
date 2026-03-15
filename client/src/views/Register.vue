@@ -107,15 +107,33 @@
                 <!-- Mobile or Email -->
                 <div class="form-group">
                     <label class="block text-sm font-medium text-black mb-2">
-                        {{ $t('mobileOrEmail') }}<span class="text-primary">*</span>
+                        {{ $t('email') }}<span class="text-primary">*</span>
                     </label>
                     <div class="form-group-inner">
                         <input
                             class="input-field"
                             type="text"
-                            :placeholder="$t('mobileOrEmailPlaceholder')"
-                            v-model="formData.mobileOrEmail"
-                            @input="mobileOrEmailTouched = true"
+                            :placeholder="$t('emailPlaceholder')"
+                            v-model="formData.email"
+                            @input="emailTouched = true"
+                        />
+                    </div>
+                    <p class="text-xs text-gray-600 mt-2">
+                        {{ $t('notificationInfo') }}
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-black mb-2">
+                        {{ $t('phoneNumber') }}
+                    </label>
+                    <div class="form-group-inner">
+                        <input
+                            class="input-field"
+                            type="text"
+                            :placeholder="$t('phoneNumberPlaceholder')"
+                            v-model="formData.phoneNumber"
+                            @input="phoneNumberTouched = true"
                         />
                     </div>
                     <p class="text-xs text-gray-600 mt-2">
@@ -182,6 +200,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
 import { useI18n } from 'vue-i18n';
+import type { RegisterForm } from '../types/registerUser';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -189,14 +208,15 @@ const router = useRouter();
 const isLoading = ref(false);
 
 // Form data
-const formData = reactive({
+const formData: RegisterForm = reactive({
     lastName: '',
     firstName: '',
     day: '',
     month: '',
     year: '',
     gender: '',
-    mobileOrEmail: '',
+    email: '',
+    phoneNumber: '',
     password: '',
 });
 
@@ -207,7 +227,8 @@ const dayTouched = ref(false);
 const monthTouched = ref(false);
 const yearTouched = ref(false);
 const genderTouched = ref(false);
-const mobileOrEmailTouched = ref(false);
+const emailTouched = ref(false);
+const phoneNumberTouched = ref(false);
 const passwordTouched = ref(false);
 
 // Generate years for dropdown (1900 to current year)
@@ -229,23 +250,32 @@ const firstNameError = computed<string>(() => {
 
 const dateOfBirthError = computed<string>(() => {
     if (!dayTouched.value || !monthTouched.value || !yearTouched.value) return '';
-    if (!formData.day || !formData.month || !formData.year) return 'Vui lòng chọn đầy đủ ngày sinh';
+    if (!formData.day || !formData.month || !formData.year) return t('dateOfBirthRequired');
     return '';
 });
 
 const genderError = computed<string>(() => {
     if (!genderTouched.value) return '';
-    if (!formData.gender) return 'Vui lòng chọn giới tính';
+    if (!formData.gender) return t('genderRequired');
     return '';
 });
 
-const mobileOrEmailError = computed<string>(() => {
-    if (!mobileOrEmailTouched.value) return '';
-    if (!formData.mobileOrEmail.trim()) return t('emailRequired');
+const emailError = computed<string>(() => {
+    if (!emailTouched.value) return '';
+    if (!formData.email.trim()) return t('emailRequired');
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const phoneRegex = /^[0-9]{10,11}$/;
-    if (!emailRegex.test(formData.mobileOrEmail) && !phoneRegex.test(formData.mobileOrEmail)) {
+    if (!emailRegex.test(formData.email)) {
         return t('emailInvalid');
+    }
+    return '';
+});
+
+const phoneNumberError = computed<string>(() => {
+    if (!phoneNumberTouched.value) return '';
+    if (!formData.phoneNumber.trim()) return t('phoneRequired');
+    const phoneRegex = /^[0-9]{10,11}$/;
+    if (!phoneRegex.test(formData.phoneNumber)) {
+        return t('phoneInvalid');
     }
     return '';
 });
@@ -272,7 +302,8 @@ const submitForm = async () => {
     monthTouched.value = true;
     yearTouched.value = true;
     genderTouched.value = true;
-    mobileOrEmailTouched.value = true;
+    emailTouched.value = true;
+    phoneNumberTouched.value = true;
     passwordTouched.value = true;
 
     // Validate
@@ -281,7 +312,8 @@ const submitForm = async () => {
         firstNameError.value ||
         dateOfBirthError.value ||
         genderError.value ||
-        mobileOrEmailError.value ||
+        emailError.value ||
+        phoneNumberError.value ||
         passwordError.value
     ) {
         return;
