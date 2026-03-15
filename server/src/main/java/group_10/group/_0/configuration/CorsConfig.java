@@ -17,6 +17,7 @@ public class CorsConfig {
 
         config.setAllowedOrigins(List.of(
                 "https://social.dainji.id.vn",
+                "https://test-social.dainji.id.vn",
                 "http://localhost:3000",
                 "http://localhost:5173"
         ));
