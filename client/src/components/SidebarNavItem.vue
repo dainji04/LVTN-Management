@@ -21,10 +21,11 @@ const props = defineProps<{
     icon: any;
     label: string;
     badge?: number | string;
+    isActive?: boolean;
 }>();
 
 const route = useRoute();
-const isActive = computed(() => route.path === props.to);
+const isActive = computed(() => props.isActive !== undefined ? props.isActive : route.path === props.to);
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-    <div class="post bg-white rounded-lg border border-gray-200 mb-6">
+    <div class="post bg-white rounded-lg border border-gray-200 mb-6 shadow-lg">
         <!-- Post Header -->
         <div class="post-header flex items-center justify-between p-4">
             <div class="flex items-center gap-3">
