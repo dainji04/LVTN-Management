@@ -1,6 +1,7 @@
 package group_10.group._0.mapper;
 
 import group_10.group._0.dto.request.UsersRequest;
+import group_10.group._0.dto.request.UsersUpdateRequest;
 import group_10.group._0.dto.response.UsersResponse;
 import group_10.group._0.entity.Users;
 import org.mapstruct.Mapper;
@@ -14,5 +15,5 @@ public interface UsersMapper {
     UsersResponse toTaikhoanResponse(Users taikhoan);
 
     @Mapping(target = "matKhau", ignore = true)
-    void updateTaikhoan(@MappingTarget Users user, UsersRequest request);
+    void updateTaikhoan(@MappingTarget Users user, UsersUpdateRequest request);
 }

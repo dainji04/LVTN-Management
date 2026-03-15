@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import group_10.group._0.dto.request.AuthenticationRequest;
 import group_10.group._0.dto.request.LogoutRequest;
 import group_10.group._0.dto.request.UsersRequest;
+import group_10.group._0.dto.request.UsersUpdateRequest;
 import group_10.group._0.dto.response.ApiResponse;
 import group_10.group._0.dto.response.AuthenticationResponse;
 import group_10.group._0.dto.response.UsersResponse;
@@ -89,7 +90,7 @@ public class UsersController {
     @Operation(summary = "Cập nhật người dùng", description = "Cập nhật thông tin profile của người dùng")
     public ApiResponse<UsersResponse> updateUser(
             @Parameter(description = "ID của người dùng cần cập nhật") @PathVariable Integer id,
-            @RequestBody @Valid UsersRequest request) {
+            @RequestBody @Valid UsersUpdateRequest request) {
         return ApiResponse.<UsersResponse>builder()
                 .message("Da update user co id: "+id)
                 .data(usersService.updateUser(id, request))
@@ -98,7 +99,6 @@ public class UsersController {
 
     // Xóa user
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Xóa người dùng", description = "Xóa tài khoản người dùng khỏi hệ thống")
     public ApiResponse<Void> deleteUser(
             @Parameter(description = "ID của người dùng cần xóa") @PathVariable Integer id) {
