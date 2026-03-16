@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/api-docs/**",
                                 "/api-docs",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/chat/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").permitAll()
                         .anyRequest().authenticated()
