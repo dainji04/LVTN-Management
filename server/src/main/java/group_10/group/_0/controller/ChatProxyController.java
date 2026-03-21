@@ -37,10 +37,24 @@ public class ChatProxyController {
             if (authHeader != null) headers.set("Authorization", authHeader);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 //            return restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+//            ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+//            System.out.println("Response status: " + response.getStatusCode());
+//            System.out.println("Response body: " + response.getBody());
+//            return response;
+
             ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
             System.out.println("Response status: " + response.getStatusCode());
             System.out.println("Response body: " + response.getBody());
-            return response;
+
+            // Thêm Content-Type vào response
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            return ResponseEntity
+                    .status(response.getStatusCode())
+                    .headers(responseHeaders)
+                    .body(response.getBody());
+
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             System.out.println("HTTP Error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -63,7 +77,10 @@ public class ChatProxyController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             if (authHeader != null) headers.set("Authorization", authHeader);
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            return restTemplate.exchange(nodejsUrl + path, HttpMethod.POST, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(nodejsUrl + path, HttpMethod.POST, entity, String.class);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            return ResponseEntity.status(response.getStatusCode()).headers(responseHeaders).body(response.getBody());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
@@ -84,7 +101,10 @@ public class ChatProxyController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             if (authHeader != null) headers.set("Authorization", authHeader);
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            return restTemplate.exchange(nodejsUrl + path, HttpMethod.PUT, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(nodejsUrl + path, HttpMethod.PUT, entity, String.class);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            return ResponseEntity.status(response.getStatusCode()).headers(responseHeaders).body(response.getBody());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
@@ -105,7 +125,10 @@ public class ChatProxyController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             if (authHeader != null) headers.set("Authorization", authHeader);
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            return restTemplate.exchange(nodejsUrl + path, HttpMethod.DELETE, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(nodejsUrl + path, HttpMethod.DELETE, entity, String.class);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            return ResponseEntity.status(response.getStatusCode()).headers(responseHeaders).body(response.getBody());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
