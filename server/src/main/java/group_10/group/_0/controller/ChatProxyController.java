@@ -36,8 +36,13 @@ public class ChatProxyController {
             HttpHeaders headers = new HttpHeaders();
             if (authHeader != null) headers.set("Authorization", authHeader);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            return restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+//            return restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+            System.out.println("Response status: " + response.getStatusCode());
+            System.out.println("Response body: " + response.getBody());
+            return response;
         } catch (HttpClientErrorException | HttpServerErrorException e) {
+            System.out.println("HTTP Error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
             System.out.println("Proxy error: " + e.getMessage()); // ← thêm dòng này
