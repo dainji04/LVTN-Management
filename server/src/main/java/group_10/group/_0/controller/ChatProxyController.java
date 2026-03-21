@@ -30,13 +30,17 @@ public class ChatProxyController {
             String query = request.getQueryString();
             if (query != null) path += "?" + query;
 
+            String fullUrl = nodejsUrl + path;
+            System.out.println("Proxy GET: " + fullUrl); // ← thêm dòng này
+
             HttpHeaders headers = new HttpHeaders();
             if (authHeader != null) headers.set("Authorization", authHeader);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            return restTemplate.exchange(nodejsUrl + path, HttpMethod.GET, entity, String.class);
+            return restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
+            System.out.println("Proxy error: " + e.getMessage()); // ← thêm dòng này
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                     .body("{\"error\": \"Chat service không khả dụng\"}");
         }
