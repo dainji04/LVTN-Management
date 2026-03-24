@@ -4,12 +4,10 @@ package group_10.group._0.service;
 import group_10.group._0.dto.request.ThongBaoRequest;
 import group_10.group._0.dto.response.ThongBaoResponse;
 import group_10.group._0.entity.ThongBao;
-import group_10.group._0.entity.Users;
 import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.ThongBaoMapper;
 import group_10.group._0.repository.ThongBaoRepository;
-import group_10.group._0.repository.UsersRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -56,7 +54,7 @@ public class ThongBaoService {
 
     public List<ThongBaoResponse> layDSThongBao(Integer maUser)
     {
-        return thongBaoRepository.findByMaNguoiNhan_IdOrderByNgayTaoDesc(maUser)
+        return thongBaoRepository.findByMaNguoiNhan_MaNguoiDungOrderByNgayTaoDesc(maUser)
                 .stream()
                 .map(thongBaoMapper::toThongBaoResponse)
                 .collect(Collectors.toList());
