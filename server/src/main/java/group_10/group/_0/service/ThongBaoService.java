@@ -56,7 +56,7 @@ public class ThongBaoService {
 
     public List<ThongBaoResponse> layDSThongBao(Integer maUser)
     {
-        return thongBaoRepository.findByMaNguoiNhan_IdOrderByNgayTaoDesc(maUser)
+        return thongBaoRepository.findByMaNguoiNhan_MaNguoiDungOrderByNgayTaoDesc(maUser)
                 .stream()
                 .map(thongBaoMapper::toThongBaoResponse)
                 .collect(Collectors.toList());
