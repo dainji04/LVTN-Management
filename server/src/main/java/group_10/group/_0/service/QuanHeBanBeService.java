@@ -1,5 +1,6 @@
 package group_10.group._0.service;
 
+import group_10.group._0.dto.request.ThongBaoRequest;
 import group_10.group._0.dto.response.BanBeResponse;
 import group_10.group._0.entity.QuanHeBanBe;
 import group_10.group._0.entity.Users;
@@ -18,6 +19,7 @@ public class QuanHeBanBeService {
 
     final QuanHeBanBeRepository repository;
     final UsersRepository usersRepository;
+    final ThongBaoService thongBaoService;
 
     public boolean areFriends(Integer id1, Integer id2) {
         return repository.areFriends(id1, id2);
@@ -49,16 +51,31 @@ public class QuanHeBanBeService {
 
     public QuanHeBanBe addFriend(Integer id1, Integer id2) {
         if (areFriends(id1, id2)) throw new RuntimeException("Đã là bạn bè rồi!");
+
         Users user1 = usersRepository.findById(id1)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id1));
         Users user2 = usersRepository.findById(id2)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id2));
+
         QuanHeBanBe quanHe = QuanHeBanBe.builder()
                 .maNguoiDung1(user1)
                 .maNguoiDung2(user2)
                 .ngayTao(Instant.now())
                 .ngayCapNhat(Instant.now())
                 .build();
-        return repository.save(quanHe);
+
+        QuanHeBanBe saved = repository.save(quanHe);
+
+        // Gửi thông báo cho user2 (người được kết bạn)
+        ThongBaoRequest thongBao = ThongBaoRequest.builder()
+                .maNguoiHanhDong(id1)
+                .maNguoiNhan(id2)
+                .loaiHanhDong("KET_BAN")
+                .maDoiTuong(saved.getId())
+                .loaiDoiTuong("QuanHeBanBe")
+                .build();
+        thongBaoService.taoMoiThongBao(thongBao);
+
+        return saved;
     }
 }
