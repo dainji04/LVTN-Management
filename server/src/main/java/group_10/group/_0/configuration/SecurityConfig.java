@@ -42,7 +42,9 @@ public class SecurityConfig {
                                 "/api-docs",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/chat/**"
+                                "/chat/**",
+                                "/thongbao/subscribe/**",
+                                "/thongbao/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").permitAll()
                         .anyRequest().authenticated()

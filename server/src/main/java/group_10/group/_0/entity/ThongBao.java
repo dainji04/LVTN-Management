@@ -21,8 +21,10 @@ import java.time.Instant;
 })
 public class ThongBao {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaThongBao", nullable = false)
     private Integer id;
+
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
