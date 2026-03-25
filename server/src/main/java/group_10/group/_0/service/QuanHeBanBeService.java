@@ -4,6 +4,7 @@ import group_10.group._0.dto.request.ThongBaoRequest;
 import group_10.group._0.dto.response.BanBeResponse;
 import group_10.group._0.entity.QuanHeBanBe;
 import group_10.group._0.entity.Users;
+import group_10.group._0.mapper.BanBeMapper;
 import group_10.group._0.repository.QuanHeBanBeRepository;
 import group_10.group._0.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,28 +22,12 @@ public class QuanHeBanBeService {
     final UsersRepository usersRepository;
     final ThongBaoService thongBaoService;
 
+    final BanBeMapper mapper; // inject mapper
+
     public boolean areFriends(Integer id1, Integer id2) {
         return repository.areFriends(id1, id2);
     }
 
-    public List<BanBeResponse> getFriends(Integer userId) {
-        List<QuanHeBanBe> friends = repository.findFriends(userId);
-        return friends.stream().map(q -> {
-            Users friend = q.getMaNguoiDung1().getMaNguoiDung().equals(userId)
-                    ? q.getMaNguoiDung2()
-                    : q.getMaNguoiDung1();
-            return BanBeResponse.builder()
-                    .maNguoiDung(friend.getMaNguoiDung())
-                    .ho(friend.getHo())
-                    .ten(friend.getTen())
-                    .bietDanh(friend.getBietDanh())
-                    .anhDaiDien(friend.getAnhDaiDien())
-                    .email(friend.getEmail())
-                    .hoatDongLanCuoi(friend.getHoatDongLanCuoi())
-                    .ngayKetBan(q.getNgayTao())
-                    .build();
-        }).toList();
-    }
 
     @Transactional
     public void removeFriend(Integer id1, Integer id2) {
@@ -78,4 +63,43 @@ public class QuanHeBanBeService {
 
         return saved;
     }
+
+
+    // Lấy danh sách bạn bè của user
+    public List<BanBeResponse> getFriends(Integer userId) {
+        return repository.findFriends(userId).stream().map(q -> {
+            Users friend = q.getMaNguoiDung1().getMaNguoiDung().equals(userId)
+                    ? q.getMaNguoiDung2()
+                    : q.getMaNguoiDung1();
+            BanBeResponse response = mapper.toBanBeResponse(friend);
+            response.setNgayKetBan(q.getNgayTao()); // set thêm ngayKetBan
+            return response;
+        }).toList();
+    }
+
+    // Lấy thông tin bạn bè theo danh sách ID
+    public List<BanBeResponse> getFriendsByIds(List<Integer> ids) {
+        return usersRepository.findAllById(ids).stream()
+                .map(mapper::toBanBeResponse)
+                .toList();
+    }
+
+    public List<BanBeResponse> searchFriends(Integer userId, String query) {
+        String keyword = query.toLowerCase();
+        return repository.findFriends(userId).stream().map(q ->
+                        q.getMaNguoiDung1().getMaNguoiDung().equals(userId)
+                                ? q.getMaNguoiDung2()
+                                : q.getMaNguoiDung1()
+                )
+                .filter(friend ->
+                        (friend.getHo() != null && friend.getHo().toLowerCase().contains(keyword)) ||
+                                (friend.getTen() != null && friend.getTen().toLowerCase().contains(keyword)) ||
+                                (friend.getBietDanh() != null && friend.getBietDanh().toLowerCase().contains(keyword)) ||
+                                (friend.getEmail() != null && friend.getEmail().toLowerCase().contains(keyword))
+                )
+                .limit(20)
+                .map(mapper::toBanBeResponse)
+                .toList();
+    }
+
 }

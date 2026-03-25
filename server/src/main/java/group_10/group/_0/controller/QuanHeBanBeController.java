@@ -61,4 +61,28 @@ public class QuanHeBanBeController {
                 .message("Đã xóa bạn bè thành công!")
                 .build();
     }
+
+    @PostMapping("/by-ids")
+    @Operation(summary = "Lấy thông tin bạn bè theo danh sách ID",
+            description = "Truyền mảng ID user vào body, trả về danh sách thông tin user")
+    public ApiResponse<List<BanBeResponse>> getFriendsByIds(
+            @RequestBody List<Integer> ids) {
+        return ApiResponse.<List<BanBeResponse>>builder()
+                .code(200)
+                .data(service.getFriendsByIds(ids))
+                .build();
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Tìm kiếm bạn bè",
+            description = "Tìm kiếm bạn bè theo họ, tên, biệt danh, email")
+    public ApiResponse<List<BanBeResponse>> searchFriends(
+            @RequestParam Integer userId,
+            @RequestParam String query) {
+        return ApiResponse.<List<BanBeResponse>>builder()
+                .code(200)
+                .data(service.searchFriends(userId, query))
+                .build();
+    }
+
 }
