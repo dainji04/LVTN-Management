@@ -50,7 +50,7 @@ public class SecurityConfig {
                                 "/thongbao/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").permitAll()
-                        // Spring Security sẽ tự động cho phép các request OPTIONS nếu CORS được bật
+                        .requestMatchers(HttpMethod.HEAD, "/users", "/users/{id}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
