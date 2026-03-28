@@ -11,7 +11,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/chat_proxy")
 @Tag(name = "Chat Service", description = "Proxy API đến NodeJS chat service. Xem đầy đủ tại: https://github.com/dainji04/LVTN-Management/blob/main/chat-service/API_TESTING.md")
 public class ChatProxyController {
 

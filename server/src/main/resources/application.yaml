@@ -13,6 +13,16 @@ springdoc:
     operations-sorter: alpha
 
 spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: nodejs-chat-service
+            uri: ${nodejs.url}
+            predicates:
+              - Path=/chat/**
+            filters:
+              - StripPrefix=1 #hàm .replace("/chat", "")
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
     username: avnadmin

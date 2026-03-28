@@ -19,6 +19,7 @@ public class CorsConfig {
                 "https://social.dainji.id.vn",
                 "https://test-social.dainji.id.vn",
                 "http://localhost:3000",
+                "http://localhost:8080",
                 "http://localhost:5173"
         ));
 
