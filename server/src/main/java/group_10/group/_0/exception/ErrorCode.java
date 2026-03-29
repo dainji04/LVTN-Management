@@ -32,8 +32,8 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "Ban khong co quyen thuc hien hanh dong nay", HttpStatus.UNAUTHORIZED),
 
     //dung cho thong bao
-    NOTIFICATION_NOT_EXISTED(1011, "ma thong bao khong ton tai", HttpStatus.NOT_FOUND)
-    ;
+    NOTIFICATION_NOT_EXISTED(1011, "ma thong bao khong ton tai", HttpStatus.NOT_FOUND),
+    FOLLOW_NOT_EXISTED(1011,"chưa tồn tại theo dõi" ,HttpStatus.NOT_FOUND );
 
 
 
