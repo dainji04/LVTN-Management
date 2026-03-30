@@ -133,7 +133,7 @@ FE hiển thị: **"Nguyen An muốn kết bạn với bạn"** + nút Chấp nh
 ### Bước 3A: B chấp nhận lời mời
 ```
 // 1. Cập nhật trạng thái lời mời → CHAP_NHAN
-PATCH /loi-moi/{maDoiTuong}/trang-thai?trangThai=CHAP_NHAN
+PATCH /loi-moi-ket-ban/{maDoiTuong}/trang-thai?trangThai=CHAP_NHAN
 Authorization: Bearer {token}
  
 // 2. Tạo quan hệ bạn bè
@@ -158,7 +158,7 @@ Server thực hiện khi gọi `/ban-be/add`:
 ### Bước 3B: B từ chối lời mời
 ```
 // 1. Cập nhật trạng thái lời mời → TU_CHOI
-PATCH /loi-moi/{maDoiTuong}/trang-thai?trangThai=TU_CHOI
+PATCH /loi-moi-ket-ban/{maDoiTuong}/trang-thai?trangThai=TU_CHOI
 Authorization: Bearer {token}
  
 // 2. Đánh dấu thông báo đã đọc
@@ -178,7 +178,7 @@ function hienThiLoiMoi(thongBao) {
  
     // Nút Chấp nhận
     btnChapNhan.onclick = async () => {
-        await fetch(`/loi-moi/${maLoiMoi}/trang-thai?trangThai=CHAP_NHAN`, {
+        await fetch(`/loi-moi-ket-ban/${maLoiMoi}/trang-thai?trangThai=CHAP_NHAN`, {
             method: 'PATCH',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -194,7 +194,7 @@ function hienThiLoiMoi(thongBao) {
  
     // Nút Từ chối
     btnTuChoi.onclick = async () => {
-        await fetch(`/loi-moi/${maLoiMoi}/trang-thai?trangThai=TU_CHOI`, {
+        await fetch(`/loi-moi-ket-ban/${maLoiMoi}/trang-thai?trangThai=TU_CHOI`, {
             method: 'PATCH',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -212,7 +212,7 @@ function hienThiLoiMoi(thongBao) {
 
 **User 5 gửi lời mời:**
 ```javascript
-await fetch('/loi-moi/gui?nguoiGuiId=5&nguoiNhanId=19', {
+await fetch('/loi-moi-ket-ban/gui?nguoiGuiId=5&nguoiNhanId=19', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}` }
 });
@@ -224,7 +224,7 @@ await fetch('/loi-moi/gui?nguoiGuiId=5&nguoiNhanId=19', {
 **User 19 chấp nhận:**
 ```javascript
 // maDoiTuong=7, id=123 lấy từ thông báo SSE
-await fetch('/loi-moi/7/trang-thai?trangThai=CHAP_NHAN', {
+await fetch('/loi-moi-ket-ban/7/trang-thai?trangThai=CHAP_NHAN', {
     method: 'PATCH',
     headers: { 'Authorization': `Bearer ${token}` }
 });
@@ -243,7 +243,7 @@ await fetch('/thongbao/123/read', {
 
 **User 19 từ chối:**
 ```javascript
-await fetch('/loi-moi/7/trang-thai?trangThai=TU_CHOI', {
+await fetch('/loi-moi-ket-ban/7/trang-thai?trangThai=TU_CHOI', {
     method: 'PATCH',
     headers: { 'Authorization': `Bearer ${token}` }
 });

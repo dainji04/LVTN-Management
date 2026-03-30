@@ -1,5 +1,6 @@
 package group_10.group._0.service;
 
+import group_10.group._0.dto.request.TheoDoiRequest;
 import group_10.group._0.dto.request.ThongBaoRequest;
 import group_10.group._0.dto.response.LoiMoiResponse;
 import group_10.group._0.entity.LoiMoiKetBan;
@@ -22,6 +23,7 @@ public class LoiMoiKetBanService {
     final ThongBaoService thongBaoService;
     final QuanHeBanBeService quanHeBanBeService;
     final LoiMoiKetBanMapper mapper;
+    final TheoDoiService theoDoiService;
 
     // 1. Gửi lời mời kết bạn
     public LoiMoiResponse guiLoiMoi(Integer nguoiGuiId, Integer nguoiNhanId) {
@@ -53,6 +55,12 @@ public class LoiMoiKetBanService {
                 .maDoiTuong(saved.getId())
                 .loaiDoiTuong("LoiMoiKetBan")
                 .build());
+        theoDoiService.createTheoDoiKhongThongBao(
+                TheoDoiRequest.builder()
+                        .maNguoiTheoDoi(nguoiGuiId)
+                        .maNguoiDuocTheoDoi(nguoiNhanId)
+                        .build()
+        );
 
         return mapper.toResponse(saved);
     }

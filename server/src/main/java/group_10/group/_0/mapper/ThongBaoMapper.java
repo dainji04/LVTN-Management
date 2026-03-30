@@ -13,6 +13,7 @@ import org.mapstruct.MappingTarget;
 public interface ThongBaoMapper {
     @Mapping(target = "maNguoiHanhDong", source = "maNguoiHanhDong.maNguoiDung")
     @Mapping(target = "maNguoiNhan", source = "maNguoiNhan.maNguoiDung")
+    @Mapping(target = "id", source = "id")
     ThongBaoResponse toThongBaoResponse(ThongBao thongBao);
 
     @Mapping(target = "id", ignore = true)

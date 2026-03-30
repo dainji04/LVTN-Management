@@ -54,7 +54,7 @@ public class LoiMoiKetBanController {
     @PatchMapping("/{id}/trang-thai")
     @Operation(summary = "Cập nhật trạng thái lời mời")
     public ApiResponse<LoiMoiResponse> capNhatTrangThai(
-            @PathVariable Integer loiMoiId,
+            @PathVariable("id") Integer loiMoiId,
             @RequestParam String trangThai) {
         return ApiResponse.<LoiMoiResponse>builder()
                 .code(200)

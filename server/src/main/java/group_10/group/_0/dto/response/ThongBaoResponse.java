@@ -14,19 +14,13 @@ import java.time.Instant;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ThongBaoResponse {
-
-    private Integer maNguoiHanhDong;
-
-    private Integer maNguoiNhan;
-
-    private String loaiHanhDong;
-
-    private Integer maDoiTuong;
-
-    private String loaiDoiTuong;
-
-    private Boolean daDoc;
-
-    private Instant ngayTao;
+    Integer id;
+    Integer maNguoiHanhDong;
+    Integer maNguoiNhan;
+    String loaiHanhDong;
+    Integer maDoiTuong;
+    String loaiDoiTuong;
+    Boolean daDoc;
+    Instant ngayTao;
 
 }
