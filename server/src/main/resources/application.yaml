@@ -1,13 +1,32 @@
 server:
   port: 8080
-  servlet:
-    context-path: /SocialMedia
+
+nodejs:
+  url: https://chat-service-social-media.onrender.com
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    tags-sorter: alpha
+    operations-sorter: alpha
 
 spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: nodejs-chat-service
+            uri: ${nodejs.url}
+            predicates:
+              - Path=/chat/**
+            filters:
+              - StripPrefix=1 #hàm .replace("/chat", "")
   datasource:
-    url: "jdbc:mysql://26.90.29.70:3306/SocialMedia?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
-    username: root
-    password: root
+    url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
+    username: avnadmin
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -17,9 +36,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true  # SQL log dễ đọc hơn
+        format_sql: true  #Hien thi cau lenh SQL, SQL log dễ đọc hơn
 
 jwt:
-  signerKey: "61b8e4c9638f759c9112471bdfff29f02310f0e6e1053fa9c04d924d3d9869fc"
+  signerKey: ${SIGNER_JWT}
   valid-duration: 3600
   refreshable-duration: 360000

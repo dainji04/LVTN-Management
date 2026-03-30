@@ -16,6 +16,7 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuanHeBanBe {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaQuanHe", nullable = false)
     private Integer id;
 

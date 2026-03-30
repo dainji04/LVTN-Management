@@ -29,7 +29,12 @@ public enum ErrorCode {
     DATA_EXISTED(1012, "Da ton tai data", HttpStatus.CONFLICT),
     PAYLOAD_TOO_LARGE(1013, "Dung luong file vuot qua gioi han cho phep", HttpStatus.PAYLOAD_TOO_LARGE),
     ACCESS_DENIED(1014, "Khong co quyen truy cap tai nguyen", HttpStatus.FORBIDDEN),
-    UNAUTHORIZED(1007, "Ban khong co quyen thuc hien hanh dong nay", HttpStatus.UNAUTHORIZED);
+    UNAUTHORIZED(1007, "Ban khong co quyen thuc hien hanh dong nay", HttpStatus.UNAUTHORIZED),
+
+    //dung cho thong bao
+    NOTIFICATION_NOT_EXISTED(1011, "ma thong bao khong ton tai", HttpStatus.NOT_FOUND),
+    FOLLOW_NOT_EXISTED(1011,"chưa tồn tại theo dõi" ,HttpStatus.NOT_FOUND );
+
 
 
 

@@ -15,28 +15,15 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersRequest {
+public class UsersUpdateRequest {
 
-    @NotBlank(message = "Họ không được để trống")
     @Size(max = 50, message = "Ho tối đa 50 ký tự")
     String ho;
 
-    @NotBlank(message = "Tên không được để trống")
-    @Size(max = 50, message = "Ten tối đa 10 ký tự")
+    @Size(max = 10, message = "Ten tối đa 10 ký tự")
     String ten;
 
-    @Email(message = "Email không hợp lệ")
-    @NotBlank(message = "Email không được để trống")
-    @Size(max = 30, message = "Email tối đa 30 ký tự")
-    String email;
-
-    @Size(max = 10, message = "Gioi tinh tối đa 10 ký tự")
-    @NotBlank(message = "Giới tính không được để trống")
-    String gioiTinh;
-
-    @Size(min = 6, message = "Mat khau tối thiểu 6 ký tự")
-    @Size(max = 255, message = "Mat khau tối đa 255 ký tự")
-    @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 6, max = 255, message = "Mat khau tu 6 den 255 ky tu")
     String matKhau;
 
     @Size(max = 15, message = "Biet danh tối đa 15 ký tự")
@@ -63,5 +50,7 @@ public class UsersRequest {
     @Pattern(regexp = "^[0-9]*$", message = "So dien thoai chi duoc chua so")
     String soDienThoai;
 
+    @Size(max = 10, message = "Gioi tinh tối đa 10 ký tự")
+    String gioiTinh;
 
 }
