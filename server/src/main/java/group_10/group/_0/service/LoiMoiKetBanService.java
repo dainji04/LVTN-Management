@@ -78,7 +78,7 @@ public class LoiMoiKetBanService {
         LoiMoiKetBan loiMoi = loiMoiRepository.findById(loiMoiId)
                 .orElseThrow(() -> new RuntimeException("Lời mời không tồn tại!"));
         loiMoi.setTrangThai(trangThai);
-        return mapper.toResponse(loiMoiRepository.save(loiMoi)); // dùng mapper
+        return mapper.toResponse(loiMoiRepository.save(loiMoi));
     }
 
     // 5. Kiểm tra trạng thái có phải CHAP_NHAN không

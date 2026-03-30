@@ -73,4 +73,12 @@ public class TheoDoiService {
         }
         return theoDoiRepository.findById(id).get();
     }
+
+    public void createTheoDoiKhongThongBao(TheoDoiRequest request) {
+        TheoDoi theoDoi = theoDoiMapper.toEntity(request);
+        Users nguoiTheoDoi = usersRepository.findById(request.getMaNguoiTheoDoi())
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        theoDoi.setMaNguoiTheoDoi(nguoiTheoDoi);
+        theoDoiRepository.save(theoDoi);
+    }
 }

@@ -39,11 +39,12 @@ public class QuanHeBanBeController {
     }
 
     @PostMapping("/add")
-    @Operation(summary = "Thêm bạn bè", description = "Thêm quan hệ bạn bè giữa 2 user")
+    @Operation(summary = "Thêm bạn bè", description = "Thêm quan hệ bạn bè sau khi chấp nhận lời mời")
     public ApiResponse<Void> addFriend(
             @RequestParam Integer id1,
-            @RequestParam Integer id2) {
-        service.addFriend(id1, id2);
+            @RequestParam Integer id2,
+            @RequestParam Integer loiMoiId) {
+        service.addFriend(id1, id2, loiMoiId);
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Đã thêm bạn bè thành công!")

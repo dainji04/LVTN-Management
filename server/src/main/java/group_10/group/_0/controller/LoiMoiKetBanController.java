@@ -22,7 +22,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/loi-moi")
+@RequestMapping("/loi-moi-ket-ban")
 @RequiredArgsConstructor
 @Tag(name = "Lời mời kết bạn", description = "API quản lý lời mời kết bạn")
 public class LoiMoiKetBanController {
@@ -54,11 +54,11 @@ public class LoiMoiKetBanController {
     @PatchMapping("/{id}/trang-thai")
     @Operation(summary = "Cập nhật trạng thái lời mời")
     public ApiResponse<LoiMoiResponse> capNhatTrangThai(
-            @PathVariable Integer id,
+            @PathVariable Integer loiMoiId,
             @RequestParam String trangThai) {
         return ApiResponse.<LoiMoiResponse>builder()
                 .code(200)
-                .data(service.capNhatTrangThai(id, trangThai))
+                .data(service.capNhatTrangThai(loiMoiId, trangThai))
                 .build();
     }
 
