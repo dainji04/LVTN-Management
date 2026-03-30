@@ -24,15 +24,38 @@ public class ThongBaoService {
 
     ThongBaoRepository thongBaoRepository;
     ThongBaoMapper thongBaoMapper;
+    UsersRepository usersRepository;
 
-    public ThongBaoResponse taoMoiTHongBao(ThongBaoRequest request) {
+    SseService sseService;
+
+
+
+    public ThongBaoResponse taoMoiThongBao(ThongBaoRequest request) {
         ThongBao thongBao = thongBaoMapper.toThongBao(request);
+
+        // Set Users object thủ công
+        Users nguoiHanhDong = usersRepository.findById(request.getMaNguoiHanhDong())
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        Users nguoiNhan = usersRepository.findById(request.getMaNguoiNhan())
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+
+        thongBao.setMaNguoiHanhDong(nguoiHanhDong);
+        thongBao.setMaNguoiNhan(nguoiNhan);
         thongBao.setDaDoc(false);
         thongBao.setNgayTao(Instant.now());
 
-        return thongBaoMapper.toThongBaoResponse(thongBaoRepository.save(thongBao));
-
+        ThongBaoResponse response = thongBaoMapper.toThongBaoResponse(thongBaoRepository.save(thongBao));
+        sseService.sendToUser(request.getMaNguoiNhan(), response);
+        return response;
     }
+//    public ThongBaoResponse taoMoiTHongBao(ThongBaoRequest request) {
+//        ThongBao thongBao = thongBaoMapper.toThongBao(request);
+//        thongBao.setDaDoc(false);
+//        thongBao.setNgayTao(Instant.now());
+//
+//        return thongBaoMapper.toThongBaoResponse(thongBaoRepository.save(thongBao));
+//
+//    }
 
     public void xoaThongBao(Integer maThongBao)
     {

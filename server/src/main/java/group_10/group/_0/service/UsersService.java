@@ -1,18 +1,24 @@
 package group_10.group._0.service;
 
 import group_10.group._0.dto.request.UsersRequest;
+import group_10.group._0.dto.request.UsersUpdateRequest;
 import group_10.group._0.dto.response.UsersResponse;
 import group_10.group._0.entity.Users;
+import group_10.group._0.exception.AppExceptions;
+import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.UsersMapper;
 import group_10.group._0.repository.UsersRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +42,30 @@ public class UsersService {
     public UsersResponse getUserById(Integer id) {
         Users user = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
-        return toResponse(user);
+        return mapper.toTaikhoanResponse(user);
+        //        return toResponse(user); Cach ma mapper thuc su lam
+    }
+    // Map Entity -> Response DTO
+//    private UsersResponse toResponse(Users user) {
+//        return UsersResponse.builder()
+//                .maNguoiDung(user.getMaNguoiDung())
+//                .ho(user.getHo())
+//                .ten(user.getTen())
+//                .email(user.getEmail())
+//                .ngayTao(user.getNgayTao())
+//                .build();
+//    }
+
+
+
+    private String removeDiacritics(String input) {
+        if (input == null) return "";
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        return normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("đ", "d")
+                .replaceAll("Đ", "D")
+                .trim()
+                .replaceAll("\\s+", "");
     }
 
     public UsersResponse createUser(UsersRequest request) {
@@ -50,10 +79,20 @@ public class UsersService {
         user.setNgayTao(Instant.now());
         user.setNgayCapNhat(Instant.now());
 
+        // Tự động tạo avatar nếu không có
+        if (request.getAnhDaiDien() == null || request.getAnhDaiDien().isBlank()) {
+            String ho = removeDiacritics(request.getHo());
+            String ten = removeDiacritics(request.getTen());
+            String avatar = "https://ui-avatars.com/api/?name="
+                    + ten + "+" + ho
+                    + "&background=random&color=fff";
+            user.setAnhDaiDien(avatar);
+        }
+
         return mapper.toTaikhoanResponse(repository.save(user));
     }
 
-    public UsersResponse updateUser(Integer id, UsersRequest request) {
+    public UsersResponse updateUser(Integer id, UsersUpdateRequest request) {
         Users user = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
 
@@ -76,14 +115,14 @@ public class UsersService {
         repository.deleteById(id);
     }
 
-    // Map Entity -> Response DTO
-    private UsersResponse toResponse(Users user) {
-        return UsersResponse.builder()
-                .maNguoiDung(user.getMaNguoiDung())
-                .ho(user.getHo())
-                .ten(user.getTen())
-                .email(user.getEmail())
-                .ngayTao(user.getNgayTao())
-                .build();
+
+    public UsersResponse getMyInfo(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        Users tk = repository.findByEmail(email).orElseThrow(
+                () -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        return mapper.toTaikhoanResponse(tk);
     }
+
 }

@@ -75,10 +75,13 @@ public class Users {
     @Column(name = "NgayCapNhat")
     private Instant ngayCapNhat;
 
-    @Column(name = "BaCam")
-    private Boolean baCam;
+    @Column(name = "BiCam")
+    private Boolean biCam;
 
     @Column(name = "HoatDongLanCuoi")
     private Instant hoatDongLanCuoi;
+
+    @Column(name = "GioiTinh")
+    String gioiTinh;
 
 }

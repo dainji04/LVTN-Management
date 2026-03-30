@@ -7,19 +7,19 @@ const routes = [
         path: '/', 
         name: 'Home', 
         component: Home,
-        meta: { requiresAuth: true }
+        // meta: { requiresAuth: true }
     },
     { 
         path: '/login', 
         name: 'Login', 
         component: () => import('./views/Login.vue'),
-        meta: { requiresGuest: true }
+        // meta: { requiresGuest: true }
     },
     { 
         path: '/register', 
         name: 'Register', 
         component: () => import('./views/Register.vue'),
-        meta: { requiresGuest: true }
+        // meta: { requiresGuest: true }
     },
     { 
         path: '/terms', 
@@ -30,6 +30,21 @@ const routes = [
         path: '/privacy', 
         name: 'Privacy', 
         component: () => import('./views/Privacy.vue')
+    },
+    { 
+        path: '/users', 
+        name: 'Users', 
+        component: () => import('./views/Users.vue')
+    },
+    { 
+        path: '/users/:id', 
+        name: 'UserDetail', 
+        component: () => import('./views/UserDetail.vue')
+    },
+    { 
+        path: '/users/:id/edit', 
+        name: 'UserEdit', 
+        component: () => import('./views/UserEdit.vue')
     },
     {
         path: '/:pathMatch(.*)*',

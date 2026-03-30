@@ -15,6 +15,7 @@ import group_10.group._0.entity.Invalidatedtoken;
 import group_10.group._0.entity.Users;
 import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
+import group_10.group._0.mapper.UsersMapper;
 import group_10.group._0.repository.InvalidatedTokenRepository;
 import group_10.group._0.repository.UsersRepository;
 import lombok.AccessLevel;
@@ -53,6 +54,9 @@ public class AuthenticationService {
     @Value("${jwt.refreshable-duration}")
     protected long refreshTime;
 
+    UsersMapper userMapper;
+
+
     public IntrospectResponse introspect(IntrospectRequest request)
             throws JOSEException, ParseException {
         var token = request.getToken();
@@ -84,6 +88,7 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
+                .thongTinUser(userMapper.toTaikhoanResponse(user))
                 .build();
     }
 
