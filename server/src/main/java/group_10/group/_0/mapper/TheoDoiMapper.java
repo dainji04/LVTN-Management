@@ -16,8 +16,8 @@ public interface TheoDoiMapper {
     TheoDoi toEntity(TheoDoiRequest request);
 
     // 2. Mapping từ Entity sang Response
-    @Mapping(source = "maNguoiTheoDoi.id", target = "followerId")
-    @Mapping(source = "maNguoiDuocTheoDoi", target = "followingId")
+    @Mapping(source = "maNguoiTheoDoi.maNguoiDung", target = "maNguoiTheoDoi")
+    @Mapping(source = "maNguoiDuocTheoDoi", target = "maNguoiDuocTheoDoi")
     @Mapping(source = "id", target = "id")
     TheoDoiResponse toResponse(TheoDoi entity);
 }

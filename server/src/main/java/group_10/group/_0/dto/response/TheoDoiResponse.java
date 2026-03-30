@@ -1,15 +1,22 @@
 package group_10.group._0.dto.response;
 
 import group_10.group._0.entity.Users;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class TheoDoiResponse {
-    private  Integer id;
+    Integer id;
 
-    private Integer maNguoiTheoDoi;
+    Integer maNguoiTheoDoi;
 
-    private Integer maNguoiDuocTheoDoi;
+    Integer maNguoiDuocTheoDoi;
 
-    private Instant ngayTheoDoi;
+    Instant ngayTheoDoi;
 }
