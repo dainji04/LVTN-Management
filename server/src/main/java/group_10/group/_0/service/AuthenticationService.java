@@ -100,7 +100,7 @@ public class AuthenticationService {
                 .issuer("Social media Group 10")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 tieng
+                        Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 ngay
                 .jwtID(UUID.randomUUID().toString())
 //                .claim("role", buildScope(taikhoan))
                 .claim("id", taikhoan.getMaNguoiDung())

@@ -40,5 +40,5 @@ spring:
 
 jwt:
   signerKey: ${SIGNER_JWT}
-  valid-duration: 3600
+  valid-duration: 86400 #1 ngày
   refreshable-duration: 360000
