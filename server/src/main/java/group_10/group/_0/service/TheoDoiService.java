@@ -59,6 +59,9 @@ public class TheoDoiService {
     public TheoDoiResponse createTheodoi(TheoDoiRequest request)
     {
        TheoDoi theoDoi = theoDoiMapper.toEntity(request);
+       Users nguoiTheoDoi = usersRepository.findById(request.getMaNguoiTheoDoi())
+               .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+       theoDoi.setMaNguoiTheoDoi(nguoiTheoDoi);
        return theoDoiMapper.toResponse(theoDoiRepository.save(theoDoi));
     }
 

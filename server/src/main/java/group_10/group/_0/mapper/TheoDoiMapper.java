@@ -12,6 +12,7 @@ public interface TheoDoiMapper {
 
     // 1. Mapping từ Request sang Entity
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "maNguoiTheoDoi", ignore = true)
     @Mapping(target = "ngayTheoDoi", expression = "java(java.time.Instant.now())")
     TheoDoi toEntity(TheoDoiRequest request);
 
