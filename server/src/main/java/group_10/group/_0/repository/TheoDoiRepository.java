@@ -15,7 +15,7 @@ public interface TheoDoiRepository extends JpaRepository<TheoDoi, Integer> {
 
     long countByMaNguoiDuocTheoDoi(Integer userId);
 
-    long countByNguoiTheoDoi(Users user);
+    long countByMaNguoiTheoDoi(Users maNguoiTheoDoi);
 
     @Query("SELECT t.maNguoiTheoDoi FROM TheoDoi t WHERE t.maNguoiDuocTheoDoi = :userId")
     List<Users> findFollowersByUserId(@Param("userId") Integer userId);

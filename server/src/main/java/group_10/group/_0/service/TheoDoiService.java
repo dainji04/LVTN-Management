@@ -36,7 +36,7 @@ public class TheoDoiService {
                 .orElseThrow( () -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         long TongTheoDoi = theoDoiRepository.countByMaNguoiDuocTheoDoi(maUser);
-        long TongDuocTheoDoi = theoDoiRepository.countByNguoiTheoDoi(users);
+        long TongDuocTheoDoi = theoDoiRepository.countByMaNguoiTheoDoi(users);
 
         List<Users> DSDuocTheoDoi = theoDoiRepository.findFollowersByUserId(maUser);
         List<Users> DSDangTheoDoi = theoDoiRepository.findFollowingByUser(users);
