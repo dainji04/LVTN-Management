@@ -11,9 +11,16 @@ import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.TheoDoiMapper;
 import group_10.group._0.repository.TheoDoiRepository;
 import group_10.group._0.repository.UsersRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TheoDoiService {
 
     TheoDoiRepository theoDoiRepository;
