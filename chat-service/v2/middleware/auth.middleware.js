@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const requestContext = require('../utils/requestContext.js');
 
 class AuthMiddleware {
   // Verify JWT token from request
@@ -22,8 +23,15 @@ class AuthMiddleware {
       // Add user info to request
       req.user = {
         userId: decoded.id,
-        email: decoded.email
+        // email: decoded.email
       };
+
+      const store = requestContext.get();
+
+      if (store) {
+      store.userId = decoded.id;
+      store.token = authHeader;
+      }
 
       next();
     } catch (error) {
@@ -48,28 +56,6 @@ class AuthMiddleware {
     }
   }
 
-//   // Optional middleware - verify but don't fail if no token
-//   static optionalAuth(req, res, next) {
-//     try {
-//       const authHeader = req.headers.authorization;
-      
-//       if (authHeader && authHeader.startsWith('Bearer ')) {
-//         const token = authHeader.substring(7);
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-//         req.user = {
-//           userId: decoded.userId,
-//           email: decoded.email
-//         };
-//       }
-      
-//       next();
-//     } catch (error) {
-//       // Don't fail, just continue without auth
-//       next();
-//     }
-//   }
-
   // Verify socket authentication
   static verifySocketToken(socket, next) {
     try {
@@ -83,8 +69,16 @@ class AuthMiddleware {
       
       socket.userId = decoded.id;
       socket.userEmail = decoded.email;
-      
-      next();
+      socket.token = `Bearer ${token}`;
+      requestContext.run(
+      {
+        token: `Bearer ${token}`,
+        userId: decoded.id,
+        requestId: Date.now()
+      },
+      () => next()
+      );
+
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         return next(new Error('Authentication error: Token expired'));
@@ -93,6 +87,19 @@ class AuthMiddleware {
       return next(new Error('Authentication error: Invalid token'));
     }
   }
+
+
+  static requestContextMiddleware(req, res, next) {
+
+  requestContext.run(
+    {
+      token: req.headers.authorization,
+      requestId: Date.now()
+    },
+    () => next()
+  );
+
+}
 }
 
 module.exports = AuthMiddleware;
