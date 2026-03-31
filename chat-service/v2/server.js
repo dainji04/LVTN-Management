@@ -18,7 +18,7 @@ const io = new Server(server, {
 // khởi tạo socket events
 initSocket(io);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 server.listen(PORT, () => {
   console.log(`Chat Service running on port ${PORT}`);

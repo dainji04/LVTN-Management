@@ -7,9 +7,9 @@ Quick reference cho tất cả API endpoints
 | Endpoint | Method | Body | Description |
 |----------|--------|------|-------------|
 | `/api/auth/refresh` | POST | `{"refreshToken": "..."}` | Refresh access token |
-| `/api/auth/me` | GET | - | Get current user  |
-| `/api/auth/verify` | GET | - | Verify token  |
-| `/api/auth/logout` | POST | - | Logout |
+| `/api/auth/me` | GET | - | Get current user (Protected) |
+| `/api/auth/verify` | GET | - | Verify token (Protected) |
+| `/api/auth/logout` | POST | - | Logout (Protected) |
  
 ## 💬 Conversations (Protected)
  
@@ -25,13 +25,6 @@ Quick reference cho tất cả API endpoints
 |----------|--------|--------|-------------|
 | `/api/friends` | GET | - | Get friends list |
 | `/api/friends/search` | GET | `?query=name` | Search friends |
- 
-## 👤 Users (Protected)
- 
-| Endpoint | Method | Params | Description |
-|----------|--------|--------|-------------|
-| `/api/users/:id` | GET | - | Get user by ID |
-| `/api/users/search` | GET | `?query=name` | Search users |
  
 ## 📝 Messages (Protected)
  
