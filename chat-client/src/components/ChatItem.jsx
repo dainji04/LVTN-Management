@@ -1,11 +1,14 @@
 import React from "react";
 import { Avatar } from "antd";
 import { formatChatTime } from "../utils/formatTime.js";
+import { useChatContext } from "../context/ChatContext.jsx";
 
 const ChatItem = ({ chat,friend, isActive = false, onClick }) => {
+  const { isUserOnline } = useChatContext();
   // const { name, avatar, lastMessage, lastMessageTime, online, unread } = chat;
-  const {  TinNhanCuoi, NgayTinNhanCuoi, online, unread } = chat;
+  const {  TinNhanCuoi, NgayTinNhanCuoi, unread } = chat;
   const { name, username , avatar } = friend || {};
+  const online = isUserOnline(friend?.id);
   return (
     <div
       onClick={() => onClick?.(chat.MaCuocTroChuyen)}

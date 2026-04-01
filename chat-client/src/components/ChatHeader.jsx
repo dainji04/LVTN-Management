@@ -3,9 +3,12 @@ import { Avatar } from "antd";
 import {
   PhoneOutlined, VideoCameraOutlined, MoreOutlined, ArrowLeftOutlined,
 } from "@ant-design/icons";
+import { useChatContext } from "../context/ChatContext.jsx";
 
 const ChatHeader = ({ chat, onBack, isMobile = false }) => {
-
+  const { isUserOnline } = useChatContext();
+  const online = isUserOnline(chat?.FriendId);
+  console.log("Rendering ChatHeader for chat", chat);
   if (!chat) return null;
 
   return ( chat.SoLuongThanhVien === 2 ? (
@@ -25,14 +28,14 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
           >
             {chat.FriendTen?.[0]?.toUpperCase()}
           </Avatar>
-          {chat.online && (
+          {online && (
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
           )}
         </div>
         <div>
           <h3 className="font-semibold text-gray-800">{chat.FriendHo??""} {chat.FriendTen??""}</h3>
           <p className={`text-xs ${chat.online ? "text-green-500" : "text-gray-400"}`}>
-            {chat.online ? "Đang hoạt động" : "Không hoạt động"}
+            {online ? "Đang hoạt động" : "Không hoạt động"}
           </p>
         </div>
       </div>
@@ -70,14 +73,14 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
           >
             {chat.Ten?.[0]?.toUpperCase()}
           </Avatar>
-          {chat.online && (
+          {online && (
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
           )}
         </div>
         <div>
           <h3 className="font-semibold text-gray-800">{chat.Ten}</h3>
           <p className={`text-xs ${chat.online ? "text-green-500" : "text-gray-400"}`}>
-            {chat.online ? "Đang hoạt động" : "Không hoạt động"}
+            {online ? "Đang hoạt động" : "Không hoạt động"}
           </p>
         </div>
       </div>

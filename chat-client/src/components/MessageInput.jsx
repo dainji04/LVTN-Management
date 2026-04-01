@@ -7,8 +7,10 @@ import { useChatContext } from "../context/ChatContext.jsx";
 
 
 const MessageInput = ({ onSend, onTyping, onStopTyping, disabled = false }) => {
+  const { activeConvRef, currentUserRef } = useChatContext();
   const { activeConvId, currentUser } = useChatContext();
   console.log("MessageInput render with conversationId:", activeConvId, "currentUser:", currentUser);
+  console.log("Refs - activeConvRef:", activeConvRef.current, "currentUserRef:", currentUserRef.current);
   const [text, setText]               = useState("");
   const [isTypingLocal, setTypingLocal] = useState(false);
   const typingTimerRef                = useRef(null);
@@ -36,9 +38,9 @@ const MessageInput = ({ onSend, onTyping, onStopTyping, disabled = false }) => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
     stopTypingNow();
-    onSend?.({ convId: activeConvId, content: trimmed, type: "text" });
+    onSend?.({ convId: activeConvRef.current, content: trimmed, type: "text" });
     setText("");
-  }, [activeConvId, text, disabled, onSend, stopTypingNow]);  
+  });  
 
   const handleKeyDown = e => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
