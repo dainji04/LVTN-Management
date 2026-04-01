@@ -106,7 +106,7 @@ const userServiceClient = {
       const user = await callUserService(`/users/${id}`);
       console.log(`[UserServiceClient] Fetched user ${id} from User Service:`, user);
       // Lưu cache (không await — không chặn response)
-      redis.setex(cacheKey, CACHE_TTL, JSON.stringify(user)).catch(() => {});
+      redis.setex(cacheKey, CACHE_TTL, JSON.stringify(user.data)).catch(() => {});
       return user;
 
     } catch (err) {
@@ -149,6 +149,7 @@ const userServiceClient = {
         throw new Error("Invalid response from User Service");
       }
       const users = response.data; 
+        console.log(`[UserServiceClient] Batch fetch successful. Users received:`, users);
       for (const user of users) {
         result[user.maNguoiDung] = user;
         redis.setex(`user:${user.maNguoiDung}`, CACHE_TTL, JSON.stringify(user)).catch(() => {});

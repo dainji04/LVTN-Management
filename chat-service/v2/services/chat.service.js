@@ -147,6 +147,8 @@ class ChatService {
       }
 
       const participantIds = [creatorId, ...memberIds];
+      const participants_info = await userServiceClient.getUsersByIds(participantIds);
+      console.log("Participants info for new conversation:", participants_info);
 
       // Lấy thông tin conversation
       const conversation = await Conversation.getById(conversationId);
@@ -163,7 +165,7 @@ class ChatService {
         const memberSocket = this.onlineUsers.get(memberId);
         console.log(`Notifying member ${memberId} about new conversation. Socket: ${memberSocket}`);
         if (memberSocket) {
-          this.io.to(memberSocket).emit('conversation_created', { conversation, participantIds });
+          this.io.to(memberSocket).emit('conversation_created', { conversation, participants_info });
           this.io.sockets.sockets.get(memberSocket)?.join(`conversation_${conversationId}`);
           console.log("conversation created event emitted:", { conversation});
         }
@@ -235,7 +237,7 @@ class ChatService {
     this.typingUsers.get(conversationId).add(userId);
     
     // Broadcast typing status
-    this.io.to(`conversation_${conversationId}`).emit('user_typing', {
+    this.io.to(`conversation_${conversationId}`).emit('typing', {
       conversationId,
       userId,
       isTyping: true

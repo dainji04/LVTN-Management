@@ -82,9 +82,9 @@ class Conversation {
     return rows.map(row => ({
       ...row,
       FriendHo: userMap[row.FriendId]?.ho ?? null,
-      FriendTen: userMap[row.FriendId]?.Ten ?? null,
-      FriendAvatar: userMap[row.FriendId]?.AnhDaiDien ?? null,
-      FriendLastActive: userMap[row.FriendId]?.HoatDongLanCuoi ?? null,
+      FriendTen: userMap[row.FriendId]?.ten ?? null,
+      FriendAvatar: userMap[row.FriendId]?.anhDaiDien ?? null,
+      FriendLastActive: userMap[row.FriendId]?.hoatDongLanCuoi ?? null,
       type: "direct",
     }));
   }
