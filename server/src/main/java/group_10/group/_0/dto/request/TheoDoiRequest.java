@@ -14,8 +14,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TheoDoiRequest {
+
     private Integer maNguoiTheoDoi;
 
     private Integer maNguoiDuocTheoDoi;
-
 }
