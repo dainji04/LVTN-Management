@@ -1,8 +1,5 @@
 /**
  * useChat.js
- *
- * Central state hook cho toàn bộ chat app.
- *
  * Flow khởi động:
  *  1. Gọi GET /api/conversations để load danh sách
  *  2. Socket connect → tự động emit "user_connect" (trong websocketService)
@@ -37,6 +34,11 @@ const useChat = (token) => {
   const [error, setError]                     = useState(null);
   const [messagesByConversation, setMessagesByConversation] = useState({});
   const activeConvRef = useRef(null);
+  const currentUserRef = useRef(null);
+
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
 
   useEffect(() => {
     activeConvRef.current = activeConvId;
@@ -126,6 +128,7 @@ const useChat = (token) => {
   /** "connected" — seed trạng thái online từ server */
   const handleConnected = useCallback(({ onlineUsers: onlineList = [] }) => {
     setOnlineUsers(new Set(onlineList.map(String)));
+    console.log("Socket connected. Online users:", onlineList);
   }, []);
 
   /**
@@ -207,20 +210,26 @@ const useChat = (token) => {
     );
   }, []);
 
-  const handleConversationCreated = useCallback(({ conversation, participantIds = [] }) => {
+  const handleConversationCreated = useCallback(({ conversation, participants_info}) => {
+  const user = currentUserRef.current;
+  if (!user) return;
+  const participants = Object.values(participants_info);
   const convId = String(conversation.MaCuocTroChuyen);
-    console.log("New conversation created:", conversation);
-    console.log("userid get this event is user:", currentUser?.id);
+  console.log("participants_info received in conversation_created event:", participants);
+  console.log("New conversation created:", conversation);
+  console.log("userid get this event is user:", user.id);
+  console.log("participants_info length:", participants.length);
   // add conversation nếu chưa tồn tại
-  participantIds.length === 2 &&
+  participants.length === 2 &&
     setConversations(prev => {
       const exists = prev.some(
         c => String(c.MaCuocTroChuyen) === convId
       ); 
 
       if (exists) return prev;
-      const id = participantIds.filter(m => String(m) !== String(currentUser?.id))[0];
-      return [{ ...conversation, FriendId: id }, ...prev];
+      const friend = participants.filter(m => String(m.maNguoiDung) !== String(user.id))[0];
+      console.log("Adding new conversation with friend info:", friend);
+      return [{ ...conversation, FriendId: friend.maNguoiDung, FriendTen: friend.ten, FriendAvatar: friend.anhDaiDien, FriendLastActive: friend.hoatDongLanCuoi }, ...prev];
     });
   console.log("conversations after adding new one:", conversations);
   // init message list
@@ -235,13 +244,13 @@ const useChat = (token) => {
   // open conversation
   setActiveConvId(convId);
 
-}, [currentUser]);
+}, []);
 
   /** "typing" — { conversationId, userId } */
   const handleTyping = useCallback(({ conversationId, userId }) => {
     const convId = String(conversationId);
     const uid    = String(userId);
-
+    console.log(`User ${uid} is typing in conversation ${convId}`);
     setTypingUsers((prev) => ({
       ...prev,
       [convId]: [...new Set([...(prev[convId] || []), uid])],
@@ -406,6 +415,9 @@ const messages = messagesByConversation[activeConvId];
     conversations,
     activeConvId,
     activeConversation,
+    activeConvRef, 
+    currentUserRef,
+
     // messages,
     messages,
     loadingConvs,

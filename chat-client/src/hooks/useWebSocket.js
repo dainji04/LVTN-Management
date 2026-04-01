@@ -62,7 +62,7 @@ const useWebSocket = ({
     ].filter(Boolean);
 
     return () => unsubs.forEach((unsub) => unsub());
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token,]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Stable emit helpers ──────────────────────────────────────────
 

@@ -5,19 +5,6 @@ import ChatWindow from "../components/ChatWindow";
 import { useChatContext } from "../context/ChatContext";
 import ChatProvider from "../context/ChatProvider.jsx";
 
-/**
- * Layout KHỚP CHÍNH XÁC với HTML gốc:
- *
- * <div class="home-container flex justify-between h-screen bg-[#f5f5f5] overflow-hidden">
- *   <aside class="sidebar w-64 ..."/>
- *   <main class="main-content w-full flex-1 flex justify-center overflow-y-auto">
- *     <div class="w-80 ..."/>     ← ChatList là DIRECT CHILD của main
- *     <div class="flex-1 ..."/>   ← ChatWindow là DIRECT CHILD của main
- *   </main>
- * </div>
- *
- * KHÔNG được bọc thêm wrapper div giữa main và 2 panel.
- */
 const ChatPage = ({ onLogout }) => {
   const [mobileView, setMobileView] = useState("list"); // "list" | "chat"
   
