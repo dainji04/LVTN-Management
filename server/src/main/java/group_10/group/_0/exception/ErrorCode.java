@@ -33,7 +33,9 @@ public enum ErrorCode {
 
     //dung cho thong bao
     NOTIFICATION_NOT_EXISTED(1011, "ma thong bao khong ton tai", HttpStatus.NOT_FOUND),
-    FOLLOW_NOT_EXISTED(1011,"chưa tồn tại theo dõi" ,HttpStatus.NOT_FOUND );
+    FOLLOW_NOT_EXISTED(1011,"chưa tồn tại theo dõi" ,HttpStatus.NOT_FOUND ),
+    MEMBER_NOT_EXISTED(1011,"thành viên không tồn tại" ,HttpStatus.NOT_FOUND )
+    ;
 
 
 
