@@ -64,42 +64,42 @@ api.interceptors.request.use((config) => {
  * @param {"direct"|"group"} [type="all"]
  */
 export const getConversations = (type = "direct") =>
-  api.get(`/api/conversations/${type}`);
+  api.get(`/api/v1/conversations/${type}`);
 
 /**
- * GET /api/conversations/:id
+ * GET /api/v1/conversations/:id
  * @param {string} conversationId
  */
 export const getConversationById = (conversationId) =>
-  api.get(`/api/conversations/${conversationId}`);
+  api.get(`/api/v1/conversations/${conversationId}`);
 
 /**
- * GET /api/conversations/:id/messages?limit=50&offset=0
+ * GET /api/v1/conversations/:id/messages?limit=50&offset=0
  * @param {string} conversationId
  * @param {{ limit?: number, offset?: number }} params
  */
 export const getConversationMessages = (id, params = {}) =>
-  api.get(`/api/conversations/${id}/messages`, {
+  api.get(`/api/v1/conversations/${id}/messages`, {
     params: { limit: 50, offset: 0, ...params },
   });
 
 // ─── Messages ───────────────────────────────────────────────────────────────
 
 /**
- * PUT /api/messages/:id
+ * PUT /api/v1/messages/:id
  * @param {string} messageId
  * @param {{ content: string, userId: number }} data
  */
 export const updateMessage = (messageId, data) =>
-  api.put(`/api/messages/${messageId}`, data);
+  api.put(`/api/v1/messages/${messageId}`, data);
 
 /**
- * DELETE /api/messages/:id
+ * DELETE /api/v1/messages/:id
  * @param {string} messageId
  * @param {number} userId
  */
 export const deleteMessage = (messageId, userId) =>
-  api.delete(`/api/messages/${messageId}`, { data: { userId } });
+  api.delete(`/api/v1/messages/${messageId}`, { data: { userId } });
 
 export default api;
 
