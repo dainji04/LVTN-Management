@@ -2,9 +2,9 @@
   "name": "chat-service",
   "version": "1.0.0",
   "description": "",
-  "main": "v2/server.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon v2/server.js"
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",

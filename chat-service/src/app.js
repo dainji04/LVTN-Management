@@ -21,7 +21,7 @@ app.get("/health", (req, res) => {
 
 
 // routes
-app.use("/api/", chatRoutes);
+app.use("/api/v1/", chatRoutes);
 
  
 // error middleware
