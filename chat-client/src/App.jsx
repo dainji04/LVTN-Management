@@ -4,6 +4,7 @@ import viVN from "antd/locale/vi_VN";
 import LoginPage from "./pages/LoginPage";
 import ChatPage from "./pages/ChatPage";
 import ChatProvider from "./context/ChatProvider.jsx"
+import "./i18n/i18n";
 
 // Ant Design theme override — primary = #F4517A
 const antdTheme = {

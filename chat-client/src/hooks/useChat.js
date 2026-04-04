@@ -363,8 +363,8 @@ const useChat = (token) => {
   );
 
   const editMessageAction = useCallback(
-    (conversationId, messageId, newContent) => {
-      wsEditMessage({ conversationId, messageId, newContent });
+    (conversationId, messageId, content) => {
+      wsEditMessage({ conversationId, messageId, content });
     },
     [wsEditMessage]
   );
