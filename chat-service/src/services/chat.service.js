@@ -310,6 +310,7 @@ class ChatService {
     try {
       const { messageId, content } = data;
       const userId = socket.userId;
+      console.log(`User ${userId} editing message ${messageId}:`, data);
 
       // Lấy tin nhắn gốc để kiểm tra quyền
       const message = await Message.getById(messageId);
