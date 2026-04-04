@@ -1,73 +1,132 @@
 import React, { useState } from "react";
 import { formatMessageTime } from "../utils/formatTime";
 import { useChatContext } from "../context/ChatContext.jsx";
-import { deleteMessage } from "../api/chatApi";
 
-
-const MessageBubble = ({ message, onMessageDeleted }) => {
-  const { currentUser } = useChatContext();
+const MessageBubble = ({ message }) => {
+  // Lấy thêm action xóa và sửa từ Context
+  const { currentUser, deleteMessageAction, editMessageAction } = useChatContext();
+  
+  // State cho việc Xóa và Sửa
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(message.NoiDung || "");
 
-  // const { text, image, isSelf, timestamp } = message; Hình ảnh chưa có nên tạm thời ẩn đi, sau này sửa lại
-  const { MaTinNhan, NoiDung, MaNguoiGui, NgayGuiTinNhan } = message;
+  const { MaTinNhan, NoiDung, MaNguoiGui, NgayGuiTinNhan, MaCuocTroChuyen } = message;
   const time = formatMessageTime(NgayGuiTinNhan);
 
   const isSelf = MaNguoiGui === currentUser?.id;
 
-  // Hàm xóa tin nhắn
-  const handleDeleteMessage = async () => {
+  // ─── XỬ LÝ XÓA ──────────────────────────────────────────────
+  const handleDeleteMessage = () => {
     if (!window.confirm("Bạn chắc chắn muốn xóa tin nhắn này?")) return;
     
     setIsDeleting(true);
     try {
-      await deleteMessage(MaTinNhan, currentUser?.id);
-      if (onMessageDeleted) {
-        onMessageDeleted(MaTinNhan);
+      if (deleteMessageAction) {
+        deleteMessageAction(MaCuocTroChuyen, MaTinNhan);
       }
     } catch (error) {
-      console.error("Lỗi xóa tin nhắn:", error);
+      console.error("Lỗi gửi yêu cầu xóa qua socket:", error);
       alert("Không thể xóa tin nhắn!");
     } finally {
-      setIsDeleting(false);
+      setTimeout(() => setIsDeleting(false), 500);
     }
   }; 
-  if (isSelf) {
+
+  // ─── XỬ LÝ SỬA ──────────────────────────────────────────────
+  const handleSaveEdit = () => {
+    // Nếu nội dung trống hoặc không có gì thay đổi thì hủy bỏ
+    if (!editContent.trim() || editContent === NoiDung) {
+      setIsEditing(false);
+      return;
+    }
+    
+    try {
+      if (editMessageAction) {
+        editMessageAction(MaCuocTroChuyen, MaTinNhan, editContent);
+      }
+      setIsEditing(false); // Tắt form sửa sau khi gửi lệnh
+    } catch (error) {
+      console.error("Lỗi gửi yêu cầu sửa:", error);
+    }
+  };
+
+  // ─── GIAO DIỆN KHI ĐANG SỬA TIN NHẮN ──────────────────────────
+  if (isEditing && isSelf) {
     return (
-      <div className="message-bubble flex mb-4 justify-end group">
-        <div className="flex items-center gap-2">
-          {/* Nút xóa (ẩn đi, hiện khi hover) */}
-          {isSelf && (
-            <button
-              onClick={handleDeleteMessage}
-              disabled={isDeleting}
-              className="px-2 py-1 text-xs bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 disabled:opacity-50"
-              title="Xóa tin nhắn"
+      <div className="message-bubble flex mb-4 justify-end">
+        <div className="flex flex-col items-end gap-2 max-w-md w-full">
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="w-full text-sm text-black px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none shadow-sm"
+            rows="2"
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <button 
+              onClick={() => {
+                setIsEditing(false);
+                setEditContent(NoiDung); // Phục hồi nội dung cũ nếu bấm Hủy
+              }}
+              className="px-3 py-1 text-xs text-gray-600 bg-gray-200 rounded hover:bg-gray-300 transition"
             >
-              {isDeleting ? "Đang xóa..." : "Xóa"}
+              Hủy
             </button>
-          )}
-          <div className="message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-primary text-white">
-            {/* {image && (
-              <p className="mb-2">
-                <img src={image} alt="shared" className="rounded-lg max-w-full h-auto" />
-              </p>
-            )} */}
-            {NoiDung && <p className="text-sm whitespace-pre-wrap">{NoiDung}</p>}
-            <p className="text-xs mt-1 text-white/70">{time}</p>
+            <button 
+              onClick={handleSaveEdit}
+              className="px-3 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600 transition shadow-sm"
+            >
+              Lưu
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
+  // ─── GIAO DIỆN BÌNH THƯỜNG (CỦA BẠN) ──────────────────────────
+  if (isSelf) {
+    return (
+      <div className="message-bubble flex mb-4 justify-end group">
+        <div className="flex items-center gap-2">
+          {/* Nhóm Nút thao tác (ẩn đi, hiện khi hover) */}
+          <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => {
+                setEditContent(NoiDung); // Đảm bảo lấy nội dung mới nhất
+                setIsEditing(true);
+              }}
+              className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+              title="Sửa tin nhắn"
+            >
+              Sửa
+            </button>
+            <button
+              onClick={handleDeleteMessage}
+              disabled={isDeleting}
+              className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 transition"
+              title="Xóa tin nhắn"
+            >
+              {isDeleting ? "..." : "Xóa"}
+            </button>
+          </div>
+
+          <div className="message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-primary text-white shadow-sm">
+            {/* {image && ( ... )} */}
+            {NoiDung && <p className="text-sm whitespace-pre-wrap">{NoiDung}</p>}
+            <p className="text-xs mt-1 text-white/70 text-right">{time}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── GIAO DIỆN BÌNH THƯỜNG (CỦA NGƯỜI KHÁC) ───────────────────
   return (
     <div className="message-bubble flex mb-4 justify-start">
-      <div className="message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-white text-gray-800">
-        {/* {image && (
-          <p className="mb-2">
-            <img src={image} alt="shared" className="rounded-lg max-w-full h-auto" />
-          </p>
-        )} */}
+      <div className="message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-white text-gray-800 border border-gray-100 shadow-sm">
+        {/* {image && ( ... )} */}
         {NoiDung && <p className="text-sm whitespace-pre-wrap">{NoiDung}</p>}
         <p className="text-xs mt-1 text-gray-500">{time}</p>
       </div>
