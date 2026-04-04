@@ -305,6 +305,87 @@ class ChatService {
     }
   }
 
+  // Sửa tin nhắn
+  async editMessage(socket, data) {
+    try {
+      const { messageId, content } = data;
+      const userId = socket.userId;
+
+      // Lấy tin nhắn gốc để kiểm tra quyền
+      const message = await Message.getById(messageId);
+      if (!message) {
+        throw new Error('Tin nhắn không tồn tại hoặc đã bị xóa');
+      }
+
+      // Chỉ người gửi mới được sửa
+      if (message.MaNguoiGui !== userId) {
+        throw new Error('Bạn không có quyền sửa tin nhắn này');
+      }
+
+      // Chỉ cho sửa tin nhắn dạng text
+      if (message.LoaiTinNhan !== 'text') {
+        throw new Error('Chỉ có thể sửa tin nhắn văn bản');
+      }
+
+      // Cập nhật DB
+      await Message.update(messageId, content);
+
+      // Lấy lại tin nhắn sau khi sửa
+      const updatedMessage = await Message.getById(messageId);
+
+      // Broadcast cho tất cả members trong conversation
+      this.io.to(`conversation_${message.MaCuocTroChuyen}`).emit('message_edited', {
+        conversationId: message.MaCuocTroChuyen,
+        message: updatedMessage,
+      });
+
+      return { success: true, message: updatedMessage };
+    } catch (error) {
+      console.error('Error editing message:', error);
+      socket.emit('error', { message: error.message });
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Xóa tin nhắn (soft delete)
+  async deleteMessage(socket, data) {
+    try {
+      const { messageId } = data;
+      const userId = socket.userId;
+
+      // Lấy tin nhắn gốc để kiểm tra quyền
+      const message = await Message.getById(messageId);
+      if (!message) {
+        throw new Error('Tin nhắn không tồn tại hoặc đã bị xóa');
+      }
+
+      // Chỉ người gửi hoặc admin nhóm mới được xóa
+      const isSender = message.MaNguoiGui === userId;
+      // const isAdmin  = await Conversation.isAdmin(message.MaCuocTroChuyen, userId);
+
+      if (!isSender) {
+        throw new Error('Bạn không có quyền xóa tin nhắn này');
+      }
+
+      // Soft delete
+      await Message.delete(messageId);
+
+      // Broadcast cho tất cả members
+      this.io.to(`conversation_${message.MaCuocTroChuyen}`).emit('message_deleted', {
+        conversationId: message.MaCuocTroChuyen,
+        messageId,
+        deletedBy: userId,
+        deletedAt: new Date(),
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      socket.emit('error', { message: error.message });
+      return { success: false, error: error.message };
+    }
+  }
+
   // Lấy online users
   getOnlineUsers() {
     return Array.from(this.onlineUsers.keys());

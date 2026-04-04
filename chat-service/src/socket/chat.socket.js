@@ -71,6 +71,14 @@ module.exports = (io) => {
       await chatService.markAsRead(socket.userId, data);
     }));
 
+    socket.on("edit_message", withContext(socket, async (data) => {
+      await chatService.editMessage(socket.userId, data);
+    }));
+
+    socket.on("delete_message", withContext(socket, async (data) => {
+      await chatService.deleteMessage(socket.userId, data);
+    }));
+
     socket.on("disconnect", withContext(socket, async () => {
 
       if (socket.userId) {
