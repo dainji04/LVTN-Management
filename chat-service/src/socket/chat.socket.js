@@ -72,11 +72,11 @@ module.exports = (io) => {
     }));
 
     socket.on("edit_message", withContext(socket, async (data) => {
-      await chatService.editMessage(socket.userId, data);
+      await chatService.editMessage(socket, data);
     }));
 
     socket.on("delete_message", withContext(socket, async (data) => {
-      await chatService.deleteMessage(socket.userId, data);
+      await chatService.deleteMessage(socket, data);
     }));
 
     socket.on("disconnect", withContext(socket, async () => {
