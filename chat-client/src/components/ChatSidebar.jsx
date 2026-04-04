@@ -5,20 +5,34 @@ import {
   PlayCircleOutlined, MessageOutlined, BellOutlined,
   PlusCircleOutlined, UserOutlined, MenuOutlined,
 } from "@ant-design/icons";
+import { ChangeLanguage } from "./ChangeLanguage.jsx";
+import { useTranslation } from "react-i18next";
+
 
 const NAV_ITEMS = [
-  { icon: <HomeOutlined />,        label: "Trang chủ",     path: "/" },
-  { icon: <SearchOutlined />,      label: "Tìm kiếm",      path: "/search" },
-  { icon: <TeamOutlined />,        label: "Nhóm",          path: "/groups" },
-  { icon: <CompassOutlined />,     label: "Khám phá",      path: "/explore" },
-  { icon: <PlayCircleOutlined />,  label: "Reels",         path: "/reels" },
-  { icon: <MessageOutlined />,     label: "Tin nhắn",      path: "/messages" },
-  { icon: <BellOutlined />,        label: "Thông báo",     path: "/notifications", badge: 2 },
-  { icon: <PlusCircleOutlined />,  label: "Tạo",           path: "/create" },
-  { icon: <UserOutlined />,        label: "Trang cá nhân", path: "/profile" },
+  // { icon: <HomeOutlined />,        label: "Trang chủ",     path: "/" },
+  // { icon: <SearchOutlined />,      label: "Tìm kiếm",      path: "/search" },
+  // { icon: <TeamOutlined />,        label: "Nhóm",          path: "/groups" },
+  // { icon: <CompassOutlined />,     label: "Khám phá",      path: "/explore" },
+  // { icon: <PlayCircleOutlined />,  label: "Reels",         path: "/reels" },
+  // { icon: <MessageOutlined />,     label: "Tin nhắn",      path: "/messages" },
+  // { icon: <BellOutlined />,        label: "Thông báo",     path: "/notifications", badge: 2 },
+  // { icon: <PlusCircleOutlined />,  label: "Tạo",           path: "/create" },
+  // { icon: <UserOutlined />,        label: "Trang cá nhân", path: "/profile" },
+  { icon: <HomeOutlined />,        label: "home",     path: "/" },
+  { icon: <SearchOutlined />,      label: "search",      path: "/search" },
+  { icon: <TeamOutlined />,        label: "groups",          path: "/groups" },
+  { icon: <CompassOutlined />,     label: "explore",      path: "/explore" },
+  { icon: <PlayCircleOutlined />,  label: "reels",         path: "/reels" },
+  { icon: <MessageOutlined />,     label: "messages",      path: "/messages" },
+  { icon: <BellOutlined />,        label: "notifications",     path: "/notifications", badge: 2 },
+  { icon: <PlusCircleOutlined />,  label: "create",           path: "/create" },
+  { icon: <UserOutlined />,        label: "profile", path: "/profile" },
 ];
 
 const ChatSidebar = ({ currentUser, onLogout, activePath = "/messages" }) => {
+  const { t } = useTranslation();
+
   const [active, setActive] = useState(activePath);
 
   return (
@@ -52,7 +66,7 @@ const ChatSidebar = ({ currentUser, onLogout, activePath = "/messages" }) => {
             className={`nav-item flex items-center py-3 px-4 rounded-lg transition-colors text-black ${active === path ? "active" : ""}`}
           >
             <span className="text-xl mr-3 anticon">{icon}</span>
-            <span className="font-medium">{label}</span>
+            <span className="font-medium">{t(label)}</span>
             {badge > 0 && (
               <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {badge}
@@ -61,9 +75,9 @@ const ChatSidebar = ({ currentUser, onLogout, activePath = "/messages" }) => {
           </a>
         ))}
       </nav>
-
+        
       {/* User profile */}
-      <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+      <div className="p-4 border-t border-gray-200">
         <div className="group-user flex items-center space-x-3">
           <Avatar
             src={currentUser?.avatar || "https://testingbot.com/free-online-tools/random-avatar/100"}
@@ -74,17 +88,12 @@ const ChatSidebar = ({ currentUser, onLogout, activePath = "/messages" }) => {
             <span className="text-sm font-semibold">
               {currentUser?.name || currentUser?.username || "Username"}
             </span>
-            <p className="text-primary text-xs cursor-pointer">Trang cá nhân</p>
+            <p className="text-primary text-xs cursor-pointer">{t("profile")}</p>
           </div>
         </div>
-        <a
-          className="ant-dropdown-link ant-dropdown-trigger cursor-pointer"
-          onClick={onLogout}
-          title="Đăng xuất"
-        >
-          Đăng xuất
-          <MenuOutlined />
-        </a>
+
+        <ChangeLanguage onLogout={onLogout} />
+        
       </div>
     </div>
   );

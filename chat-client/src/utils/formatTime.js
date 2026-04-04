@@ -1,3 +1,5 @@
+import i18n from "../i18n/i18n.js";
+
 export const formatTime = (date) => {
   if (!date) return "";
   const d = typeof date === "string" ? new Date(date) : date;
@@ -15,12 +17,19 @@ export const formatChatTime = (date) => {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "Vừa xong";
-  if (diffMins < 60) return `${diffMins} phút`;
-  if (diffHours < 24) return `${diffHours} giờ`;
-  if (diffDays === 1) return "Hôm qua";
+  if (diffMins < 1) return i18n.t("time.just_now");
+  if (diffMins < 60) return `${diffMins} ${i18n.t("time.minutes")}`;
+  if (diffHours < 24) return `${diffHours} ${i18n.t("time.hours")}`;
+  if (diffDays === 1) return i18n.t("time.yesterday");
 
-  const days = ["CN", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+  const days = [ i18n.t("days.sun"),
+    i18n.t("days.mon"),
+    i18n.t("days.tue"),
+    i18n.t("days.wed"),
+    i18n.t("days.thu"),
+    i18n.t("days.fri"),
+    i18n.t("days.sat")
+  ];
   if (diffDays < 7) return days[d.getDay()];
 
   return `${d.getDate()}/${d.getMonth() + 1}`;

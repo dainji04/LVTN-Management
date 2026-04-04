@@ -1,0 +1,36 @@
+{
+  "home": "Home",
+  "search": "Search",
+  "groups": "Groups",
+  "explore": "Explore",
+  "reels": "Reels",
+  "messages": "Messages",
+  "notifications": "Notifications",
+  "create": "Create",
+  "profile": "Profile",
+  "logout": "Logout",
+
+  "time": {
+    "just_now": "Just now",
+    "minutes": "min",
+    "hours": "hr",
+    "yesterday": "Yesterday"
+  },
+  "days": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  },
+
+  "message": "Message",
+  "welcome": "Welcome to AloChat!",
+  "welcome_disc": "Select a conversation to start messaging",
+
+  "friend_not_found": "No friends found",
+  "conversation_not_found": "No conversations yet",
+  "search_placeholder": "Search"
+}   

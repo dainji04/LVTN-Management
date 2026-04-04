@@ -3,6 +3,7 @@ import { Input, Avatar } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import ChatItem from "./ChatItem";
 import { searchFriends, getFriendsByIds, getMe } from "../api/userApi";
+import { useTranslation } from "react-i18next";
 
 // ── Skeleton loading row ──────────────────────────────────────────────────────
 const SkeletonRow = () => (
@@ -54,6 +55,8 @@ const ChatList = ({
   const [searchError, setSearchError] = useState("");
   const debounceRef                   = useRef(null);
   const [friendsMap, setFriendsMap] = useState({});
+
+  const { t } = useTranslation();
 
   const doSearch = useCallback(async (q) => {
     if (!q.trim()) { setFriends([]); return; }
@@ -140,7 +143,7 @@ const ChatList = ({
       if (friends.length === 0) return (
         <div className="flex flex-col items-center justify-center h-40 text-gray-400">
           <span className="text-3xl mb-2">🔍</span>
-          <p className="text-sm">Không tìm thấy bạn bè</p>
+          <p className="text-sm">{t("friend_not_found")}</p>
         </div>
       );
       return (
@@ -160,7 +163,7 @@ const ChatList = ({
     if (chats.length === 0) return (
       <div className="flex flex-col items-center justify-center h-40 text-gray-400">
         <span className="text-3xl mb-2">💬</span>
-        <p className="text-sm">Chưa có cuộc trò chuyện</p>
+        <p className="text-sm">{t("conversation_not_found")}</p>
       </div>
     );
     return chats.map((chat) => (
@@ -179,14 +182,14 @@ const ChatList = ({
     <>
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex-shrink-0">
-        <h2 className="text-xl font-bold text-gray-800">Tin nhắn</h2>
+        <h2 className="text-xl font-bold text-gray-800">{t("messages")}</h2>
       </div>
 
       {/* Search input */}
       <div className="p-2 border-b border-gray-200 flex-shrink-0">
         <Input
           prefix={<SearchOutlined className="text-gray-400" />}
-          placeholder="Tìm kiếm"
+          placeholder={t("search_placeholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           allowClear
