@@ -3,7 +3,7 @@ import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
 
 
-const MessageList = ({ messages = [], isTyping = false, loading = false }) => {
+const MessageList = ({ messages = [], isTyping = false, loading = false, onMessageDeleted }) => {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -29,7 +29,11 @@ const MessageList = ({ messages = [], isTyping = false, loading = false }) => {
   return (
     <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
       {messages.map(msg => (
-        <MessageBubble key={msg.MaTinNhan} message={msg} />
+        <MessageBubble 
+          key={msg.MaTinNhan} 
+          message={msg}
+          onMessageDeleted={onMessageDeleted}
+        />
       ))}
       {isTyping && <TypingIndicator />}
       <div ref={bottomRef} />

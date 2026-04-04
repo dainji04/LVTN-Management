@@ -13,7 +13,7 @@ const EmptyState = () => (
 
 const ChatWindow = ({
   chat, messages, loadingMessages, isTyping,
-  onSendMessage, onTyping, onStopTyping, onBack, isMobile = false,
+  onSendMessage, onTyping, onStopTyping, onBack, onMessageDeleted, isMobile = false,
 }) => {
   if (!chat) return <div className="flex-1 flex flex-col bg-white"><EmptyState /></div>;
   return (
@@ -23,6 +23,7 @@ const ChatWindow = ({
         messages={messages}
         loading={loadingMessages}
         isTyping={isTyping}
+        onMessageDeleted={onMessageDeleted}
       />
       <MessageInput
         conversationId={chat.id}

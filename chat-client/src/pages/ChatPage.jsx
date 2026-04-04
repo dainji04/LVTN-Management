@@ -46,6 +46,12 @@ const ChatPage = ({ onLogout }) => {
 
   const handleBack = useCallback(() => setMobileView("list"), []);
 
+  // Xóa tin nhắn khỏi danh sách
+  const handleMessageDeleted = useCallback((messageId) => {
+    console.log("Tin nhắn đã được xóa:", messageId);
+    // Optionally: refetch messages or filter from current state
+  }, []);
+
   return (
     <div className="home-container flex justify-between h-screen bg-[#f5f5f5] overflow-hidden">
 
@@ -85,6 +91,7 @@ const ChatPage = ({ onLogout }) => {
               onTyping={() => notifyTyping(activeConvId)}
               onStopTyping={() => notifyStopTyping(activeConvId)}
               onBack={handleBack}
+              onMessageDeleted={handleMessageDeleted}
               isMobile={mobileView === "chat"}
             />
           
