@@ -4,23 +4,27 @@
  * Singleton Socket.IO client — event names khớp chính xác với BE handler.
  *
  * ── Client → Server ──────────────────────────────────────────────────────────
- *  "user_connect"       ()                           → trigger sau khi connect
- *  "send_message"       { conversationId, content, type? }
- *  "create_conversation"{ participantIds, type?, name? }
- *  "typing"             { conversationId }
- *  "stop_typing"        { conversationId }
- *  "join_conversation"  { conversationId }
- *  "leave_conversation" { conversationId }
+ * "user_connect"       ()                           → trigger sau khi connect
+ * "send_message"       { conversationId, content, type? }
+ * "create_conversation"{ participantIds, type?, name? }
+ * "typing"             { conversationId }
+ * "stop_typing"        { conversationId }
+ * "join_conversation"  { conversationId }
+ * "leave_conversation" { conversationId }
+ * "delete_message"     { conversationId, messageId }
+ * "edit_message"       { conversationId, messageId, newContent }
  *
  * ── Server → Client ──────────────────────────────────────────────────────────
- *  "connected"          { userId, socketId, onlineUsers }
- *  "new_message"        { id, conversationId, senderId, content, type, createdAt, ... }
- *  "typing"             { conversationId, userId }
- *  "stop_typing"        { conversationId, userId }
- *  "user_online"        { userId }
- *  "user_offline"       { userId }
- *  "conversation_created" { conversation }
- *  "error"              { message }
+ * "connected"          { userId, socketId, onlineUsers }
+ * "new_message"        { id, conversationId, senderId, content, type, createdAt, ... }
+ * "typing"             { conversationId, userId }
+ * "stop_typing"        { conversationId, userId }
+ * "user_online"        { userId }
+ * "user_offline"       { userId }
+ * "conversation_created" { conversation }
+ * "message_deleted"    { conversationId, messageId }
+ * "message_edited"     { conversationId, message }
+ * "error"              { message }
  */
 
 import { io } from "socket.io-client";
@@ -150,6 +154,24 @@ class SocketIOService {
     this._emit("leave_conversation", { conversationId });
   }
 
+  /**
+   * Gửi yêu cầu xóa tin nhắn lên Server.
+   *
+   * @param {{ conversationId: string, messageId: string }} payload
+   */
+  deleteMessage(payload) {
+    this._emit("delete_message", payload);
+  }
+
+  /**
+   * Gửi yêu cầu SỬA tin nhắn lên Server.
+   *
+   * @param {{ conversationId: string, messageId: string, newContent: string }} payload
+   */
+  editMessage(payload) {
+    this._emit("edit_message", payload);
+  }
+
   // ─── Status ────────────────────────────────────────────────────────
 
   /** @returns {boolean} */
@@ -202,4 +224,3 @@ class SocketIOService {
 
 const socketService = new SocketIOService();
 export default socketService;
-
