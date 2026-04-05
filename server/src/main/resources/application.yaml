@@ -43,3 +43,7 @@ jwt:
   signerKey: ${SIGNER_JWT}
   valid-duration: 86400 #1 ngày
   refreshable-duration: 360000
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
