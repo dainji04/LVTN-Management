@@ -4,8 +4,10 @@ import {
   PhoneOutlined, VideoCameraOutlined, MoreOutlined, ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { useChatContext } from "../context/ChatContext.jsx";
+import { useTranslation } from "react-i18next";
 
 const ChatHeader = ({ chat, onBack, isMobile = false }) => {
+  const { t } = useTranslation();
   const { isUserOnline } = useChatContext();
   const online = isUserOnline(chat?.FriendId);
   console.log("Rendering ChatHeader for chat", chat);
@@ -35,7 +37,7 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
         <div>
           <h3 className="font-semibold text-gray-800">{chat.FriendHo??""} {chat.FriendTen??""}</h3>
           <p className={`text-xs ${chat.online ? "text-green-500" : "text-gray-400"}`}>
-            {online ? "Đang hoạt động" : "Không hoạt động"}
+            {online ? t("online") : t("offline")}
           </p>
         </div>
       </div>

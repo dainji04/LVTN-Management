@@ -4,13 +4,12 @@ import {
   CameraOutlined, PictureOutlined, SmileOutlined, SendOutlined,
 } from "@ant-design/icons";
 import { useChatContext } from "../context/ChatContext.jsx";
+import { useTranslation } from "react-i18next";
 
 
 const MessageInput = ({ onSend, onTyping, onStopTyping, disabled = false }) => {
-  const { activeConvRef, currentUserRef } = useChatContext();
-  const { activeConvId, currentUser } = useChatContext();
-  console.log("MessageInput render with conversationId:", activeConvId, "currentUser:", currentUser);
-  console.log("Refs - activeConvRef:", activeConvRef.current, "currentUserRef:", currentUserRef.current);
+  const { t } = useTranslation();
+  const { activeConvRef } = useChatContext();
   const [text, setText]               = useState("");
   const [isTypingLocal, setTypingLocal] = useState(false);
   const typingTimerRef                = useRef(null);
@@ -69,7 +68,7 @@ const MessageInput = ({ onSend, onTyping, onStopTyping, disabled = false }) => {
         {/* Text input */}
         <Input
           className="flex-1 rounded-full"
-          placeholder="Nhập tin nhắn..."
+          placeholder={t("message_placeholder")}
           value={text}
           onChange={handleChange}
           onKeyDown={handleKeyDown}

@@ -32,7 +32,18 @@
 
   "friend_not_found": "Không tìm thấy bạn bè nào",
   "conversation_not_found": "Chưa có cuộc trò chuyện nào",
-  "search_placeholder": "Tìm kiếm"
+  "search_placeholder": "Tìm kiếm",
 
+  "online": "Đang hoạt động",
+  "offline": "Không hoạt động",
+
+  "message_placeholder": "Nhập tin nhắn...",
+
+  "delete_message": "Xóa",
+  "edit_message": "Sửa",
+
+  "confirm_delete": "Bạn có chắc chắn muốn xóa tin nhắn này không?",
+  "cancel": "Hủy",
+  "confirm": "Xác nhận"
 
 }
