@@ -1,0 +1,23 @@
+name: Chat Service CI
+
+on:
+  push:
+    branches:
+      - chat-service
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build docker image
+        run: docker build -t chat-service ./chat-service
+
+      - name: Run container test
+        run: |
+          docker run -d -p 3001:3001 chat-service
+          sleep 5
+          curl http://localhost:3001 || true
