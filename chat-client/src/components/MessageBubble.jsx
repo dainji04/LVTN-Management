@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { formatMessageTime } from "../utils/formatTime";
 import { useChatContext } from "../context/ChatContext.jsx";
+import { useTranslation } from "react-i18next";
+import { Modal } from "antd";
 
 const MessageBubble = ({ message }) => {
+  const [modal, contextHolder] = Modal.useModal();
+  const { t } = useTranslation();
   // Lấy thêm action xóa và sửa từ Context
   const { currentUser, deleteMessageAction, editMessageAction } = useChatContext();
   
@@ -16,9 +20,20 @@ const MessageBubble = ({ message }) => {
 
   const isSelf = MaNguoiGui === currentUser?.id;
 
+  const confirmDelete = () => {
+    modal.confirm({
+      title: t("confirm_delete"),
+      okText: t("delete"),
+      cancelText: t("cancel"),
+      okType: "danger",
+      onOk() {
+        handleDeleteMessage();
+      }
+    });
+  };
+
   // ─── XỬ LÝ XÓA ──────────────────────────────────────────────
   const handleDeleteMessage = () => {
-    if (!window.confirm("Bạn chắc chắn muốn xóa tin nhắn này?")) return;
     
     setIsDeleting(true);
     try {
@@ -71,13 +86,13 @@ const MessageBubble = ({ message }) => {
               }}
               className="px-3 py-1 text-xs text-gray-600 bg-gray-200 rounded hover:bg-gray-300 transition"
             >
-              Hủy
+              {t("cancel")}
             </button>
             <button 
               onClick={handleSaveEdit}
               className="px-3 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600 transition shadow-sm"
             >
-              Lưu
+              {t("confirm")}
             </button>
           </div>
         </div>
@@ -100,15 +115,18 @@ const MessageBubble = ({ message }) => {
               className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
               title="Sửa tin nhắn"
             >
-              Sửa
+              {t("edit_message")}
             </button>
+
+               {contextHolder}
+              
             <button
-              onClick={handleDeleteMessage}
+              onClick={confirmDelete}
               disabled={isDeleting}
               className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 transition"
-              title="Xóa tin nhắn"
+              title={t("delete_message")}
             >
-              {isDeleting ? "..." : "Xóa"}
+              {isDeleting ? "..." : t("delete_message")}
             </button>
           </div>
 
