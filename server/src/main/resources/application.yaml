@@ -23,6 +23,7 @@ spring:
               - Path=/chat/**
             filters:
               - StripPrefix=1 #hàm .replace("/chat", "")
+              - RemoveRequestHeader=Host
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
     username: avnadmin
