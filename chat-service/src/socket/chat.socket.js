@@ -64,12 +64,12 @@ module.exports = (io) => {
     }));
 
     socket.on("react_message", withContext(socket, async (data) => {
-      await chatService.addReaction(socket.userId, data);
+      await chatService.addReaction(socket, data);
     }));
 
-    socket.on("mark_as_read", withContext(socket, async (data) => {
-      await chatService.markAsRead(socket.userId, data);
-    }));
+    // socket.on("mark_as_read", withContext(socket, async (data) => {
+    //   await chatService.markAsRead(socket, data);
+    // }));
 
     socket.on("edit_message", withContext(socket, async (data) => {
       await chatService.editMessage(socket, data);

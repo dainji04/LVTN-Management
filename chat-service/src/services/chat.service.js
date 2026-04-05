@@ -260,7 +260,8 @@ class ChatService {
   // Thêm reaction
   async addReaction(socket, data) {
     try {
-      const { messageId, userId, reaction } = data;
+      const { messageId, reaction } = data;
+      const userId = socket.userId;
 
       await Message.addReaction(messageId, userId, reaction);
 
