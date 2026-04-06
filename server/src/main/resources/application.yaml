@@ -14,28 +14,6 @@ springdoc:
     operations-sorter: alpha
 
 spring:
-  cloud:
-    gateway:
-      mvc:
-        routes:
-          - id: nodejs-chat-service
-            uri: ${nodejs.url}
-            predicates:
-              - Path=/chat/**
-            filters:
-              - RewritePath=/chat/(?<segment>.*), /$\{segment} # Cắt /chat, giữ lại phần đằng sau. VD: /chat/health -> /health
-              # 2. Dọn rác Proxy của Gateway
-              - RemoveRequestHeader=Origin
-              - RemoveRequestHeader=X-Forwarded-Host
-              - RemoveRequestHeader=X-Forwarded-Port
-              - RemoveRequestHeader=X-Forwarded-Proto
-              - RemoveRequestHeader=X-Forwarded-For
-              - RemoveRequestHeader=Forwarded
-
-              # 3. ÉP CỨNG HOST THEO CHUẨN CỦA GATEWAY
-              - RemoveRequestHeader=Host
-              - SetRequestHeader=Host, lvtn-management-14vw.onrender.com
-
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
     username: avnadmin
