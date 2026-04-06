@@ -199,5 +199,21 @@ public class AuthenticationService {
                 .build();
     }
 
+
+    /**
+     * Hàm dùng để giải mã token và lấy ra maNguoiDung (id)
+     */
+    public Integer getMaNguoiDungFromToken(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT = verifyToken(token, false);
+
+        Integer maNguoiDung = signedJWT.getJWTClaimsSet().getIntegerClaim("id");
+
+        if (maNguoiDung == null) {
+            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+        }
+
+        return maNguoiDung;
+    }
+
 }
 

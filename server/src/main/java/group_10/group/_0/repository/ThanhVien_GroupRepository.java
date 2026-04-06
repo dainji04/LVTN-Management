@@ -12,5 +12,10 @@ import java.util.List;
 @Repository
 public interface ThanhVien_GroupRepository extends JpaRepository<ThanhVienNhom, Integer> {
 
-    List<ThanhVienNhom> findByMaNhom_MaNhom(Integer idGroup);
+    List<ThanhVienNhom> findByMaNhom_Id(Integer idGroup);
+
+    long countById(Integer idGroup);
+
+    @Query("SELECT tv FROM ThanhVienNhom tv WHERE tv.maNhom.id = :maNhom AND tv.vaiTro IN ('ADMIN', 'MODERATOR')")
+    List<ThanhVienNhom> findQuanTriVienByMaNhom(@Param("maNhom") Integer maNhom);
 }

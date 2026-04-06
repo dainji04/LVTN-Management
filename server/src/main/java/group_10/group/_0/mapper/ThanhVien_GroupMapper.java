@@ -15,13 +15,13 @@ public interface ThanhVien_GroupMapper {
     @Mapping(target = "vaiTro", ignore = true)
     @Mapping(target = "ngayThamGia", ignore = true)
     @Mapping(target = "maNguoiDung.maNguoiDung", source = "maNguoiDung")
-    @Mapping(target = "maNhom.maNhom", source = "maNhom")
+    @Mapping(target = "maNhom.id", source = "maNhom")
     @Mapping(target = "duocMoiBoi.maNguoiDung", source = "duocMoiBoi")
     @Mapping(target = "chapNhanBoi.maNguoiDung", source = "chapNhanBoi")
     ThanhVienNhom toEntity(ThanhVien_GroupRequest request);
 
     @Mapping(source = "maNguoiDung.maNguoiDung", target = "maNguoiDung")
-    @Mapping(source = "maNhom.maNhom", target = "maNhom")
+    @Mapping(source = "maNhom.id", target = "maNhom")
     @Mapping(source = "duocMoiBoi.maNguoiDung", target = "duocMoiBoi")
     @Mapping(source = "chapNhanBoi.maNguoiDung", target = "chapNhanBoi")
     ThanhVien_GroupResponse toResponse(ThanhVienNhom entity);

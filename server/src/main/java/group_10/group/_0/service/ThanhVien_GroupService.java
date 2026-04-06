@@ -62,7 +62,7 @@ public class ThanhVien_GroupService {
 
     public List<ThanhVien_GroupResponse> DSThanhVien(Integer idGroup)
     {
-        return thanhVienGroupRepository.findByMaNhom_MaNhom(idGroup)
+        return thanhVienGroupRepository.findByMaNhom_Id(idGroup)
                 .stream()
                 .map(thanhVienGroupMapper ::toResponse)
                 .collect(Collectors.toList());
