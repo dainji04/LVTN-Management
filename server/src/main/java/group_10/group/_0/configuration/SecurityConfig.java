@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        //.jwt(jwt -> jwt.decoder(jwtDecoder())) // Bỏ comment dòng này ở code thật của bạn
+                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
                         .authenticationEntryPoint((request, response, authException) -> {
                             System.out.println("JWT Error: " + authException.getMessage());
                             response.sendError(401, authException.getMessage());
