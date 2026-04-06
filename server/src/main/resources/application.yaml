@@ -2,6 +2,7 @@ server:
   port: 8080
 
 nodejs:
+#  url: https://httpbin.org
   url: https://lvtn-management-14vw.onrender.com
 
 springdoc:
@@ -47,3 +48,4 @@ jwt:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
+
