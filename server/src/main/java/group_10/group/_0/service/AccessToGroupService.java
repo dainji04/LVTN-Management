@@ -65,6 +65,22 @@ public class AccessToGroupService {
 //    {
 //
 //    }
+    public List<AccessToGroupResponse> DSYeuCauChuaXuLy(Integer idGroup)
+    {
+        return accessToGroupRepository.findByMaNhom_IdAndTrangThai(idGroup, "DA_GUI")
+                .stream()
+                .map(accessToGroupMapper ::toResponse)
+                .toList();
+    }
+
+    public void huyYeuCau(Integer idYeuCau)
+    {
+        if (!accessToGroupRepository.existsById(idYeuCau))
+        {
+            throw new AppExceptions(ErrorCode.ACCESS_NOT_EXISTED);
+        }
+        accessToGroupRepository.deleteById(idYeuCau);
+    }
 
     public void accept(Integer id,AccessToGroupUpdateRequest request,String token)
     {
