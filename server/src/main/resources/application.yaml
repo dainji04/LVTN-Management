@@ -23,8 +23,8 @@ spring:
             predicates:
               - Path=/chat/**
             filters:
-              - StripPrefix=1 #hàm .replace("/chat", "")
-              - RemoveRequestHeader=Host
+              - RewritePath=/chat/(?<segment>.*), /$\{segment} # Cắt /chat, giữ lại phần đằng sau. VD: /chat/health -> /health
+#              - StripPrefix=1 #hàm .replace("/chat", "")
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
     username: avnadmin
