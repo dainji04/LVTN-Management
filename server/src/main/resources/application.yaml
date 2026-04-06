@@ -2,8 +2,8 @@ server:
   port: 8080
 
 nodejs:
-  url: https://lvtn-management-14vw.onrender.com
-
+  url: https://chat-service-social-media.onrender.com
+#  url: https://lvtn-management-14vw.onrender.com
 springdoc:
   api-docs:
     path: /api-docs
