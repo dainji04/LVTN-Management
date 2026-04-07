@@ -60,28 +60,6 @@ class ChatController {
     }
   }
 
-  // ─── Tìm kiếm bạn bè ───────────────────────────────────────────────────────
-  // GET /chat/friends/search?q=...
-  // Chat Service chỉ là proxy — gọi thẳng sang User Service
-  // (hoặc bỏ hẳn endpoint này, để client gọi trực tiếp User Service)
-  // static async searchFriends(req, res) {
-  //   try {
-  //     const userId = req.user.userId;
-  //     const { q } = req.query;
-
-  //     if (!q || q.trim().length === 0) {
-  //       return res.status(400).json({ error: 'Thiếu từ khóa tìm kiếm' });
-  //     }
-
-  //     // Gọi User Service — Chat Service không tự query Users
-  //     const friends = await userServiceClient.searchFriends(userId, q.trim());
-  //     res.json({ success: true, data: friends });
-  //   } catch (error) {
-  //     console.error('[searchFriends]', error);
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // }
-
   // ─── Chi tiết conversation ─────────────────────────────────────────────────
   // GET /chat/conversations/:id
   static async getConversation(req, res) {

@@ -271,8 +271,11 @@ class ChatService {
       // Lấy tất cả reactions
       const reactions = await Message.getReactions(messageId);
 
+      const conversationId = message.MaCuocTroChuyen;
+
       // Broadcast reaction update
       this.io.to(`conversation_${message.MaCuocTroChuyen}`).emit('reaction_update', {
+        conversationId,
         messageId,
         reactions
       });
