@@ -22,7 +22,7 @@ public interface AccessToGroupMapper {
 
     // 2. Map từ Entity sang Response
     @Mapping(source = "maNhom.id", target = "maNhom")
-    @Mapping(source = "maNguoiDung.maNguoiDung", target = "maNguoiDung")
+    @Mapping(source = "maNguoiDung.maNguoiDung", target = "id")
     @Mapping(source = "xuLyBoi.maNguoiDung", target = "xuLyBoi")
     AccessToGroupResponse toResponse(YeuCauThamGiaNhom entity);
 
