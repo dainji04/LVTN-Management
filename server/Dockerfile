@@ -18,4 +18,5 @@ COPY --from=build /app/target/group-10-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=80.0", "-XX:InitialRAMPercentage=50.0", "-jar", "app.jar"]
+# THÊM CỜ -Dsun.net.http.allowRestrictedHeaders=true ĐỂ SỬA LỖI 502 RENDER
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=80.0", "-XX:InitialRAMPercentage=50.0", "-Dsun.net.http.allowRestrictedHeaders=true", "-jar", "app.jar"]

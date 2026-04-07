@@ -3,6 +3,7 @@ package group_10.group._0.controller;
 import group_10.group._0.dto.request.BaiVietRequest;
 import group_10.group._0.dto.response.ApiResponse;
 import group_10.group._0.dto.response.BaiVietResponse;
+import group_10.group._0.dto.response.SliceResponse;
 import group_10.group._0.service.BaiVietService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +28,31 @@ public class BaiVietController {
 
     BaiVietService baiVietService;
 
-    // Lấy tất cả bài viết
+
+
     @GetMapping
-    @Operation(summary = "Lấy tất cả bài viết", description = "Trả về danh sách toàn bộ bài viết kèm ảnh")
-    public ApiResponse<List<BaiVietResponse>> getAllBaiViet() {
-        return ApiResponse.<List<BaiVietResponse>>builder()
+    @Operation(summary = "Lấy tất cả bài viết", description = "Lấy tất cả bài viết theo giá trị mặc định trang 0, 10 bài viết (nếu để trống)")
+    public ApiResponse<SliceResponse<BaiVietResponse>> getAllBaiViet_PhanTrang(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<SliceResponse<BaiVietResponse>>builder()
                 .code(200)
-                .data(baiVietService.getAllBaiViet())
+                .data(baiVietService.getAllBaiViet_PhanTrang(page, size))
                 .build();
     }
+
+
+
+
+    // Lấy tất cả bài viết
+//    @GetMapping
+//    @Operation(summary = "Lấy tất cả bài viết", description = "Trả về danh sách toàn bộ bài viết kèm ảnh")
+//    public ApiResponse<List<BaiVietResponse>> getAllBaiViet() {
+//        return ApiResponse.<List<BaiVietResponse>>builder()
+//                .code(200)
+//                .data(baiVietService.getAllBaiViet())
+//                .build();
+//    }
 
     // Lấy bài viết theo ID
     @GetMapping("/{id}")
