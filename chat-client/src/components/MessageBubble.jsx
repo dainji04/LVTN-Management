@@ -8,7 +8,7 @@ const MessageBubble = ({ message }) => {
   const [modal, contextHolder] = Modal.useModal();
   const { t } = useTranslation();
   // Lấy thêm action xóa và sửa từ Context
-  const { currentUser, deleteMessageAction, editMessageAction } = useChatContext();
+  const { currentUser, deleteMessageAction, editMessageAction, reactMessageAction } = useChatContext();
   
   // State cho việc Xóa và Sửa
   const [isDeleting, setIsDeleting] = useState(false);
@@ -19,6 +19,18 @@ const MessageBubble = ({ message }) => {
   const time = formatMessageTime(NgayGuiTinNhan);
 
   const isSelf = MaNguoiGui === currentUser?.id;
+
+  const REACTIONS = ["👍","❤️","😂","😮","😢"];
+
+  const handleReaction = (emoji) => {
+    if (!reactMessageAction) return;
+
+    reactMessageAction(
+      MaCuocTroChuyen,
+      MaTinNhan,
+      emoji
+    );
+  };
 
   const confirmDelete = () => {
     modal.confirm({
@@ -31,6 +43,35 @@ const MessageBubble = ({ message }) => {
       }
     });
   };
+
+  const renderReactions = () => {
+    if (!message.reactions || message.reactions.length === 0) return null;
+
+    return (
+      <div
+        className={`absolute -bottom-3 flex gap-1 bg-white border rounded-full px-2 py-0.5 shadow text-xs
+        ${isSelf ? "left-0" : "right-0"}`}
+      >
+        {message.reactions.map((r, index) => (
+          <span key={index}>{r.CamXuc}</span>
+        ))}
+      </div>
+    );
+  };
+
+  const renderReactionPicker = () => (
+    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+      {REACTIONS.map((emoji) => (
+        <button
+          key={emoji}
+          onClick={() => handleReaction(emoji)}
+          className="text-lg hover:scale-125 transition"
+        >
+          {emoji}
+        </button>
+      ))}
+    </div>
+  );
 
   // ─── XỬ LÝ XÓA ──────────────────────────────────────────────
   const handleDeleteMessage = () => {
@@ -80,7 +121,7 @@ const MessageBubble = ({ message }) => {
           />
           <div className="flex gap-2">
             <button 
-              onClick={() => {
+              onClick=  {() => {
                 setIsEditing(false);
                 setEditContent(NoiDung); // Phục hồi nội dung cũ nếu bấm Hủy
               }}
@@ -130,10 +171,11 @@ const MessageBubble = ({ message }) => {
             </button>
           </div>
 
-          <div className="message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-primary text-white shadow-sm">
-            {/* {image && ( ... )} */}
+          <div className="relative message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-primary text-white shadow-sm">
             {NoiDung && <p className="text-sm whitespace-pre-wrap">{NoiDung}</p>}
             <p className="text-xs mt-1 text-white/70 text-right">{time}</p>
+
+            {renderReactions()}
           </div>
         </div>
       </div>
@@ -142,12 +184,20 @@ const MessageBubble = ({ message }) => {
 
   // ─── GIAO DIỆN BÌNH THƯỜNG (CỦA NGƯỜI KHÁC) ───────────────────
   return (
-    <div className="message-bubble flex mb-4 justify-start">
-      <div className="message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-white text-gray-800 border border-gray-100 shadow-sm">
-        {/* {image && ( ... )} */}
+    <div className="message-bubble flex mb-4 justify-start group">
+      
+      <div className="relative message-content max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-white text-gray-800 border border-gray-100 shadow-sm">
+        
         {NoiDung && <p className="text-sm whitespace-pre-wrap">{NoiDung}</p>}
+        
         <p className="text-xs mt-1 text-gray-500">{time}</p>
+
+        {renderReactions()}
+
       </div>
+
+      {renderReactionPicker()}
+      
     </div>
   );
 };

@@ -203,6 +203,35 @@ const useChat = (token) => {
     joinConversation(convId);
     setActiveConvId(convId);
   }, []);
+  
+  const updateReaction = useCallback(
+    (conversationId, messageId, reactions) => {
+      console.log(`Cập nhật phản ứng cho tin nhắn ${messageId} trong cuộc trò chuyện ${conversationId}:`, reactions);
+      setMessagesByConversation((prev) => {
+        const current = prev[String(activeConvRef.current)] || [];
+
+        return {
+          ...prev,
+          [String(conversationId)]: current.map((msg) => {
+            if (String(msg.MaTinNhan) !== String(messageId)) return msg;
+            console.log(`Cập nhật phản ứng cho tin nhắn ${messageId}:`, reactions);
+            return {
+              ...msg,
+              reactions: reactions,
+            };
+          }),
+        };
+      });
+    },
+    []
+  );
+
+  const handleMessageReaction = useCallback(
+    ({ conversationId, messageId, reactions }) => {
+      updateReaction(conversationId, messageId, reactions);
+    },
+    [updateReaction]
+  );
 
   const handleTyping = useCallback(({ conversationId, userId }) => {
     const convId = String(conversationId);
@@ -273,8 +302,6 @@ const useChat = (token) => {
         const current = prev[String(conversationId)] || [];
         return {
           ...prev,
-          // ✅ FIX: Dùng merge thay vì replace toàn bộ
-          // Giữ lại các field cũ (avatar, tên,...), chỉ cập nhật field BE trả về
           [String(conversationId)]: current.map((msg) =>
             String(msg.MaTinNhan) === String(message.MaTinNhan)
               ? { ...msg, ...message }
@@ -296,6 +323,7 @@ const useChat = (token) => {
     createConversation,
     deleteMessage: wsDeleteMessage,
     editMessage:   wsEditMessage,
+    reactMessage
   } = useWebSocket({
     token,
     onConnected:           handleConnected,
@@ -307,9 +335,17 @@ const useChat = (token) => {
     onConversationCreated: handleConversationCreated,
     onMessageDeleted:      handleMessageDeletedSocket,
     onMessageEdited:       handleMessageEditedSocket,
+    onMessageReaction: handleMessageReaction
   });
 
   // ─── Public actions ─────────────────────────────────────────────────
+
+  const reactMessageAction = useCallback(
+  (conversationId, messageId, reaction) => {
+    reactMessage({ conversationId, messageId, reaction });
+  },
+  [reactMessage]
+);
 
   const selectConversation = useCallback(
     (convId) => {
@@ -322,6 +358,7 @@ const useChat = (token) => {
           String(c.MaCuocTroChuyen) === id ? { ...c, unread: 0 } : c
         )
       );
+      console.log("messageByConversation trước khi load:", messagesByConversation);
     },
     [activeConvId, joinConversation, leaveConversation]
   );
@@ -444,6 +481,7 @@ const useChat = (token) => {
     updateMessageInState,
     deleteMessageAction,
     editMessageAction,
+    reactMessageAction,
 
     // Selectors
     isUserOnline,

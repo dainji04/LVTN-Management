@@ -53,6 +53,7 @@ const useWebSocket = ({
   onMessageDeleted,
   onMessageEdited,
   onDisconnect,
+  onMessageReaction
 } = {}) => {
 
   // ─── Wrap tất cả callbacks thành stable version ─────────────────────
@@ -67,6 +68,7 @@ const useWebSocket = ({
   const stableOnMessageDeleted      = useStableCallback(onMessageDeleted);
   const stableOnMessageEdited       = useStableCallback(onMessageEdited);
   const stableOnDisconnect          = useStableCallback(onDisconnect);
+  const stableOnMessageReaction      = useStableCallback(onMessageReaction);
 
   // ─── Chỉ connect + register listeners 1 lần duy nhất ───────────────
   // Không cần re-run khi callback thay đổi vì đã dùng useRef bên trong
@@ -84,6 +86,7 @@ const useWebSocket = ({
       onMessageDeleted      && socketService.on("message_deleted",      stableOnMessageDeleted),
       onMessageEdited       && socketService.on("message_edited",       stableOnMessageEdited),
       onDisconnect          && socketService.on("disconnect",           stableOnDisconnect),
+      onMessageReaction     && socketService.on("reaction_update",     stableOnMessageReaction),
     ].filter(Boolean);
 
     return () => unsubs.forEach((unsub) => unsub());
@@ -132,6 +135,10 @@ const useWebSocket = ({
     socketService.editMessage(payload);
   }, []);
 
+  const reactMessage = useCallback((payload) => {
+    socketService.reactMessage(payload);
+  }, []);
+
   const isConnected = useCallback(() => socketService.isConnected(), []);
 
   return {
@@ -144,6 +151,7 @@ const useWebSocket = ({
     deleteMessage,
     editMessage,
     isConnected,
+    reactMessage
   };
 };
 

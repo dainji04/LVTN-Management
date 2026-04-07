@@ -172,6 +172,13 @@ class SocketIOService {
     this._emit("edit_message", payload);
   }
 
+  /**
+     * Gửi yêu cầu REACTION tin nhắn lên Server.
+     * @param {{ conversationId: string, messageId: string, emoji: string }} payload
+   */
+  reactMessage(payload) {
+    this._emit("react_message", payload);
+  }
   // ─── Status ────────────────────────────────────────────────────────
 
   /** @returns {boolean} */
