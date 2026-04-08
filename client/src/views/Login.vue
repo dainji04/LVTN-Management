@@ -125,24 +125,24 @@ const emailErrorMessage = computed<string>(() => {
 });
 
 const passwordErrorMessage = computed<string>(() => {
-  // const passwordRegex =
-  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   if (!userInfo.password) {
     return t("passwordRequired");
   }
 
-  // if (!passwordRegex.exec(userInfo.password)) {
-  //   return (
-  //     t("passwordMinLength") +
-  //     "\n" +
-  //     t("passwordSpecialChar") +
-  //     "\n" +
-  //     t("passwordNumber") +
-  //     "\n" +
-  //     t("passwordUppercase")
-  //   );
-  // }
+  if (!passwordRegex.exec(userInfo.password)) {
+    return (
+      t("passwordMinLength") +
+      "\n" +
+      t("passwordSpecialChar") +
+      "\n" +
+      t("passwordNumber") +
+      "\n" +
+      t("passwordUppercase")
+    );
+  }
 
   return "";
 });

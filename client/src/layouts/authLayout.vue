@@ -4,6 +4,7 @@
   >
     <!-- Left Sidebar -->
     <div
+      v-if="!hideLeftSidebar"
       class="sidebar w-64 bg-white border-r border-gray-200 flex flex-col left-0 top-0 h-full overflow-y-auto"
     >
       <slot name="left-sidebar"></slot>
@@ -27,6 +28,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   hideRightSidebar?: boolean;
+  hideLeftSidebar?: boolean;
 }>();
 </script>
 

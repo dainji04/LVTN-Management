@@ -6,16 +6,16 @@
         <template #overlay>
             <a-menu>
                 <a-menu-item key="1">
-                    <div class="flex items-center gap-2">
+                    <router-link to="/profile" class="flex items-center gap-2">
                         <UserOutlined />
                         <span>{{ $t('profile') }}</span>
-                    </div>
+                    </router-link>
                 </a-menu-item>
                 <a-menu-item key="2">
-                    <div class="flex items-center gap-2">
+                    <router-link to="/settings" class="flex items-center gap-2">
                         <SettingOutlined />
                         <span>{{ $t('settings') }}</span>
-                    </div>
+                    </router-link>
                 </a-menu-item>
                 <a-menu-item key="3" @click="handleLogout" class="flex items-center gap-2">
                     <div class="flex items-center gap-2">

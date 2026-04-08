@@ -29,6 +29,7 @@
                                 v-model="formData.lastName"
                                 @input="lastNameTouched = true"
                             />
+                            <p class="error-message" v-if="lastNameError">{{ lastNameError }}</p>
                         </div>
                         <div class="form-group-inner">
                             <input
@@ -38,7 +39,24 @@
                                 v-model="formData.firstName"
                                 @input="firstNameTouched = true"
                             />
+                            <p class="error-message" v-if="firstNameError">{{ firstNameError }}</p>
                         </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-black mb-2">
+                        {{ $t('username') }}<span class="text-primary">*</span>
+                    </label>
+                    <div class="form-group-inner">
+                        <input
+                            class="input-field"
+                            type="text"
+                            :placeholder="$t('username')"
+                            v-model="formData.username"
+                            @input="usernameTouched = true"
+                        />
+                        <p class="error-message" v-if="usernameError">{{ usernameError }}</p>
                     </div>
                 </div>
 
@@ -48,38 +66,47 @@
                         {{ $t('dateOfBirth') }}<span class="text-primary">*</span>
                     </label>
                     <div class="grid grid-cols-3 gap-2 sm:gap-4">
-                        <div class="form-group-inner relative">
-                            <select
-                                class="input-field appearance-none pr-8"
-                                v-model="formData.day"
-                                @change="dayTouched = true"
-                            >
-                                <option value="">{{ $t('day') }}</option>
-                                <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
-                            </select>
-                            <DownOutlined class="select-icon" />
+                        <div>
+                            <div class="form-group-inner relative">
+                                <select
+                                    class="input-field appearance-none pr-8"
+                                    v-model="formData.day"
+                                    @change="dayTouched = true"
+                                >
+                                    <option value="">{{ $t('day') }}</option>
+                                    <option v-for="d in 31" :key="d" :value="d">{{ d }}</option>
+                                </select>
+                                <DownOutlined class="select-icon" />
+                            </div>
+                            <p class="error-message" v-if="dateOfBirthError">{{ dateOfBirthError }}</p>
                         </div>
-                        <div class="form-group-inner relative">
-                            <select
-                                class="input-field appearance-none pr-8"
-                                v-model="formData.month"
-                                @change="monthTouched = true"
-                            >
-                                <option value="">{{ $t('month') }}</option>
-                                <option v-for="m in 12" :key="m" :value="m">{{ m }}</option>
-                            </select>
-                            <DownOutlined class="select-icon" />
+                        <div>
+                            <div class="form-group-inner relative">
+                                <select
+                                    class="input-field appearance-none pr-8"
+                                    v-model="formData.month"
+                                    @change="monthTouched = true"
+                                >
+                                    <option value="">{{ $t('month') }}</option>
+                                    <option v-for="m in 12" :key="m" :value="m">{{ m }}</option>
+                                </select>
+                                <DownOutlined class="select-icon" />
+                            </div>
+                            <p class="error-message" v-if="dateOfBirthError">{{ dateOfBirthError }}</p>
                         </div>
-                        <div class="form-group-inner relative">
-                            <select
-                                class="input-field appearance-none pr-8"
-                                v-model="formData.year"
-                                @change="yearTouched = true"
-                            >
-                                <option value="">{{ $t('year') }}</option>
-                                <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
-                            </select>
-                            <DownOutlined class="select-icon" />
+                        <div>
+                            <div class="form-group-inner relative">
+                                <select
+                                    class="input-field appearance-none pr-8"
+                                    v-model="formData.year"
+                                    @change="yearTouched = true"
+                                >
+                                    <option value="">{{ $t('year') }}</option>
+                                    <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
+                                </select>
+                                <DownOutlined class="select-icon" />
+                            </div>
+                            <p class="error-message" v-if="dateOfBirthError">{{ dateOfBirthError }}</p>
                         </div>
                     </div>
                 </div>
@@ -102,6 +129,7 @@
                         </select>
                         <DownOutlined class="select-icon" />
                     </div>
+                    <p class="error-message" v-if="genderError">{{ genderError }}</p>
                 </div>
 
                 <!-- Mobile or Email -->
@@ -121,6 +149,7 @@
                     <p class="text-xs text-gray-600 mt-2">
                         {{ $t('notificationInfo') }}
                     </p>
+                    <p class="error-message" v-if="emailError">{{ emailError }}</p>
                 </div>
 
                 <div class="form-group">
@@ -139,6 +168,7 @@
                     <p class="text-xs text-gray-600 mt-2">
                         {{ $t('notificationInfo') }}
                     </p>
+                    <p class="error-message" v-if="phoneNumberError">{{ phoneNumberError }}</p>
                 </div>
 
                 <!-- Password -->
@@ -158,6 +188,7 @@
                     <p class="text-xs text-gray-600 mt-2">
                         {{ $t('contactInfoNotice') }}
                     </p>
+                    <p class="error-message" v-if="passwordError">{{ passwordError }}</p>
                 </div>
 
                 <!-- Terms and Privacy Info -->
@@ -171,6 +202,7 @@
                     :classes="'w-full round py-3 px-4 text-white mb-4'"
                     :type="'primary'"
                     :is-disabled="isLoading"
+                    :html-type="'submit'"
                 >
                     <span v-if="!isLoading">{{ $t('submit') }}</span>
                     <span v-else>Loading...</span>
@@ -201,6 +233,8 @@ import { useRouter } from 'vue-router';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
 import { useI18n } from 'vue-i18n';
 import type { RegisterForm } from '../types/registerUser';
+import { useAuthStore } from '../store/authStore';
+import { notificationHelper } from '../helpers/notificationHelper';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -211,9 +245,10 @@ const isLoading = ref(false);
 const formData: RegisterForm = reactive({
     lastName: '',
     firstName: '',
-    day: '',
-    month: '',
-    year: '',
+    username: '',
+    day: 1,
+    month: 1,
+    year: 2000,
     gender: '',
     email: '',
     phoneNumber: '',
@@ -223,6 +258,7 @@ const formData: RegisterForm = reactive({
 // Touched states for validation
 const lastNameTouched = ref(false);
 const firstNameTouched = ref(false);
+const usernameTouched = ref(false);
 const dayTouched = ref(false);
 const monthTouched = ref(false);
 const yearTouched = ref(false);
@@ -245,6 +281,18 @@ const lastNameError = computed<string>(() => {
 const firstNameError = computed<string>(() => {
     if (!firstNameTouched.value) return '';
     if (!formData.firstName.trim()) return t('emailRequired');
+    return '';
+});
+
+const usernameError = computed<string>(() => {
+    if (!usernameTouched.value) return '';
+    if (!formData.username.trim()) return t('usernameRequired');
+    if (formData.username.length < 6) return t('usernameMinLength');
+    if (formData.username.length > 30) return t('usernameMaxLength');
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(formData.username)) {
+        return t('usernameInvalid');
+    }
     return '';
 });
 
@@ -320,20 +368,19 @@ const submitForm = async () => {
     }
 
     isLoading.value = true;
+    const authStore = useAuthStore();
     try {
-        // TODO: Implement API call
-        // const response = await helperApi('register', {
-        //     method: 'POST',
-        //     body: formData,
-        // });
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Redirect to login or home
-        router.push('/login');
-    } catch (error) {
-        console.error(error);
+        const response = await authStore.register(formData);
+        if (response === true) {
+            notificationHelper('success', t('registerSuccess'));
+            setTimeout(() => {
+                router.push('/login');
+            }, 1000);
+        } else if (typeof response === 'string') {
+            notificationHelper('error', response);
+        }
+    } catch (error: any) {
+        console.log(error);
     } finally {
         isLoading.value = false;
     }
