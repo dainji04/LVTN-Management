@@ -10,9 +10,10 @@ export const formatTime = (date) => {
 
 export const formatChatTime = (date) => {
   if (!date) return "";
-  const d = typeof date === "string" ? new Date(date) : date;
+  const inputDate = typeof date === "string" ? new Date(date) : date;
+  const d =  new Date(inputDate.getTime() + 7 * 3600000) // Bù giờ GMT+7 để so sánh đúng giờ Việt Nam
   const now = new Date();
-  const diffMs = now - d;
+  const diffMs = now - d; 
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
@@ -37,6 +38,7 @@ export const formatChatTime = (date) => {
 
 export const formatMessageTime = (date) => {
   if (!date) return "";
-  const d = typeof date === "string" ? new Date(date) : date;
-  return formatTime(d);
+  const inputDate = typeof date === "string" ? new Date(date) : date;
+  const d =  new Date(inputDate.getTime() + 7 * 3600000) // Bù giờ GMT+7 để hiển thị đúng giờ Việt Nam
+  return formatTime(d); 
 };
