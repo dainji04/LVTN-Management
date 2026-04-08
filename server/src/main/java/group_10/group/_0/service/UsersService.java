@@ -18,6 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.Normalizer;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -68,9 +72,33 @@ public class UsersService {
                 .replaceAll("\\s+", "");
     }
 
+    //Hàm lấy response của URL https://picsum.photos/820/312
+    private String fetchPicsumUrl(int width, int height) {
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.NEVER) // không follow, lấy Location header
+                    .build();
+
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("https://picsum.photos/" + width + "/" + height))
+                    .GET()
+                    .build();
+
+            HttpResponse<Void> response = client.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+
+            // Picsum trả về 302 với header Location chứa URL ảnh thật
+            return response.headers()
+                    .firstValue("Location")
+                    .orElse("https://picsum.photos/" + width + "/" + height); // fallback
+
+        } catch (Exception e) {
+            return "https://picsum.photos/" + width + "/" + height; // fallback nếu lỗi
+        }
+    }
+
     public UsersResponse createUser(UsersRequest request) {
         if (repository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã tồn tại: " + request.getEmail());
+            throw new AppExceptions(ErrorCode.EMAIL_IS_EXISTED);
         }
 
         Users user = mapper.toTaikhoan(request);
@@ -81,14 +109,14 @@ public class UsersService {
 
         // Tự động tạo avatar nếu không có
         if (request.getAnhDaiDien() == null || request.getAnhDaiDien().isBlank()) {
-            String ho = removeDiacritics(request.getHo());
             String ten = removeDiacritics(request.getTen());
-            String avatar = "https://ui-avatars.com/api/?name="
-                    + ten + "+" + ho
-                    + "&background=random&color=fff";
+            String avatar = "https://api.dicebear.com/9.x/adventurer/svg?seed=" + ten;
             user.setAnhDaiDien(avatar);
         }
 
+        if (request.getAnhNen() == null || request.getAnhNen().isBlank()) {
+            user.setAnhNen(fetchPicsumUrl(820, 312));
+        }
         return mapper.toTaikhoanResponse(repository.save(user));
     }
 

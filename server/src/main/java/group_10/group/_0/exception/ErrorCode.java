@@ -9,6 +9,7 @@ public enum ErrorCode {
     USER_EXISTED(9998,"Da ton tai user",HttpStatus.CONFLICT),
     INVALID_KEY(9122,"KEY NOT VALID",HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1005, "User khong ton tai", HttpStatus.NOT_FOUND),
+    EMAIL_IS_EXISTED(1005, "Email da ton tai", HttpStatus.NOT_FOUND),
     IDVAITRO_EMPTY(1019, "Trang thai hoat dong khong duoc de trong", HttpStatus.BAD_REQUEST),
 
     // Validate du lieu dau vao

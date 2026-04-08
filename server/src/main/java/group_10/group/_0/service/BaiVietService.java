@@ -70,16 +70,6 @@ public class BaiVietService {
                 .build();
     }
 
-
-
-//    // Lấy tất cả bài viết
-//    public List<BaiVietResponse> getAllBaiViet() {
-//        return baiVietRepository.findAll()
-//                .stream()
-//                .map(baiViet -> getBaiVietById(baiViet.getId()))
-//                .toList();
-//    }
-
     // Lấy bài viết theo ID
     public BaiVietResponse getBaiVietById(Integer id) {
         BaiViet baiViet = baiVietRepository.findById(id)
@@ -96,6 +86,41 @@ public class BaiVietService {
         response.setDanhSachAnh(danhSachAnh);
 
         return response;
+    }
+
+
+    public SliceResponse<BaiVietResponse> getBaiVietByUser(Integer maNguoiDung, int page, int size) {
+        if (!usersRepository.existsById(maNguoiDung))
+            throw new RuntimeException("User không tồn tại: " + maNguoiDung);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Slice<BaiViet> slice = baiVietRepository
+                .findByMaNguoiDung_MaNguoiDungOrderByNgayTaoDesc(maNguoiDung, pageable);
+
+        List<Integer> ids = slice.getContent().stream().map(BaiViet::getId).toList();
+
+        Map<Integer, List<String>> anhMap = hinhAnhRepository
+                .findByMaDoiTuongInAndLoaiDoiTuong(ids, "BaiViet")
+                .stream()
+                .collect(Collectors.groupingBy(
+                        HinhAnh::getMaDoiTuong,
+                        Collectors.mapping(HinhAnh::getDuongDan, Collectors.toList())
+                ));
+
+        List<BaiVietResponse> content = slice.getContent().stream()
+                .map(baiViet -> {
+                    BaiVietResponse res = mapper.toBaiVietResponse(baiViet);
+                    res.setDanhSachAnh(anhMap.getOrDefault(baiViet.getId(), List.of()));
+                    return res;
+                })
+                .toList();
+
+        return SliceResponse.<BaiVietResponse>builder()
+                .content(content)
+                .hasNext(slice.hasNext())
+                .page(page)
+                .size(size)
+                .build();
     }
 
     // Lấy tất cả bài viết của 1 user

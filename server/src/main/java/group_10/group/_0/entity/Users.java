@@ -39,7 +39,7 @@ public class Users {
     private String anhDaiDien;
 
     @Size(max = 100)
-    @Column(name = "AnhNen", length = 100)
+    @Column(name = "AnhNen", length = 255)
     private String anhNen;
 
     @Column(name = "NgaySinh")

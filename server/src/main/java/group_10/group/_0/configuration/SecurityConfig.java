@@ -37,11 +37,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // CỰC KỲ QUAN TRỌNG: Cho phép tất cả các request OPTIONS (Preflight của Web) đi qua
+                        // Cho phép tất cả các request OPTIONS (Preflight của Web) đi qua
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Thêm /health vào danh sách public nếu bạn muốn Web/Postman gọi thẳng không cần Token
-                        .requestMatchers("/health").permitAll()
 
                         .requestMatchers(
                                 "/users/login",
@@ -69,77 +66,6 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-
-
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                // 1. PHẢI CÓ: Kích hoạt CORS trong Spring Security
-//                .cors(Customizer.withDefaults())
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(
-//                                "/users/login",
-//                                "/users/register",
-//                                "/swagger-ui/**",
-//                                "/swagger-ui.html",
-//                                "/api-docs/**",
-//                                "/api-docs",
-//                                "/swagger-resources/**",
-//                                "/webjars/**",
-//                                "/chat/**",
-//                                "/thongbao/subscribe/**",
-//                                "/thongbao/**"
-//                        ).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").permitAll()
-//                        .requestMatchers(HttpMethod.HEAD, "/users", "/users/{id}").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .oauth2ResourceServer(oauth2 -> oauth2
-//                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
-//                        .authenticationEntryPoint((request, response, authException) -> {
-//                            System.out.println("JWT Error: " + authException.getMessage());
-//                            response.sendError(401, authException.getMessage());
-//                        })
-//                );
-//        return http.build();
-//    }
-
-
-
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(
-//                                "/users/login",
-//                                "/users/register",
-//                                "/swagger-ui/**",
-//                                "/swagger-ui.html",
-//                                "/api-docs/**",
-//                                "/api-docs",
-//                                "/swagger-resources/**",
-//                                "/webjars/**",
-//                                "/chat/**",
-//                                "/thongbao/subscribe/**",
-//                                "/thongbao/**"
-//                        ).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-////                .oauth2ResourceServer(oauth2 -> oauth2
-////                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
-////                );
-//                .oauth2ResourceServer(oauth2 -> oauth2
-//                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
-//                        .authenticationEntryPoint((request, response, authException) -> {
-//                            System.out.println("JWT Error: " + authException.getMessage());
-//                            response.sendError(401, authException.getMessage());
-//                        })
-//                );
-//        return http.build();
-//    }
 
     @Bean
     public JwtDecoder jwtDecoder() {

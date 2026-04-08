@@ -17,4 +17,7 @@ public interface BaiVietRepository extends JpaRepository<BaiViet, Integer> {
     List<BaiViet> findByMaNguoiDung_MaNguoiDung(Integer maNguoiDung);
 
     Slice<BaiViet> findAllByOrderByNgayTaoDesc(Pageable pageable);
+
+    Slice<BaiViet> findByMaNguoiDung_MaNguoiDungOrderByNgayTaoDesc(Integer maNguoiDung, Pageable pageable); // thêm dòng này
+
 }
