@@ -44,11 +44,20 @@ class ChatService {
 
   // Broadcast trạng thái user
   broadcastUserStatus(userId, status) {
-    this.io.emit('user_status', {
-      userId,
-      status,
-      timestamp: new Date()
-    });
+    if (status === 'online') 
+      this.io.emit('user_online', {
+        userId,
+        status,
+        timestamp: new Date()
+      });
+    else if (status === 'offline')
+      this.io.emit('user_offline', {
+        userId,
+        status,
+        timestamp: new Date()
+      });
+    else
+      console.warn(`Unknown status ${status} for user ${userId}`);
   }
 
   // Gửi tin nhắn
