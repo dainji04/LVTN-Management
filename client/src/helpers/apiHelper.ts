@@ -20,6 +20,11 @@ if (!apiUrl.startsWith("http://") && !apiUrl.startsWith("https://")) {
   apiUrl = `http://${apiUrl}`;
 }
 
+let exceptUrls = [
+  "/users/login",
+  "/users/register",
+];
+
 // Create axios instance with default configuration
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: apiUrl,
@@ -48,7 +53,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !exceptUrls.includes(error.response?.config?.url)) {
       // Token expired or invalid, clear auth and redirect to login
       useAuthStore().logout();
       window.location.href = "/login";
@@ -72,11 +77,13 @@ export const helperApi = async (collection: string, options: options = {}) => {
     params,
     withCredentials = false,
   } = options;
+  const token = useAuthStore().getToken;
 
   const config: AxiosRequestConfig = {
     method: method.toLowerCase() as any,
     url: collection,
     headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
     withCredentials,

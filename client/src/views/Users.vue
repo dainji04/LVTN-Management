@@ -3,8 +3,21 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Danh sách người dùng</h1>
-        <p class="text-gray-600 mt-2">Quản lý và xem thông tin người dùng</p>
+        <h1 class="text-3xl font-bold text-gray-900">{{ $t("userListTitle") }}</h1>
+        <p class="text-gray-600 mt-2">{{ $t("userListSubtitle") }}</p>
+      </div>
+
+      <!-- Search -->
+      <div class="mb-4">
+        <input
+          v-model.trim="searchKeyword"
+          type="text"
+          :placeholder="$t('userSearchPlaceholder')"
+          class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"
+        />
+        <p class="text-sm text-gray-500 mt-2">
+          {{ $t("foundUsers", { count: filteredUsers.length }) }}
+        </p>
       </div>
 
       <!-- Loading State -->
@@ -70,7 +83,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr
-                v-for="user in users"
+                v-for="user in filteredUsers"
                 :key="user.maNguoiDung"
                 class="hover:bg-gray-50 cursor-pointer transition-colors"
                 @click="goToUserDetail(user.maNguoiDung)"
@@ -147,8 +160,8 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="users.length === 0" class="text-center py-12">
-          <p class="text-gray-500">Không có người dùng nào</p>
+        <div v-if="filteredUsers.length === 0" class="text-center py-12">
+          <p class="text-gray-500">{{ $t("noMatchingUsers") }}</p>
         </div>
       </div>
     </div>
@@ -156,17 +169,42 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axiosInstance from "../helpers/apiHelper";
 import { notificationHelper } from "../helpers/notificationHelper";
 import type { User } from "../types/userType";
 import type { ApiResponse } from "../types/responseAxios";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 const users = ref<User[]>([]);
 const isLoading = ref(false);
 const error = ref<string>("");
+const searchKeyword = ref("");
+
+const normalizeText = (value: string | number | null | undefined): string =>
+  String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+const filteredUsers = computed(() => {
+  const keyword = normalizeText(searchKeyword.value);
+  if (!keyword) return users.value;
+
+  return users.value.filter((user) => {
+    const fullName = `${user.ho || ""} ${user.ten || ""}`.trim();
+    return (
+      normalizeText(user.maNguoiDung).includes(keyword) ||
+      normalizeText(fullName).includes(keyword) ||
+      normalizeText(user.bietDanh).includes(keyword) ||
+      normalizeText(user.email).includes(keyword) ||
+      normalizeText(user.soDienThoai).includes(keyword)
+    );
+  });
+});
 
 const fetchUsers = async () => {
   isLoading.value = true;
@@ -179,14 +217,14 @@ const fetchUsers = async () => {
       users.value = response.data.data;
     } else {
       error.value =
-        response.data.message || "Không thể tải danh sách người dùng";
+        response.data.message || t("cannotLoadUsers");
       notificationHelper("error", error.value);
     }
   } catch (err: any) {
     error.value =
       err.response?.data?.message ||
       err.message ||
-      "Đã xảy ra lỗi khi tải danh sách người dùng";
+      t("cannotLoadUsers");
     notificationHelper("error", error.value);
     console.error("Error fetching users:", err);
   } finally {

@@ -149,7 +149,6 @@ const passwordErrorMessage = computed<string>(() => {
 
 const authStore = useAuthStore();
 const submitForm = async () => {
-  console.log("Form submitted");
   // Mark fields as touched when form is submitted
   emailTouched.value = true;
   passwordTouched.value = true;
@@ -171,6 +170,7 @@ const submitForm = async () => {
       userInfo.email,
       userInfo.password
     );
+
     if (!isLoginSuccess) {
       notificationHelper("error", t("loginFailed"));
     } else {
