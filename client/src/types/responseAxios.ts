@@ -5,6 +5,7 @@ export interface ApiResponse {
   message: string | null;
   data: User[];
 }
+
 export interface LoginResponse {
   code: number;
   message: string;
@@ -14,6 +15,28 @@ export interface LoginResponse {
     thongTinUser: User | null;
   };
 }
+
+export interface RegisterResponse {
+  code: number;
+  message: string;
+  data: {
+    maNguoiDung: number;
+    ho: string;
+    ten: string;
+    bietDanh: string;
+    email: string;
+    anhDaiDien: string;
+    anhNen: string;
+    ngaySinh: string;
+    gioiThieu: string;
+    noiLamViec: string;
+    noiHocTap: string;
+    soDienThoai: string;
+    ngayTao: string;
+    ngayCapNhat: string;
+  }
+}
+
 export interface LogoutResponse {
   code: number;
   message: string;

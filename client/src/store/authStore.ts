@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 import axiosInstance from "../helpers/apiHelper";
 
 import type { User } from "../types/userType";
-import type { LoginResponse, LogoutResponse } from "../types/responseAxios";
+import type { LoginResponse, LogoutResponse, RegisterResponse } from "../types/responseAxios";
+import type { RegisterForm } from "../types/registerUser";
 
 interface AuthState {
   user: User | null;
@@ -39,6 +40,30 @@ export const useAuthStore = defineStore("auth", {
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
       localStorage.setItem(IS_AUTH, isAuthenticated.toString());
+    },
+    async register(formData: RegisterForm): Promise<Boolean | String> {
+      try {
+        const dateOfBirth = new Date(formData.year, formData.month - 1, formData.day);
+        const bodyRequest = {
+          ho: formData.lastName,
+          ten: formData.firstName,
+          bietDanh: formData.username,  
+          email: formData.email,
+          ngaySinh: dateOfBirth,
+          soDienThoai: formData.phoneNumber,
+          gioiTinh: formData.gender,
+          matKhau: formData.password
+        }
+        const response = await axiosInstance.post<RegisterResponse>("/users/register", bodyRequest);
+        const res = response.data;
+        if (res.code === 201) {
+          return true;
+        } else {
+          return res.message;
+        }
+      } catch (error: any) {
+        return error.response.data.message;
+      }
     },
     async login(email: string, password: string): Promise<Boolean> {
       try {

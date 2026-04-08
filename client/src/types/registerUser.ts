@@ -1,6 +1,7 @@
 interface RegisterUser {
     firstName: string;
     lastName: string;
+    username: string;
     email: string;
     phoneNumber: string;
     password: string;
@@ -8,9 +9,9 @@ interface RegisterUser {
 }
 
 export interface RegisterForm extends RegisterUser {
-    day: string;
-    month: string;
-    year: string;
+    day: number;
+    month: number;
+    year: number;
 }
 
 export interface RegisterRequest extends RegisterForm {

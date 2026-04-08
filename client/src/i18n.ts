@@ -8,7 +8,7 @@ export type SupportedLocales = 'en' | 'vi'
 const i18n = createI18n<[MessageSchema], SupportedLocales>({
     legacy: false,
     globalInjection: true,
-    locale: 'vi',
+    locale: localStorage.getItem('locale') || 'vi',
     fallbackLocale: 'en',
     messages: {
         en,
