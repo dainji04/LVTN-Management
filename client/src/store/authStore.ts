@@ -75,6 +75,7 @@ export const useAuthStore = defineStore("auth", {
           }
         );
         const res = response.data;
+        console.log("res", res);
         if (res.code === 200 && res.data.authenticated) {
           this.setAuth(res.data.token, res.data.authenticated, res.data.thongTinUser);
           return true;

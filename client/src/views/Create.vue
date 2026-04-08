@@ -132,10 +132,10 @@
             <Button
               type="primary"
               classes="rounded-lg px-8"
-              :isDisabled="!postContent.trim() && !selectedImage"
+              :isDisabled="isSubmitting || (!postContent.trim() && !selectedImage)"
               @click="handlePost"
             >
-              {{ $t('post') }}
+              {{ isSubmitting ? $t('posting') : $t('post') }}
             </Button>
           </div>
         </div>
@@ -161,15 +161,35 @@ import SideBar from '../components/SideBar.vue';
 import Button from '../components/Button.vue';
 import { notificationHelper } from '../helpers/notificationHelper';
 import { useI18n } from 'vue-i18n';
+import axiosInstance from '../helpers/apiHelper';
+import { useAuthStore } from '../store/authStore';
+import { resolveMediaUrl } from '../helpers/mediaHelper';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 
-const userName = ref('Nguyễn Hồng Minh Quân');
-const userAvatar = ref('https://testingbot.com/free-online-tools/random-avatar/100');
+const userName = ref(
+  authStore.getUser ? `${authStore.getUser.ho} ${authStore.getUser.ten}` : 'Nguoi dung'
+);
+const userAvatar = ref(
+  resolveMediaUrl(authStore.getUser?.anhDaiDien) || 'https://testingbot.com/free-online-tools/random-avatar/100'
+);
 const postContent = ref('');
 const selectedImage = ref<string | null>(null);
 const privacySetting = ref(t('friends'));
+const privacyKey = ref<'friends' | 'public' | 'onlyMe'>('friends');
 const showEmojiPicker = ref(false);
+const isSubmitting = ref(false);
+
+interface CreatePostRequest {
+  maNguoiDung: number;
+  noiDung: string;
+  quyenRiengTu: string;
+  viTri: string;
+  mauNen: string;
+  danhSachCongTacVien: number[];
+  danhSachAnh: string[];
+}
 
 const handleImageSelect = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -189,32 +209,59 @@ const removeImage = () => {
 
 const handlePrivacyChange = ({ key }: { key: string }) => {
   if (key === 'friends') {
+    privacyKey.value = 'friends';
     privacySetting.value = t('friends');
   } else if (key === 'public') {
+    privacyKey.value = 'public';
     privacySetting.value = t('public');
   } else if (key === 'onlyMe') {
+    privacyKey.value = 'onlyMe';
     privacySetting.value = t('onlyMe');
   }
 };
 
-const handlePost = () => {
+const handlePost = async () => {
   if (!postContent.value.trim() && !selectedImage.value) {
     return;
   }
 
-  // Handle post creation logic here
-  console.log('Posting:', {
-    content: postContent.value,
-    image: selectedImage.value,
-    privacy: privacySetting.value,
-  });
+  if (!authStore.getUser?.maNguoiDung) {
+    notificationHelper('error', t('cannotFindUserInfo'));
+    return;
+  }
 
-  notificationHelper('success', t('post') + ' ' + t('loginSuccess'));
+  isSubmitting.value = true;
+  try {
+    const payload: CreatePostRequest = {
+      maNguoiDung: authStore.getUser.maNguoiDung,
+      noiDung: postContent.value.trim(),
+      quyenRiengTu: privacyKey.value,
+      viTri: '',
+      mauNen: '',
+      danhSachCongTacVien: [],
+      danhSachAnh: selectedImage.value ? [selectedImage.value] : [],
+    };
 
-  // Reset form
-  postContent.value = '';
-  selectedImage.value = null;
-  privacySetting.value = t('friends');
+    const response = await axiosInstance.post('/bai-viet', payload);
+    if (response.data?.code !== 200 && response.data?.code !== 0) {
+      notificationHelper('error', response.data?.message || t('createPostFailed'));
+      return;
+    }
+
+    notificationHelper('success', t('createPostSuccess'));
+
+    postContent.value = '';
+    selectedImage.value = null;
+    privacyKey.value = 'friends';
+    privacySetting.value = t('friends');
+  } catch (error: any) {
+    notificationHelper(
+      'error',
+      error?.response?.data?.message || t('cannotCreatePostNow')
+    );
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 

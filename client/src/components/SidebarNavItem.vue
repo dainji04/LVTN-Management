@@ -1,12 +1,12 @@
 <template>
     <router-link
         :to="to"
-        class="nav-item flex items-center py-3 px-4 rounded-lg transition-colors"
+        class="nav-item flex items-center justify-center lg:justify-start py-3 px-2 lg:px-4 rounded-lg transition-colors"
         :class="{ 'active': isActive, 'text-primary': isActive, 'text-black': !isActive }"
     >
-        <component :is="icon" class="text-xl mr-3" />
-        <span class="font-medium">{{ label }}</span>
-        <span v-if="badge" class="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+        <component :is="icon" class="text-xl lg:mr-3" />
+        <span class="font-medium hidden lg:inline">{{ label }}</span>
+        <span v-if="badge" class="hidden lg:flex ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 items-center justify-center">
             {{ badge }}
         </span>
     </router-link>

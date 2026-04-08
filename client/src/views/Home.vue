@@ -7,11 +7,13 @@
 
     <!-- Main Content -->
     <main
-      class="main-content w-full flex-1 flex justify-center overflow-y-auto"
+      ref="mainContentRef"
+      class="main-content w-full flex-1 flex justify-center overflow-y-auto px-2 sm:px-4 lg:px-6"
+      @scroll.passive="handleScroll"
     >
-      <div class="py-6">
+      <div class="w-full max-w-[640px] py-4 sm:py-6">
         <!-- Stories -->
-        <div class="stories-container flex gap-4 mb-6 overflow-x-auto pb-4">
+        <div class="stories-container flex gap-3 sm:gap-4 mb-4 sm:mb-6 overflow-x-auto pb-3 sm:pb-4">
           <Story
             avatar="https://testingbot.com/free-online-tools/random-avatar/100"
             username="Quang"
@@ -36,27 +38,35 @@
         </div>
 
         <!-- Posts -->
-        <div class="posts-container w-[600px]">
+        <div class="posts-container w-full">
           <Post
-            id="1"
-            username="quang"
-            avatar="https://testingbot.com/free-online-tools/random-avatar/300"
-            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRypbU3w47GYrpMjBwWbSwrsacu1UfaY4DGLw&s"
-            caption="Hôm nay trời đẹp quá"
-            time-ago="2 giờ"
-            :like-count="100"
-            :comment-count="10"
+            v-for="post in postStore.posts"
+            :id="String(post.maBaiViet)"
+            :key="post.maBaiViet"
+            :username="post.hoTen"
+            :avatar="resolveMediaUrl(post.anhDaiDienNguoiDang) || defaultAvatar"
+            :image="resolveMediaUrl(post.danhSachAnh?.[0])"
+            :caption="post.noiDung"
+            :time-ago="formatTimeAgo(post.ngayTao)"
+            :like-count="post.luotThich"
+            :comment-count="post.luotBinhLuan"
           />
-          <Post
-            id="2"
-            username="lan"
-            avatar="https://testingbot.com/free-online-tools/random-avatar/400"
-            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSldwR7RTUYwMvYM1BYXLYavtdQbVkshb1JCg&s"
-            caption="Làm ly trà Sữa náo"
-            time-ago="3 giờ"
-            :like-count="50"
-            :comment-count="5"
-          />
+
+          <div v-if="postStore.loading" class="text-center text-gray-500 py-4">
+            {{ t("loadingPosts") }}
+          </div>
+          <div
+            v-else-if="!postStore.hasNext && postStore.posts.length > 0"
+            class="text-center text-gray-400 py-4"
+          >
+            {{ t("allPostsDisplayed") }}
+          </div>
+          <div
+            v-if="postStore.error"
+            class="text-center text-red-500 text-sm py-3"
+          >
+            {{ postStore.error }}
+          </div>
         </div>
       </div>
     </main>
@@ -137,21 +147,51 @@ import Story from "../components/Story.vue";
 import Post from "../components/Post.vue";
 import SuggestionItem from "../components/SuggestionItem.vue";
 import AuthLayout from "../layouts/authLayout.vue";
-import { onMounted } from "vue";
-import axiosInstance from "../helpers/apiHelper";
+import { onMounted, ref } from "vue";
+import { usePostStore } from "../store/postStore";
+import { resolveMediaUrl } from "../helpers/mediaHelper";
+import { useI18n } from "vue-i18n";
+
+const postStore = usePostStore();
+const { t } = useI18n();
+const mainContentRef = ref<HTMLElement | null>(null);
+const defaultAvatar = "https://testingbot.com/free-online-tools/random-avatar/100";
+const VIRTUAL_SCROLL_THRESHOLD = 350;
 
 onMounted(() => {
-  getListPosts();
+  postStore.fetchFirstPage();
 });
 
-const getListPosts = async () => {
-  try {
-    const response = await axiosInstance.get("/bai-viet");
-    console.log("Posts:", response.data);
-  } catch (error) {
-    
+const handleScroll = async () => {
+  const el = mainContentRef.value;
+  if (!el || postStore.loading || !postStore.hasNext) return;
+
+  const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+  if (distanceToBottom <= VIRTUAL_SCROLL_THRESHOLD) {
+    await postStore.fetchNextPage();
   }
-}
+};
+
+const formatTimeAgo = (date: string): string => {
+  const createdAt = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - createdAt.getTime();
+
+  if (Number.isNaN(diffMs) || diffMs < 0) return t("justNow");
+
+  const minuteMs = 60 * 1000;
+  const hourMs = 60 * minuteMs;
+  const dayMs = 24 * hourMs;
+
+  if (diffMs < hourMs) {
+    return `${Math.max(1, Math.floor(diffMs / minuteMs))} ${t("minutes")}`;
+  }
+  if (diffMs < dayMs) {
+    return `${Math.floor(diffMs / hourMs)} ${t("hours")}`;
+  }
+
+  return `${Math.floor(diffMs / dayMs)} ${t("days")}`;
+};
 
 </script>
 

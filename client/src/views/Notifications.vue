@@ -34,7 +34,16 @@
         </div>
 
         <!-- Notification List -->
-        <div class="space-y-3 mb-6">
+        <div v-if="isLoading" class="flex justify-center py-8">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+        </div>
+        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <p class="text-red-700">{{ error }}</p>
+        </div>
+        <div v-else-if="filteredNotifications.length === 0" class="bg-white rounded-lg p-8 text-center text-gray-500">
+          {{ $t('noNotifications') }}
+        </div>
+        <div v-else class="space-y-3 mb-6">
           <NotificationItem
             v-for="notification in filteredNotifications"
             :key="notification.id"
@@ -45,7 +54,7 @@
         </div>
 
         <!-- Load More Button -->
-        <div class="text-center">
+        <div v-if="filteredNotifications.length > 0" class="text-center">
           <Button
             type="default"
             classes="border-primary text-primary hover:bg-primary hover:text-white"
@@ -112,7 +121,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import {
   CheckCircleOutlined,
   MoreOutlined,
@@ -126,76 +135,33 @@ import NotificationItem from '../components/NotificationItem.vue';
 import type { Notification } from '../types/notificationType';
 import { notificationHelper } from '../helpers/notificationHelper';
 import { useI18n } from 'vue-i18n';
+import axiosInstance from '../helpers/apiHelper';
+import { useAuthStore } from '../store/authStore';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 
 const activeTab = ref('all');
+const notifications = ref<Notification[]>([]);
+const isLoading = ref(false);
+const error = ref('');
 
-const notifications = ref<Notification[]>([
-  {
-    id: '1',
-    type: 'like',
-    user: {
-      name: 'Nguyễn Văn A',
-      avatar: 'https://testingbot.com/free-online-tools/random-avatar/100',
-    },
-    content: ` ${t('likedYourPost')}`,
-    postTitle: 'Hành trình khám phá Đà Lạt 2024...',
-    timeAgo: `2 ${t('minutesAgo')}`,
-    isRead: false,
-  },
-  {
-    id: '2',
-    type: 'comment',
-    user: {
-      name: 'Trần Thị B',
-      avatarColor: '#1890ff',
-      avatarIcon: 'comment',
-    },
-    content: ` ${t('commentedInGroup')}: 'Món này trông ngon quá bạn ơi, chia sẻ công thức nhé!'`,
-    groupName: 'Yêu Bếp',
-    timeAgo: `15 ${t('minutesAgo')}`,
-    isRead: true,
-  },
-  {
-    id: '3',
-    type: 'friend_request',
-    user: {
-      name: 'Lê Minh C',
-      avatarColor: '#ff4d4f',
-      avatarIcon: 'userAdd',
-    },
-    content: ` ${t('sentFriendRequest')}`,
-    timeAgo: `1 ${t('hoursAgo')}`,
-    isRead: false,
-  },
-  {
-    id: '4',
-    type: 'mention',
-    user: {
-      name: 'Phạm Diệu Linh',
-      avatarColor: '#52c41a',
-      avatarIcon: 'book',
-    },
-    content: ` ${t('mentionedYou')}: 'Bạn thấy ý tưởng này thế nào?'`,
-    mentionedUser: '@Hoàng Nam',
-    timeAgo: `3 ${t('hoursAgo')}`,
-    isRead: true,
-  },
-  {
-    id: '5',
-    type: 'new_post',
-    user: {
-      name: 'Hoàng Anh Tuấn',
-      avatarColor: '#52c41a',
-      avatarIcon: 'appstore',
-    },
-    content: ` ${t('postedInGroup')}.`,
-    groupName: 'Cộng đồng UI/UX Việt Nam',
-    timeAgo: `5 ${t('hoursAgo')}`,
-    isRead: true,
-  },
-]);
+interface NotificationApiItem {
+  id: number;
+  maNguoiHanhDong: number;
+  maNguoiNhan: number;
+  loaiHanhDong: string;
+  maDoiTuong: number;
+  loaiDoiTuong: string;
+  daDoc: boolean;
+  ngayTao: string;
+}
+
+interface NotificationApiResponse {
+  code: number;
+  message: string | null;
+  data: NotificationApiItem[];
+}
 
 const friendSuggestions = ref([
   {
@@ -211,6 +177,71 @@ const friendSuggestions = ref([
     mutualFriends: 8,
   },
 ]);
+
+const normalizeType = (actionType: string): Notification['type'] => {
+  const key = (actionType || '').toLowerCase();
+  if (key.includes('like') || key.includes('thich')) return 'like';
+  if (key.includes('comment') || key.includes('binh_luan') || key.includes('binhluan')) return 'comment';
+  if (key.includes('friend') || key.includes('ket_ban') || key.includes('ketban')) return 'friend_request';
+  if (key.includes('mention') || key.includes('nhac')) return 'mention';
+  return 'new_post';
+};
+
+const formatTimeAgo = (date: string): string => {
+  const createdAt = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - createdAt.getTime();
+  if (Number.isNaN(diffMs) || diffMs < 0) return t('justNow');
+
+  const minuteMs = 60 * 1000;
+  const hourMs = 60 * minuteMs;
+  const dayMs = 24 * hourMs;
+  if (diffMs < hourMs) return `${Math.max(1, Math.floor(diffMs / minuteMs))} ${t('minutesAgo')}`;
+  if (diffMs < dayMs) return `${Math.floor(diffMs / hourMs)} ${t('hoursAgo')}`;
+  return `${Math.floor(diffMs / dayMs)} ${t('daysAgo')}`;
+};
+
+const buildContent = (item: NotificationApiItem): string => {
+  const action = item.loaiHanhDong || '';
+  const objectType = item.loaiDoiTuong || '';
+  return ` da thuc hien ${action} voi ${objectType} #${item.maDoiTuong}`;
+};
+
+const mapApiNotification = (item: NotificationApiItem): Notification => ({
+  id: String(item.id),
+  type: normalizeType(item.loaiHanhDong),
+  user: {
+    name: `Nguoi dung #${item.maNguoiHanhDong}`,
+    avatarColor: '#1890ff',
+  },
+  content: buildContent(item),
+  timeAgo: formatTimeAgo(item.ngayTao),
+  isRead: item.daDoc,
+});
+
+const fetchNotifications = async () => {
+  const currentUserId = authStore.getUser?.maNguoiDung;
+  if (!currentUserId) {
+    error.value = t('cannotFindUserInfo');
+    return;
+  }
+
+  isLoading.value = true;
+  error.value = '';
+  try {
+    const response = await axiosInstance.get<NotificationApiResponse>(`/thongbao/user/${currentUserId}`);
+    const result = response.data;
+    if (result.code !== 200 && result.code !== 0) {
+      error.value = result.message || t('cannotLoadNotifications');
+      return;
+    }
+    notifications.value = Array.isArray(result.data) ? result.data.map(mapApiNotification) : [];
+  } catch (err: any) {
+    error.value = err?.response?.data?.message || t('cannotLoadNotifications');
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const filteredNotifications = computed(() => {
   if (activeTab.value === 'unread') {
@@ -237,9 +268,12 @@ const handleDeclineFriend = (notificationId: string) => {
 };
 
 const loadMore = () => {
-  // Handle load more notifications
-  console.log('Loading more notifications...');
+  fetchNotifications();
 };
+
+onMounted(() => {
+  fetchNotifications();
+});
 </script>
 
 <style scoped>
