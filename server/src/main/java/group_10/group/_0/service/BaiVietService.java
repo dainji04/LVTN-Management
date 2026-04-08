@@ -2,6 +2,7 @@ package group_10.group._0.service;
 
 import group_10.group._0.dto.request.BaiVietRequest;
 import group_10.group._0.dto.response.BaiVietResponse;
+import group_10.group._0.dto.response.SliceResponse;
 import group_10.group._0.entity.BaiViet;
 import group_10.group._0.entity.HinhAnh;
 import group_10.group._0.entity.Users;
@@ -12,10 +13,15 @@ import group_10.group._0.repository.UsersRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +33,52 @@ public class BaiVietService {
     HinhAnhRepository hinhAnhRepository;
     BaiVietMapper mapper;
 
-    // Lấy tất cả bài viết
-    public List<BaiVietResponse> getAllBaiViet() {
-        return baiVietRepository.findAll()
+
+    // Lấy tất cả bài viết bằng phân trang
+    public SliceResponse<BaiVietResponse> getAllBaiViet_PhanTrang(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Slice<BaiViet> slice = baiVietRepository.findAllByOrderByNgayTaoDesc(pageable);
+
+        List<BaiViet> danhSachBaiViet = slice.getContent();
+
+        // 1. Thu thập ID bài viết
+        List<Integer> ids = danhSachBaiViet.stream().map(BaiViet::getId).toList();
+
+        // 2. Batch fetch ảnh
+        Map<Integer, List<String>> anhMap = hinhAnhRepository
+                .findByMaDoiTuongInAndLoaiDoiTuong(ids, "BaiViet")
                 .stream()
-                .map(baiViet -> getBaiVietById(baiViet.getId()))
+                .collect(Collectors.groupingBy(
+                        HinhAnh::getMaDoiTuong,
+                        Collectors.mapping(HinhAnh::getDuongDan, Collectors.toList())
+                ));
+
+        // 3. Map sang Response
+        List<BaiVietResponse> content = danhSachBaiViet.stream()
+                .map(baiViet -> {
+                    BaiVietResponse res = mapper.toBaiVietResponse(baiViet);
+                    res.setDanhSachAnh(anhMap.getOrDefault(baiViet.getId(), List.of()));
+                    return res;
+                })
                 .toList();
+
+        return SliceResponse.<BaiVietResponse>builder()
+                .content(content)
+                .hasNext(slice.hasNext())
+                .page(page)
+                .size(size)
+                .build();
     }
+
+
+
+//    // Lấy tất cả bài viết
+//    public List<BaiVietResponse> getAllBaiViet() {
+//        return baiVietRepository.findAll()
+//                .stream()
+//                .map(baiViet -> getBaiVietById(baiViet.getId()))
+//                .toList();
+//    }
 
     // Lấy bài viết theo ID
     public BaiVietResponse getBaiVietById(Integer id) {

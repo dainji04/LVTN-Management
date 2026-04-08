@@ -12,6 +12,9 @@ public interface HinhAnhRepository extends JpaRepository<HinhAnh, Integer> {
     // Lấy tất cả ảnh theo đối tượng và loại
     List<HinhAnh> findByMaDoiTuongAndLoaiDoiTuong(Integer maDoiTuong, String loaiDoiTuong);
 
+
+    List<HinhAnh> findByMaDoiTuongInAndLoaiDoiTuong(List<Integer> maDoiTuong, String loaiDoiTuong);
+
     // Xóa tất cả ảnh của 1 đối tượng
     void deleteByMaDoiTuongAndLoaiDoiTuong(Integer maDoiTuong, String loaiDoiTuong);
 }

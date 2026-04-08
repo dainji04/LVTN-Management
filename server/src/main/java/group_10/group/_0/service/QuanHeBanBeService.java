@@ -1,10 +1,13 @@
 package group_10.group._0.service;
 
+import group_10.group._0.dto.request.TheoDoiRequest;
 import group_10.group._0.dto.request.ThongBaoRequest;
 import group_10.group._0.dto.response.BanBeResponse;
+import group_10.group._0.entity.LoiMoiKetBan;
 import group_10.group._0.entity.QuanHeBanBe;
 import group_10.group._0.entity.Users;
 import group_10.group._0.mapper.BanBeMapper;
+import group_10.group._0.repository.LoiMoiKetBanRepository;
 import group_10.group._0.repository.QuanHeBanBeRepository;
 import group_10.group._0.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,8 @@ public class QuanHeBanBeService {
     final QuanHeBanBeRepository repository;
     final UsersRepository usersRepository;
     final ThongBaoService thongBaoService;
+    final LoiMoiKetBanRepository loiMoiRepository;
+    final TheoDoiService theoDoiService;
 
     final BanBeMapper mapper; // inject mapper
 
@@ -34,8 +39,14 @@ public class QuanHeBanBeService {
         repository.removeFriend(id1, id2);
     }
 
-    public QuanHeBanBe addFriend(Integer id1, Integer id2) {
+    public QuanHeBanBe addFriend(Integer id1, Integer id2, Integer loiMoiId) {
         if (areFriends(id1, id2)) throw new RuntimeException("Đã là bạn bè rồi!");
+
+        // Kiểm tra trạng thái lời mời
+        LoiMoiKetBan loiMoi = loiMoiRepository.findById(loiMoiId)
+                .orElseThrow(() -> new RuntimeException("Lời mời không tồn tại!"));
+        if (!"CHAP_NHAN".equals(loiMoi.getTrangThai()))
+            throw new RuntimeException("Lời mời chưa được chấp nhận!");
 
         Users user1 = usersRepository.findById(id1)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id1));
@@ -51,15 +62,22 @@ public class QuanHeBanBeService {
 
         QuanHeBanBe saved = repository.save(quanHe);
 
-        // Gửi thông báo cho user2 (người được kết bạn)
-        ThongBaoRequest thongBao = ThongBaoRequest.builder()
+        // Gửi thông báo cho user2
+        thongBaoService.taoMoiThongBao(ThongBaoRequest.builder()
                 .maNguoiHanhDong(id1)
                 .maNguoiNhan(id2)
                 .loaiHanhDong("KET_BAN")
                 .maDoiTuong(saved.getId())
                 .loaiDoiTuong("QuanHeBanBe")
-                .build();
-        thongBaoService.taoMoiThongBao(thongBao);
+                .build());
+
+        // Follow người kia (không gửi thông báo)
+        theoDoiService.createTheoDoiKhongThongBao(
+                TheoDoiRequest.builder()
+                        .maNguoiTheoDoi(id1)
+                        .maNguoiDuocTheoDoi(id2)
+                        .build()
+        );
 
         return saved;
     }

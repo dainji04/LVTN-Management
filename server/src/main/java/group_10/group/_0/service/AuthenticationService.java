@@ -100,7 +100,7 @@ public class AuthenticationService {
                 .issuer("Social media Group 10")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 tieng
+                        Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 ngay
                 .jwtID(UUID.randomUUID().toString())
 //                .claim("role", buildScope(taikhoan))
                 .claim("id", taikhoan.getMaNguoiDung())
@@ -197,6 +197,22 @@ public class AuthenticationService {
                 .token(token)
                 .authenticated(true)
                 .build();
+    }
+
+
+    /**
+     * Hàm dùng để giải mã token và lấy ra maNguoiDung (id)
+     */
+    public Integer getMaNguoiDungFromToken(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT = verifyToken(token, false);
+
+        Integer maNguoiDung = signedJWT.getJWTClaimsSet().getIntegerClaim("id");
+
+        if (maNguoiDung == null) {
+            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+        }
+
+        return maNguoiDung;
     }
 
 }

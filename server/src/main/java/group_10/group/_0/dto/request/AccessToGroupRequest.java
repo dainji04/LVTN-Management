@@ -1,7 +1,6 @@
 package group_10.group._0.dto.request;
 
-import group_10.group._0.entity.Users;
-import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +12,9 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TheoDoiRequest {
+public class AccessToGroupRequest {
+    Integer maNhom;
 
-    private Integer maNguoiTheoDoi;
+    Integer maNguoiDung;
 
-    private Integer maNguoiDuocTheoDoi;
 }

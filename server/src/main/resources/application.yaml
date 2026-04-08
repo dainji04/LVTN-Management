@@ -2,7 +2,8 @@ server:
   port: 8080
 
 nodejs:
-  url: https://chat-service-social-media.onrender.com
+#  url: https://httpbin.org
+  url: https://lvtn-management-14vw.onrender.com
 
 springdoc:
   api-docs:
@@ -13,16 +14,6 @@ springdoc:
     operations-sorter: alpha
 
 spring:
-  cloud:
-    gateway:
-      mvc:
-        routes:
-          - id: nodejs-chat-service
-            uri: ${nodejs.url}
-            predicates:
-              - Path=/chat/**
-            filters:
-              - StripPrefix=1 #hàm .replace("/chat", "")
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
     username: avnadmin
@@ -40,5 +31,10 @@ spring:
 
 jwt:
   signerKey: ${SIGNER_JWT}
-  valid-duration: 3600
+  valid-duration: 86400 #1 ngày
   refreshable-duration: 360000
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
