@@ -9,6 +9,7 @@ import group_10.group._0.entity.Users;
 import group_10.group._0.mapper.BanBeMapper;
 import group_10.group._0.repository.LoiMoiKetBanRepository;
 import group_10.group._0.repository.QuanHeBanBeRepository;
+import group_10.group._0.repository.TheoDoiRepository;
 import group_10.group._0.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class QuanHeBanBeService {
     final ThongBaoService thongBaoService;
     final LoiMoiKetBanRepository loiMoiRepository;
     final TheoDoiService theoDoiService;
+    final TheoDoiRepository theoDoiRepository;
 
     final BanBeMapper mapper; // inject mapper
 
@@ -72,12 +74,14 @@ public class QuanHeBanBeService {
                 .build());
 
         // Follow người kia (không gửi thông báo)
-        theoDoiService.createTheoDoiKhongThongBao(
-                TheoDoiRequest.builder()
-                        .maNguoiTheoDoi(id1)
-                        .maNguoiDuocTheoDoi(id2)
-                        .build()
-        );
+        if (!theoDoiRepository.existsByMaNguoiTheoDoi_MaNguoiDungAndMaNguoiDuocTheoDoi(id1, id2)) {
+            theoDoiService.createTheoDoiKhongThongBao(
+                    TheoDoiRequest.builder()
+                            .maNguoiTheoDoi(id1)
+                            .maNguoiDuocTheoDoi(id2)
+                            .build()
+            );
+        }
 
         return saved;
     }
