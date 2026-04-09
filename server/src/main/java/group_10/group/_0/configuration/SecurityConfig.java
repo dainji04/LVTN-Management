@@ -29,6 +29,11 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
+    private static final String[] PUBLIC_URLS = {
+            "/users/login", "/users/register",
+            "/chat/**", "/thongbao/**",
+            "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/api-docs/**"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -40,19 +45,8 @@ public class SecurityConfig {
                         // Cho phép tất cả các request OPTIONS (Preflight của Web) đi qua
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        .requestMatchers(
-                                "/users/login",
-                                "/users/register",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/api-docs/**",
-                                "/api-docs",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/chat/**",
-                                "/thongbao/subscribe/**",
-                                "/thongbao/**"
-                        ).permitAll()
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").permitAll()
                         .requestMatchers(HttpMethod.HEAD, "/users", "/users/{id}").permitAll()
                         .anyRequest().authenticated()

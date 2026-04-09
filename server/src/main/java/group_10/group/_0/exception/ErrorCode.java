@@ -26,7 +26,7 @@ public enum ErrorCode {
 // ----------------
 
     UNAUTHENTICATED(1006, "Ban chua dang nhap", HttpStatus.UNAUTHORIZED),
-    LOAICA_NOT_EXISTED(1011, "Loai ca khong ton tai", HttpStatus.NOT_FOUND),
+    SAI_MAT_KHAU(1007, "Email hoặc mật khẩu không chính xác", HttpStatus.UNAUTHORIZED),
     DATA_EXISTED(1012, "Da ton tai data", HttpStatus.CONFLICT),
     REQUEST_IS_PROCESSED(1012, "yêu cầu đã được xử lý", HttpStatus.CONFLICT),
     PAYLOAD_TOO_LARGE(1013, "Dung luong file vuot qua gioi han cho phep", HttpStatus.PAYLOAD_TOO_LARGE),

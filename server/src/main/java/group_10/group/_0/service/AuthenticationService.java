@@ -57,6 +57,7 @@ public class AuthenticationService {
     UsersMapper userMapper;
 
 
+    //Kiểm tra token có hợp lệ hay không
     public IntrospectResponse introspect(IntrospectRequest request)
             throws JOSEException, ParseException {
         var token = request.getToken();
@@ -74,13 +75,15 @@ public class AuthenticationService {
                 .build();
     }
 
+
+    //Xác thực người dùng và trả về token nếu hợp lệ
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = TKRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getMatKhau());
         if (!authenticated)
-            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+            throw new AppExceptions(ErrorCode.SAI_MAT_KHAU);
 
 
         var token = generateToken(user);
@@ -138,14 +141,14 @@ public class AuthenticationService {
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expityTime = (isRefresh)
+        Date expiryTime = (isRefresh)
                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(refreshTime, ChronoUnit.SECONDS).toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
 
         //Neu chu ky het han hoac khong duoc verified thi cut
-        if(!(verified && expityTime.after(new Date())))
+        if(!(verified && expiryTime.after(new Date())))
             throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
 
         if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
@@ -189,7 +192,7 @@ public class AuthenticationService {
         var email = signJWT.getJWTClaimsSet().getSubject();
 
         var taiKhoan = TKRepository.findByEmail(email)
-                .orElseThrow(() -> new AppExceptions(ErrorCode.UNAUTHENTICATED));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         var token = generateToken(taiKhoan);
 

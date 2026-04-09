@@ -6,6 +6,8 @@ import group_10.group._0.dto.response.SliceResponse;
 import group_10.group._0.entity.BaiViet;
 import group_10.group._0.entity.HinhAnh;
 import group_10.group._0.entity.Users;
+import group_10.group._0.exception.AppExceptions;
+import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.BaiVietMapper;
 import group_10.group._0.repository.BaiVietRepository;
 import group_10.group._0.repository.HinhAnhRepository;
@@ -139,7 +141,7 @@ public class BaiVietService {
     // Tạo bài viết mới
     public BaiVietResponse createBaiViet(BaiVietRequest request) {
         Users user = usersRepository.findById(request.getMaNguoiDung())
-                .orElseThrow(() -> new RuntimeException("User không tồn tại: " + request.getMaNguoiDung()));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         BaiViet baiViet = mapper.toBaiViet(request);
         baiViet.setMaNguoiDung(user);
