@@ -22,4 +22,10 @@ public interface TheoDoiRepository extends JpaRepository<TheoDoi, Integer> {
 
     @Query("SELECT u FROM Users u WHERE u.maNguoiDung IN (SELECT t.maNguoiDuocTheoDoi FROM TheoDoi t WHERE t.maNguoiTheoDoi = :user)")
     List<Users> findFollowingByUser(@Param("user") Users user);
+
+    @Query("SELECT t.id FROM TheoDoi t WHERE t.maNguoiTheoDoi.maNguoiDung = :followerId AND t.maNguoiDuocTheoDoi = :followedId")
+    Integer findIdByFollowerAndFollowed(
+            @Param("followerId") Integer followerId,
+            @Param("followedId") Integer followedId
+    );
 }

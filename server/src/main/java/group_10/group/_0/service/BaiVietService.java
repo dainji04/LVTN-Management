@@ -1,19 +1,20 @@
 package group_10.group._0.service;
 
+import com.nimbusds.jose.JOSEException;
 import group_10.group._0.dto.request.BaiVietRequest;
+import group_10.group._0.dto.request.ThongBaoRequest;
 import group_10.group._0.dto.response.BaiVietResponse;
-import group_10.group._0.entity.BaiViet;
-import group_10.group._0.entity.HinhAnh;
-import group_10.group._0.entity.Users;
+import group_10.group._0.entity.*;
+import group_10.group._0.exception.AppExceptions;
+import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.BaiVietMapper;
-import group_10.group._0.repository.BaiVietRepository;
-import group_10.group._0.repository.HinhAnhRepository;
-import group_10.group._0.repository.UsersRepository;
+import group_10.group._0.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.List;
 
@@ -25,6 +26,11 @@ public class BaiVietService {
     BaiVietRepository baiVietRepository;
     UsersRepository usersRepository;
     HinhAnhRepository hinhAnhRepository;
+    GroupRepository groupRepository;
+    ThanhVien_GroupRepository thanhVienGroupRepository;
+    ThongBaoService thongBaoService;
+    TheoDoiRepository theoDoiRepository;
+    AuthenticationService authenticationService;
     BaiVietMapper mapper;
 
     // Lấy tất cả bài viết
@@ -80,7 +86,65 @@ public class BaiVietService {
         baiViet.setNgayTao(Instant.now());
         baiViet.setNgayCapNhat(Instant.now());
 
+        //xử lý nhom
+        if (request.getMaNhom() != null)
+        {
+            Nhom nhom = groupRepository.findById(request.getMaNhom())
+                    .orElseThrow(()->new RuntimeException("Nhóm không tồn tại: " + request.getMaNhom()));
+
+            if (!(groupRepository.existsByUserIdAndGroupId(request.getMaNguoiDung(), request.getMaNhom())))
+                throw new RuntimeException("Bạn không phải thành viên của nhóm này để đăng bài!");
+
+
+            baiViet.setMaNhom(nhom);
+            if (Boolean.TRUE.equals(nhom.getCanDuyetBaiDang()))
+            {
+                baiViet.setTrangThai("PENDING");
+            }
+            else
+                baiViet.setTrangThai("APPROVED");
+        }
+        else
+        {
+            baiViet.setTrangThai("APPROVED");
+
+        }
+
         BaiViet BaiVietDaLuu = baiVietRepository.save(baiViet); // lưu bài viết trước để có ID
+
+
+        if (request.getMaNhom() != null && "PENDING".equals(BaiVietDaLuu.getTrangThai()))
+        {
+            List<ThanhVienNhom> dsNguoiDuyet = thanhVienGroupRepository.
+                    findQuanTriVienByMaNhom(request.getMaNhom());
+
+            dsNguoiDuyet.forEach(thanhVien -> {
+                        ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
+                                request.getMaNguoiDung(),
+                                thanhVien.getMaNguoiDung().getMaNguoiDung(),
+                                "yêu cầu duyet bai viet",
+                                BaiVietDaLuu.getId(),
+                                "BAI VIET");
+
+                        thongBaoService.taoMoiThongBao(thongBaoRequest);
+            });
+        }
+
+        if ("APPROVED".equals(BaiVietDaLuu.getTrangThai()))
+        {
+            List<Users> dsnguoitheodoi = theoDoiRepository.findFollowersByUserId(request.getMaNguoiDung());
+
+            dsnguoitheodoi.forEach(users -> {
+                ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
+                        request.getMaNguoiDung(),
+                        users.getMaNguoiDung(),
+                        "đăng bài viết mới",
+                        BaiVietDaLuu.getId(),
+                        "BAI VIET");
+
+                thongBaoService.taoMoiThongBao(thongBaoRequest);
+            });
+        }
 
         // Lưu danh sách ảnh vào HinhAnh
         if (request.getDanhSachAnh() != null && !request.getDanhSachAnh().isEmpty()) {
@@ -95,6 +159,39 @@ public class BaiVietService {
         }
 
         return getBaiVietById(BaiVietDaLuu.getId()); // trả về kèm danh sách ảnh
+    }
+
+    //dung cho quan tri vien group (PENDING, APPROVED, REJECTED)
+    public BaiVietResponse xuLyDangBaiGroup(String kqTrangThaiBaiViet ,Integer idBaiViet, String token)
+    {
+        Integer maNguoiTao;
+
+        try {
+            maNguoiTao = authenticationService.getMaNguoiDungFromToken(token);
+
+        } catch (ParseException | JOSEException e) {
+            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+        }
+
+        Users user = usersRepository.findById(maNguoiTao)
+                .orElseThrow(()->new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+
+        BaiViet baiViet = baiVietRepository.findById(idBaiViet)
+                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại: " + idBaiViet));
+
+        baiViet.setTrangThai(kqTrangThaiBaiViet);
+        baiViet.setNgayCapNhat(Instant.now());
+
+        ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
+                maNguoiTao,
+                baiViet.getMaNguoiDung().getMaNguoiDung(),
+                kqTrangThaiBaiViet,
+                baiViet.getId(),
+                "BAI VIET"
+        );
+        thongBaoService.taoMoiThongBao(thongBaoRequest);
+
+        return  mapper.toBaiVietResponse(baiVietRepository.save(baiViet));
     }
 
     // Cập nhật bài viết
