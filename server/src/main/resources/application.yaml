@@ -2,7 +2,8 @@ server:
   port: 8080
 
 nodejs:
-  url: https://chat-service-social-media.onrender.com
+#  url: https://httpbin.org
+  url: https://lvtn-management-14vw.onrender.com
 
 springdoc:
   api-docs:
@@ -13,20 +14,10 @@ springdoc:
     operations-sorter: alpha
 
 spring:
-  cloud:
-    gateway:
-      mvc:
-        routes:
-          - id: nodejs-chat-service
-            uri: ${nodejs.url}
-            predicates:
-              - Path=/chat/**
-            filters:
-              - StripPrefix=1 #hàm .replace("/chat", "")
   datasource:
     url: "jdbc:mysql://mysql-783bdf2-socialmedia-gr10.i.aivencloud.com:15495/SocialMedia?serverTimezone=Asia/Ho_Chi_Minh&ssl-mode=REQUIRED"
     username: avnadmin
-    password: AVNS__cZFTBZi9dYoz1fRlYX
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -36,9 +27,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
+        format_sql: true  #Hien thi cau lenh SQL, SQL log dễ đọc hơn
 
 jwt:
-  signerKey: 61b8e4c9638f759c9112471bdfff29f02310f0e6e1053fa9c04d924d3d9869fc
-  valid-duration: 3600
+  signerKey: ${SIGNER_JWT}
+  valid-duration: 86400 #1 ngày
   refreshable-duration: 360000
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
