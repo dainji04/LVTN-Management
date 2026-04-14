@@ -20,7 +20,6 @@ const ChatItem = ({ chat,friend, isActive = false, onClick }) => {
           src={avatar}
           size={50}
           icon={<span className="font-semibold">{name?.[0]?.toUpperCase() || username?.[0]?.toUpperCase()}</span>}
-          style={{ backgroundColor: "#F4517A" }}
         />
         {online && (
           <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />

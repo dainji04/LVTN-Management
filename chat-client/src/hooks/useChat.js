@@ -53,7 +53,7 @@ const useChat = (token) => {
       setError(null);
       try {
         const data = await getConversations();
-        setConversations(Array.isArray(data.data.data) ? data.data.data : []);
+        setConversations(Array.isArray(data.data) ? data.data : []);
       } catch {
         setConversations([]);
       } finally {
@@ -75,7 +75,7 @@ const useChat = (token) => {
         const data = await getConversationMessages(id);
         setMessagesByConversation((prev) => ({
           ...prev,
-          [id]: Array.isArray(data.data.data) ? data.data.data : [],
+          [id]: Array.isArray(data.data) ? data.data : [],
         }));
       } catch {
         setMessagesByConversation((prev) => ({ ...prev, [id]: [] }));
