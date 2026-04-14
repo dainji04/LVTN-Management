@@ -25,7 +25,7 @@ const FriendItem = ({ friend, onClick }) => (
     <Avatar
       src={friend.avatar}
       size={50}
-      style={{ backgroundColor: "#F4517A", flexShrink: 0 }}
+      style={{ flexShrink: 0 }}
     >
       {(friend.name || friend.username)?.[0]?.toUpperCase()}
     </Avatar>

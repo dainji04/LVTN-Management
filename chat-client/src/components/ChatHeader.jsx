@@ -25,7 +25,6 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
           <Avatar
           src={chat.FriendAvatar || null}
             size={40}
-            style={{ backgroundColor: "#F4517A" }}
           >
             {chat.FriendTen?.[0]?.toUpperCase()}
           </Avatar>
@@ -69,7 +68,6 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
           <Avatar
           src={chat.AnhDaiDien || null}
             size={40}
-            style={{ backgroundColor: "#F4517A" }}
           >
             {chat.Ten?.[0]?.toUpperCase()}
           </Avatar>

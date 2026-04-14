@@ -10,15 +10,6 @@ import { useTranslation } from "react-i18next";
 
 
 const NAV_ITEMS = [
-  // { icon: <HomeOutlined />,        label: "Trang chủ",     path: "/" },
-  // { icon: <SearchOutlined />,      label: "Tìm kiếm",      path: "/search" },
-  // { icon: <TeamOutlined />,        label: "Nhóm",          path: "/groups" },
-  // { icon: <CompassOutlined />,     label: "Khám phá",      path: "/explore" },
-  // { icon: <PlayCircleOutlined />,  label: "Reels",         path: "/reels" },
-  // { icon: <MessageOutlined />,     label: "Tin nhắn",      path: "/messages" },
-  // { icon: <BellOutlined />,        label: "Thông báo",     path: "/notifications", badge: 2 },
-  // { icon: <PlusCircleOutlined />,  label: "Tạo",           path: "/create" },
-  // { icon: <UserOutlined />,        label: "Trang cá nhân", path: "/profile" },
   { icon: <HomeOutlined />,        label: "home",     path: "/" },
   { icon: <SearchOutlined />,      label: "search",      path: "/search" },
   { icon: <TeamOutlined />,        label: "groups",          path: "/groups" },
