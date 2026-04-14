@@ -5,41 +5,57 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-    UNCATEGORIZED(9999,"UNCATEGORIZED", HttpStatus.INTERNAL_SERVER_ERROR),
-    USER_EXISTED(9998,"Da ton tai user",HttpStatus.CONFLICT),
-    INVALID_KEY(9122,"KEY NOT VALID",HttpStatus.BAD_REQUEST),
-    USER_NOT_EXISTED(1005, "User khong ton tai", HttpStatus.NOT_FOUND),
-    EMAIL_IS_EXISTED(1005, "Email da ton tai", HttpStatus.NOT_FOUND),
-    IDVAITRO_EMPTY(1019, "Trang thai hoat dong khong duoc de trong", HttpStatus.BAD_REQUEST),
+    // ==========================================
+    // 1. SYSTEM & COMMON ERRORS (99xx)
+    // ==========================================
+    UNCATEGORIZED(9999, "Lỗi hệ thống chưa phân loại", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_KEY(9998, "Key cấu hình không hợp lệ", HttpStatus.BAD_REQUEST),
+    PAYLOAD_TOO_LARGE(9001, "Dung lượng file vượt quá giới hạn", HttpStatus.PAYLOAD_TOO_LARGE),
+    DATA_EXISTED(9002, "Dữ liệu đã tồn tại", HttpStatus.CONFLICT),
+    REQUEST_IS_PROCESSED(9003, "Yêu cầu đã được xử lý", HttpStatus.CONFLICT),
 
-    // Validate du lieu dau vao
-    FULL_NAME_INVALID(1008, "Ho va ten khong duoc de trong", HttpStatus.BAD_REQUEST),
-    EMAIL_INVALID(1009, "Email khong hop le", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(1010, "Mat khau phai tu 8 den 50 ky tu", HttpStatus.BAD_REQUEST),
-    VAITRO_INVALID(1017, "Vai tro khong duoc de trong", HttpStatus.BAD_REQUEST),
-    TRANGTHAI_INVALID(1018, "Trang thai hoat dong khong duoc de trong", HttpStatus.BAD_REQUEST),
+    // ==========================================
+    // 2. AUTHENTICATION & AUTHORIZATION (10xx)
+    // ==========================================
+    UNAUTHENTICATED(1001, "Bạn chưa đăng nhập", HttpStatus.UNAUTHORIZED),
+    SAI_MAT_KHAU(1002, "Email hoặc mật khẩu không chính xác", HttpStatus.UNAUTHORIZED), // Có thể đổi tên thành CREDENTIALS_INVALID
+    UNAUTHORIZED(1003, "Bạn không có quyền thực hiện hành động này", HttpStatus.UNAUTHORIZED),
+    ACCESS_DENIED(1004, "Không có quyền truy cập tài nguyên", HttpStatus.FORBIDDEN),
 
+    // ==========================================
+    // 3. VALIDATION ERRORS (20xx)
+    // ==========================================
+    FULL_NAME_INVALID(2001, "Họ và tên không được để trống", HttpStatus.BAD_REQUEST),
+    EMAIL_INVALID(2002, "Email không hợp lệ", HttpStatus.BAD_REQUEST),
+    PHONE_INVALID(2003, "Số điện thoại không hợp lệ (Phải có 10 số, bắt đầu bằng số 0)", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(2004, "Mật khẩu phải từ 8 đến 50 ký tự", HttpStatus.BAD_REQUEST),
+    ADDRESS_INVALID(2005, "Địa chỉ không được để trống", HttpStatus.BAD_REQUEST),
+    VAITRO_INVALID(2006, "Vai trò không được để trống", HttpStatus.BAD_REQUEST),
+    IDVAITRO_EMPTY(2007, "ID vai trò không được để trống", HttpStatus.BAD_REQUEST),
+    TRANGTHAI_INVALID(2008, "Trạng thái hoạt động không được để trống", HttpStatus.BAD_REQUEST),
 
-    // --- THEM MOI ---
-    PHONE_INVALID(1015, "So dien thoai khong hop le (Phai co 10 so, bat dau bang so 0)", HttpStatus.BAD_REQUEST),
-    ADDRESS_INVALID(1016, "Dia chi khong duoc de trong", HttpStatus.BAD_REQUEST),
-// ----------------
+    // ==========================================
+    // 4. USER DOMAIN (30xx)
+    // ==========================================
+    USER_NOT_EXISTED(3001, "User không tồn tại", HttpStatus.NOT_FOUND),
+    USER_EXISTED(3002, "User đã tồn tại", HttpStatus.CONFLICT),
+    EMAIL_IS_EXISTED(3003, "Email đã tồn tại", HttpStatus.CONFLICT),
 
-    UNAUTHENTICATED(1006, "Ban chua dang nhap", HttpStatus.UNAUTHORIZED),
-    SAI_MAT_KHAU(1007, "Email hoặc mật khẩu không chính xác", HttpStatus.UNAUTHORIZED),
-    DATA_EXISTED(1012, "Da ton tai data", HttpStatus.CONFLICT),
-    REQUEST_IS_PROCESSED(1012, "yêu cầu đã được xử lý", HttpStatus.CONFLICT),
-    PAYLOAD_TOO_LARGE(1013, "Dung luong file vuot qua gioi han cho phep", HttpStatus.PAYLOAD_TOO_LARGE),
-    ACCESS_DENIED(1014, "Khong co quyen truy cap tai nguyen", HttpStatus.FORBIDDEN),
-    UNAUTHORIZED(1007, "Ban khong co quyen thuc hien hanh dong nay", HttpStatus.UNAUTHORIZED),
+    // ==========================================
+    // 5. SOCIAL DOMAIN (POST, COMMENT, GROUP) (40xx)
+    // ==========================================
+    BAIVIET_NOT_EXISTED(4001, "Bài viết không tồn tại", HttpStatus.NOT_FOUND),
+    BINHLUAN_NOT_EXISTED(4002, "Bình luận không tồn tại", HttpStatus.NOT_FOUND),
+    BINHLUANCHA_NOT_EXISTED(4003, "Bình luận cha không tồn tại", HttpStatus.NOT_FOUND),
+    GROUP_NOT_EXISTED(4004, "Nhóm không tồn tại", HttpStatus.NOT_FOUND),
+    MEMBER_NOT_EXISTED(4005, "Thành viên không tồn tại", HttpStatus.NOT_FOUND),
+    FOLLOW_NOT_EXISTED(4006, "Chưa tồn tại theo dõi", HttpStatus.NOT_FOUND),
 
-    //dung cho thong bao
-    NOTIFICATION_NOT_EXISTED(1011, "ma thong bao khong ton tai", HttpStatus.NOT_FOUND),
-    FOLLOW_NOT_EXISTED(1011,"chưa tồn tại theo dõi" ,HttpStatus.NOT_FOUND ),
-    MEMBER_NOT_EXISTED(1011,"thành viên không tồn tại" ,HttpStatus.NOT_FOUND ),
-    GROUP_NOT_EXISTED(1011,"Nhóm không tồn tại" ,HttpStatus.NOT_FOUND  ),
-    ACCESS_NOT_EXISTED(1011,"yêu cầu không tồn tại" ,HttpStatus.NOT_FOUND ),
-    ;
+    // ==========================================
+    // 6. NOTIFICATION & OTHERS (50xx)
+    // ==========================================
+    NOTIFICATION_NOT_EXISTED(5001, "Mã thông báo không tồn tại", HttpStatus.NOT_FOUND),
+    ACCESS_NOT_EXISTED(5002, "Yêu cầu không tồn tại", HttpStatus.NOT_FOUND);
 
 
 
