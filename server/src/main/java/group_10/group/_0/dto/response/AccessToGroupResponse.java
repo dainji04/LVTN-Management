@@ -17,6 +17,8 @@ public class AccessToGroupResponse {
 
     Integer maNhom;
 
+    Integer maNguoiDung;
+
     String trangThai;
 
     Instant yeuCauLuc;

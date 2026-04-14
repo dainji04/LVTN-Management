@@ -35,6 +35,8 @@ public class AccessToGroupService {
     UsersRepository usersRepository;
     TheoDoiService theoDoiService;
 
+
+    //người dùng
     public AccessToGroupResponse createRequestToGroup(AccessToGroupRequest request)
     {
         YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupMapper.toEntity(request);
@@ -65,6 +67,8 @@ public class AccessToGroupService {
 //    {
 //
 //    }
+
+    // quan tri vien
     public List<AccessToGroupResponse> DSYeuCauChuaXuLy(Integer idGroup)
     {
         return accessToGroupRepository.findByMaNhom_IdAndTrangThai(idGroup, "DA_GUI")
@@ -72,7 +76,7 @@ public class AccessToGroupService {
                 .map(accessToGroupMapper ::toResponse)
                 .toList();
     }
-
+//người dùng
     public void huyYeuCau(Integer idYeuCau)
     {
         if (!accessToGroupRepository.existsById(idYeuCau))
@@ -82,6 +86,7 @@ public class AccessToGroupService {
         accessToGroupRepository.deleteById(idYeuCau);
     }
 
+    //dung bởi quản trị viên (chap nhận)
     public void accept(Integer id,AccessToGroupUpdateRequest request,String token)
     {
         YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupRepository.findById(id)
@@ -120,7 +125,7 @@ public class AccessToGroupService {
                 yeuCauThamGiaNhom.getMaNguoiDung().getMaNguoiDung(),
                 yeuCauThamGiaNhom.getMaNhom().getId()
         );
-
+        theoDoiService.createTheoDoi(theoDoiRequest);
 
         ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
                 maNguoiDuyet,
@@ -132,7 +137,7 @@ public class AccessToGroupService {
         thongBaoService.taoMoiThongBao(thongBaoRequest);
     }
 
-
+    //dung bởi quản trị viên (từ chối)
     public void reject(Integer id,AccessToGroupUpdateRequest request,String token)
     {
         YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupRepository.findById(id)
@@ -167,4 +172,5 @@ public class AccessToGroupService {
         );
         thongBaoService.taoMoiThongBao(thongBaoRequest);
     }
+
 }
