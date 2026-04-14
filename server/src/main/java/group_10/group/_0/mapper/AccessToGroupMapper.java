@@ -21,9 +21,9 @@ public interface AccessToGroupMapper {
 
     // 2. Map từ Entity sang Response
     @Mapping(source = "maNhom.id", target = "maNhom")
-    @Mapping(source = "maNguoiDung.maNguoiDung", target = "id")
+    @Mapping(source = "maNguoiDung.maNguoiDung", target = "maNguoiDung")
     @Mapping(source = "xuLyBoi.maNguoiDung", target = "xuLyBoi")
-    AccessToGroupResponse toResponse(YeuCauThamGiaNhom entity);
+    AccessToGroupResponse  toResponse(YeuCauThamGiaNhom entity);
 
     // 3. Cập nhật Entity
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
