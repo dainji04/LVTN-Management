@@ -28,4 +28,7 @@ public interface TheoDoiRepository extends JpaRepository<TheoDoi, Integer> {
             @Param("followerId") Integer followerId,
             @Param("followedId") Integer followedId
     );
+
+    boolean existsByMaNguoiTheoDoi_MaNguoiDungAndMaNguoiDuocTheoDoi(
+            Integer maNguoiTheoDoi, Integer maNguoiDuocTheoDoi);
 }
