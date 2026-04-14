@@ -35,7 +35,6 @@ const ChatPage = ({ onLogout }) => {
     const existing = conversations.find(
       (c) => c.SoLuongThanhVien === 2 && String(c.FriendId) === friendId 
     );
-    console.log("Existing conversation with friendId", friendId, ":", existing);
     if (existing) {
       selectConversation(String(existing.MaCuocTroChuyen));
     } else {
@@ -48,30 +47,23 @@ const ChatPage = ({ onLogout }) => {
 
   // Xóa tin nhắn khỏi danh sách
   const handleMessageDeleted = useCallback((messageId) => {
-    console.log("Tin nhắn đã được xóa:", messageId);
-    // Optionally: refetch messages or filter from current state
   }, []);
 
   return (
     <div className="home-container flex justify-between h-screen bg-[#f5f5f5] overflow-hidden">
 
-      {/* ── Sidebar ───────────────────────────────────────────── */}
       <ChatSidebar
         currentUser={currentUser}
         onLogout={onLogout}
         activePath="/messages"
       />
 
-      {/* ── Main content ──────────────────────────────────────── */}
-      {/* DESKTOP: ChatList + ChatWindow đều là direct children của main */}
       <ChatProvider token={localStorage.getItem("Token")}>
       <main className="main-content w-full flex-1 flex overflow-hidden">
         
-        {/* ── ChatList panel (desktop luôn hiển thị, mobile toggle) ── */}
         <div className={`${mobileView === "list" ? "flex" : "hidden"} md:flex flex-col w-80 flex-shrink-0 bg-white border-r border-gray-200`}>
 
             <ChatList
-              // currentUser={currentUser}
               chats={conversations}
               activeChatId={activeConvId}
               onSelectChat={handleSelectConversation}
@@ -80,7 +72,6 @@ const ChatPage = ({ onLogout }) => {
             />
         </div>
 
-        {/* ── ChatWindow panel (desktop luôn hiển thị, mobile toggle) ── */}
         <div className={`${mobileView === "chat" ? "flex" : "hidden"} md:flex flex-1 flex-col overflow-hidden`}>
             <ChatWindow
               chat={activeConversation}

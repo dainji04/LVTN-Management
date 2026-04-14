@@ -5,7 +5,7 @@ import ChatItem from "./ChatItem";
 import { searchFriends, getFriendsByIds, getMe } from "../api/userApi";
 import { useTranslation } from "react-i18next";
 
-// ── Skeleton loading row ──────────────────────────────────────────────────────
+//Skeleton loading row 
 const SkeletonRow = () => (
   <div className="p-4 flex items-center gap-3 animate-pulse">
     <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0" />
@@ -16,7 +16,7 @@ const SkeletonRow = () => (
   </div>
 );
 
-// ── Friend result row ─────────────────────────────────────────────────────────
+// Friend result row
 const FriendItem = ({ friend, onClick }) => (
   <div
     onClick={() => onClick?.(friend)}
@@ -40,13 +40,12 @@ const FriendItem = ({ friend, onClick }) => (
   </div>
 );
 
-// ── Main component ────────────────────────────────────────────────────────────
+//Main component 
 const ChatList = ({
   chats = [],
   activeChatId,
   onSelectChat,
   onSelectFriend,
-  // currentUser,
   loading = false,
 }) => {
   const [query, setQuery]             = useState("");
@@ -68,7 +67,6 @@ const ChatList = ({
       const userId = parseInt(me.data.maNguoiDung);
       const res = await searchFriends(q.trim(), userId);
       const raw = (Array.isArray(res.data) ? res.data : []);
-      console.log("searchFriends result", raw); 
       setFriends(
         raw.map(user => ({
           id: user.maNguoiDung,
@@ -132,7 +130,7 @@ const ChatList = ({
 
   const isSearchMode = query.trim().length > 0;
 
-  // ── Render list content ───────────────────────────────────────────────────
+  // Render list content
   const renderContent = () => {
     // Search mode
     if (isSearchMode) {
@@ -177,15 +175,13 @@ const ChatList = ({
     ));
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Render
   return (
     <>
-      {/* Header */}
       <div className="p-4 border-b border-gray-200 flex-shrink-0">
         <h2 className="text-xl font-bold text-gray-800">{t("messages")}</h2>
       </div>
 
-      {/* Search input */}
       <div className="p-2 border-b border-gray-200 flex-shrink-0">
         <Input
           prefix={<SearchOutlined className="text-gray-400" />}
@@ -197,7 +193,6 @@ const ChatList = ({
         />
       </div>
 
-      {/* Scrollable list */}
       <div className="flex-1 overflow-y-auto">
         {renderContent()}
       </div>

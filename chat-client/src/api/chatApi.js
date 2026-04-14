@@ -1,18 +1,3 @@
-/**
- * chatApi.js
- *
- * Axios calls cho Chat Service — khớp với API Quick Reference v1.
- *
- *  GET  /api/conversations                         → danh sách conversations
- *  GET  /api/conversations/:id                     → chi tiết conversation
- *  GET  /api/conversations/:id/messages            → messages (phân trang)
- *  PUT  /api/messages/:id                          → cập nhật tin nhắn
- *  DELETE /api/messages/:id                        → xoá tin nhắn
- *
- * Lưu ý: KHÔNG có POST /api/messages.
- * Gửi tin nhắn được thực hiện hoàn toàn qua Socket.IO ("send_message").
- */
-
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_CHAT_API_URL;
@@ -30,32 +15,32 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Tự động refresh token khi nhận 401
-// api.interceptors.response.use(
-//   (res) => res.data,
-//   async (err) => {
-//     const original = err.config;
+//Tự động refresh token khi nhận 401
+api.interceptors.response.use(
+  (res) => res.data,
+  async (err) => {
+    const original = err.config;
 
-//     if (err.response?.status === 401 && !original._retry) {
-//       original._retry = true;
-//       try {
-//         const refreshToken = localStorage.getItem("refreshToken");
-//         const { token: accessToken } = await api.post("/auth/refresh", { refreshToken });
-//         localStorage.setItem("Token", accessToken);
-//         original.headers.Authorization = `Bearer ${accessToken}`;
-//         return api(original);
-//       } catch {
-//         // Refresh thất bại → xoá token, redirect login
-//         localStorage.removeItem("Token");
-//         localStorage.removeItem("refreshToken");
-//         window.location.href = "/login";
-//       }
-//     }
+    if (err.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        const { token: accessToken } = await api.post("/auth/refresh", { refreshToken });
+        localStorage.setItem("Token", accessToken);
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return api(original);
+      } catch {
+        // Refresh thất bại → xoá token, redirect login
+        localStorage.removeItem("Token");
+        localStorage.removeItem("refreshToken");
+        // window.location.href = "/login";
+      }
+    }
 
-//     const message = err.response?.data?.message || err.message || "Something went wrong";
-//     return Promise.reject(new Error(message));
-//   }
-// );
+    const message = err.response?.data?.message || err.message || "Something went wrong";
+    return Promise.reject(new Error(message));
+  }
+);
 
 // ─── Conversations ──────────────────────────────────────────────────────────
 

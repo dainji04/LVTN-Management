@@ -1,30 +1,3 @@
-/**
- * useWebSocket.js
- *
- * Hook quản lý Socket.IO — event names khớp với BE:
- *
- * Server → Client events được lắng nghe:
- * "connected"            { userId, socketId, onlineUsers }
- * "new_message"          { id, conversationId, senderId, content, type, createdAt, sender }
- * "typing"               { conversationId, userId }
- * "stop_typing"          { conversationId, userId }
- * "user_online"          { userId }
- * "user_offline"         { userId }
- * "conversation_created" { conversation }
- * "message_deleted"      { conversationId, messageId }
- * "message_edited"       { conversationId, message }
- *
- * Client → Server emit methods được trả về:
- * sendMessage(payload)          → "send_message"
- * sendTyping(conversationId)    → "typing"
- * sendStopTyping(conversationId)→ "stop_typing"
- * joinConversation(id)          → "join_conversation"
- * leaveConversation(id)         → "leave_conversation"
- * createConversation(payload)   → "create_conversation"
- * deleteMessage(payload)        → "delete_message"
- * editMessage(payload)          → "edit_message"
- */
-
 import { useEffect, useCallback, useRef } from "react";
 import socketService from "../services/websocketService";
 
@@ -95,42 +68,34 @@ const useWebSocket = ({
 
   // ─── Stable emit helpers ─────────────────────────────────────────────
 
-  /** emit "send_message" → { conversationId, content, type? } */
   const sendMessage = useCallback((payload) => {
     socketService.sendMessage(payload);
   }, []);
 
-  /** emit "typing" → { conversationId } */
   const sendTyping = useCallback((conversationId) => {
     socketService.sendTyping(conversationId);
   }, []);
 
-  /** emit "stop_typing" → { conversationId } */
   const sendStopTyping = useCallback((conversationId) => {
     socketService.sendStopTyping(conversationId);
   }, []);
 
-  /** emit "join_conversation" → { conversationId } */
   const joinConversation = useCallback((conversationId) => {
     socketService.joinConversation(conversationId);
   }, []);
 
-  /** emit "leave_conversation" → { conversationId } */
   const leaveConversation = useCallback((conversationId) => {
     socketService.leaveConversation(conversationId);
   }, []);
 
-  /** emit "create_conversation" → { participantIds, type?, name? } */
   const createConversation = useCallback((payload) => {
     socketService.createConversation(payload);
   }, []);
 
-  /** emit "delete_message" → { conversationId, messageId } */
   const deleteMessage = useCallback((payload) => {
     socketService.deleteMessage(payload);
   }, []);
 
-  /** emit "edit_message" → { conversationId, messageId, newContent } */
   const editMessage = useCallback((payload) => {
     socketService.editMessage(payload);
   }, []);

@@ -1,24 +1,3 @@
-/**
- * useChat.js
- * Flow khởi động:
- * 1. Gọi GET /api/conversations để load danh sách
- * 2. Socket connect → tự động emit "user_connect" (trong websocketService)
- * 3. Server emit "connected" → lưu onlineUsers ban đầu
- * 4. Khi chọn conversation: emit "join_conversation", load messages qua API
- * 5. Khi gửi tin: emit "send_message" (socket only, không gọi API)
- * 6. Server broadcast "new_message" → append vào message list
- *
- * Server → Client events handled:
- * "connected"        → seed onlineUsers từ danh sách server trả về
- * "new_message"      → append message, update preview conversation
- * "typing"           → thêm userId vào typingUsers[conversationId]
- * "stop_typing"      → xoá userId khỏi typingUsers[conversationId]
- * "user_online"      → thêm vào onlineUsers set
- * "user_offline"     → xoá khỏi onlineUsers set
- * "message_deleted"  → gỡ tin nhắn khỏi giao diện của mọi người
- * "message_edited"   → cập nhật nội dung tin nhắn cho mọi người
- */
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getConversations, getConversationMessages } from "../api/chatApi";
 import { getMe } from "../api/userApi";
@@ -47,7 +26,7 @@ const useChat = (token) => {
 
   const stopTypingTimers = useRef({});
 
-  // ─── Load current user ──────────────────────────────────────────────
+  //  Load current user 
   useEffect(() => {
     const fetchMe = async () => {
       try {
@@ -67,7 +46,7 @@ const useChat = (token) => {
     fetchMe();
   }, []);
 
-  // ─── Load conversation list ─────────────────────────────────────────
+  // Load conversation list 
   useEffect(() => {
     const fetch = async () => {
       setLoadingConvs(true);
@@ -84,7 +63,7 @@ const useChat = (token) => {
     fetch();
   }, []);
 
-  // ─── Load messages khi đổi conversation ────────────────────────────
+  //Load messages khi đổi conversation 
   useEffect(() => {
     if (!activeConvId) return;
     if (messagesByConversation[activeConvId]) return;
@@ -107,7 +86,7 @@ const useChat = (token) => {
     fetch();
   }, [activeConvId]);
 
-  // ─── Socket event handlers ──────────────────────────────────────────
+  // Socket event handlers 
 
   const handleConnected = useCallback(({ onlineUsers: onlineList = [] }) => {
     setOnlineUsers(new Set(onlineList.map(String)));

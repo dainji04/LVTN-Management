@@ -14,7 +14,7 @@ const ChatItem = ({ chat,friend, isActive = false, onClick }) => {
       onClick={() => onClick?.(chat.MaCuocTroChuyen)}
       className={`chat-list-item p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors rounded-lg ${isActive ? "bg-pink-50" : ""}`}
     >
-      {/* Avatar with online dot */}
+
       <div className="relative flex-shrink-0">
         <Avatar
           src={avatar}
@@ -27,7 +27,6 @@ const ChatItem = ({ chat,friend, isActive = false, onClick }) => {
         )}
       </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <h3 className="font-semibold text-gray-800 truncate">{name || username}</h3>

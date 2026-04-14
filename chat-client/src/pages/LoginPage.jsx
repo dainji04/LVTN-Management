@@ -34,15 +34,12 @@ const LoginPage = ({ onLoginSuccess }) => {
     setError("");
 
     try {
-      // Response shape: { code: 200, data: { token, authenticated } }
       const res = await login({ email: form.username, password: form.password });
       const token  = res.data.token;
-      console.log("token:", token);
       if (!token) {
         setError("Tài khoản hoặc mật khẩu không đúng.");
         return;
       }
-      console.log("Login successful, token:", token);
       localStorage.setItem("Token", token);
       onLoginSuccess(token);
     } catch (err) {
@@ -54,7 +51,6 @@ const LoginPage = ({ onLoginSuccess }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-white to-pink-100 p-4">
-      {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-pink-200 rounded-full opacity-30 blur-3xl" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-300 rounded-full opacity-20 blur-3xl" />

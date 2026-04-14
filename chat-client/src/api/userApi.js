@@ -1,20 +1,3 @@
-/**
- * userApi.js
- *
- * Axios calls cho Auth + Users + Friends — khớp với API Quick Reference v1.
- *
- *  POST /api/auth/refresh        → refresh access token
- *  GET  /api/auth/me             → current user (Protected)
- *  GET  /api/auth/verify         → verify token (Protected)
- *  POST /api/auth/logout         → logout (Protected)
- *
- *  GET  /api/friends             → danh sách bạn bè
- *  GET  /api/friends/search      → tìm kiếm bạn bè ?query=
- *
- *  GET  /api/users/:id           → user theo ID
- *  GET  /api/users/search        → tìm kiếm users ?query=
- */
-
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_USER_API_URL;

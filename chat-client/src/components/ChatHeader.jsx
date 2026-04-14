@@ -10,7 +10,6 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
   const { t } = useTranslation();
   const { isUserOnline } = useChatContext();
   const online = isUserOnline(chat?.FriendId);
-  console.log("Rendering ChatHeader for chat", chat);
   if (!chat) return null;
 
   return ( chat.SoLuongThanhVien === 2 ? (
@@ -60,7 +59,6 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
   : 
 
   <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white flex-shrink-0">
-      {/* Left: back (mobile) + avatar + name */}
       <div className="flex items-center gap-3">
         {isMobile && (
           <button onClick={onBack} className="text-gray-600 hover:text-primary mr-1">
@@ -87,7 +85,6 @@ const ChatHeader = ({ chat, onBack, isMobile = false }) => {
         </div>
       </div>
 
-      {/* Right: action icons */}
       <div className="flex items-center gap-4">
         <PhoneOutlined
           className="text-xl text-gray-600 cursor-pointer hover:text-primary transition-colors"
