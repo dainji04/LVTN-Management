@@ -111,7 +111,7 @@ public class BinhLuanService {
         boolean laChuBaiViet = binhLuan.getMaBaiDang().getMaNguoiDung().getMaNguoiDung().equals(nguoiXoaId);
 
         if (!laoChuBinhLuan && !laChuBaiViet)
-            throw new RuntimeException("Không có quyền xóa bình luận này!");
+            throw new AppExceptions(ErrorCode.BINHLUAN_DELETE_FORBIDDEN);
 
         // Giảm số bình luận
         BaiViet baiViet = binhLuan.getMaBaiDang();
