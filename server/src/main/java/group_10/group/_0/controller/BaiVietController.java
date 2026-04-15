@@ -112,4 +112,18 @@ public class BaiVietController {
                 .message("Xóa bài viết thành công")
                 .build();
     }
+
+    // Quản trị viên duyệt/từ chối bài viết PENDING trong nhóm
+    @PutMapping("/xu-ly-dang-bai/{id}")
+    @Operation(summary = "Xử lý duyệt bài viết", description = "Admin/Moderator duyệt hoặc từ chối bài viết đang chờ duyệt trong nhóm")
+    public ApiResponse<BaiVietResponse> xuLyDangBaiGroup(
+            @Parameter(description = "ID của bài viết") @PathVariable Integer id,
+            @RequestParam String kqTrangThai,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return ApiResponse.<BaiVietResponse>builder()
+                .code(200)
+                .data(baiVietService.xuLyDangBaiGroup(kqTrangThai, id, token))
+                .build();
+    }
 }

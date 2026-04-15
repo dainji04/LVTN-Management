@@ -42,6 +42,19 @@ public class ThanhVien_GroupService {
        thanhVienNhom.setVaiTro("MEMBER");
        thanhVienNhom.setNgayThamGia(Instant.now());
 
+       if (request.getDuocMoiBoi() != null) {
+           thanhVienNhom.setDuocMoiBoi(
+               usersRepository.findById(request.getDuocMoiBoi())
+                   .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED))
+           );
+       }
+       if (request.getChapNhanBoi() != null) {
+           thanhVienNhom.setChapNhanBoi(
+               usersRepository.findById(request.getChapNhanBoi())
+                   .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED))
+           );
+       }
+
        return thanhVienGroupMapper.toResponse(thanhVienGroupRepository.save(thanhVienNhom));
     }
 
@@ -55,7 +68,9 @@ public class ThanhVien_GroupService {
                thanhVienNhom.getMaNguoiDung().getMaNguoiDung(),
                 thanhVienNhom.getMaNhom().getId());
 
-        theoDoiService.xoaTheoDoi(matheoDoi);
+        if (matheoDoi != null) {
+            theoDoiService.xoaTheoDoi(matheoDoi);
+        }
 
        thanhVienGroupRepository.deleteById(id);
 
@@ -82,6 +97,6 @@ public class ThanhVien_GroupService {
 
     public Long soThanhVienTrongGroup(Integer idgroup)
     {
-        return thanhVienGroupRepository.countById(idgroup);
+        return thanhVienGroupRepository.countByMaNhom_Id(idgroup);
     }
 }

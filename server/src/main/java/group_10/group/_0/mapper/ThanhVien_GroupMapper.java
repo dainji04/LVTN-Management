@@ -16,8 +16,8 @@ public interface ThanhVien_GroupMapper {
     @Mapping(target = "ngayThamGia", ignore = true)
     @Mapping(target = "maNguoiDung.maNguoiDung", source = "maNguoiDung")
     @Mapping(target = "maNhom.id", source = "maNhom")
-    @Mapping(target = "duocMoiBoi.maNguoiDung", source = "duocMoiBoi")
-    @Mapping(target = "chapNhanBoi.maNguoiDung", source = "chapNhanBoi")
+    @Mapping(target = "duocMoiBoi", ignore = true)
+    @Mapping(target = "chapNhanBoi", ignore = true)
     ThanhVienNhom toEntity(ThanhVien_GroupRequest request);
 
     @Mapping(source = "maNguoiDung.maNguoiDung", target = "maNguoiDung")

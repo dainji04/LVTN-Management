@@ -19,6 +19,7 @@ import java.time.Instant;
 public class Nhom {
     @Id
     @Column(name = "MaNhom", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull

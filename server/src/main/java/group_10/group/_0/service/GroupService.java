@@ -15,6 +15,12 @@ import group_10.group._0.mapper.GroupMapper;
 import group_10.group._0.repository.GroupRepository;
 import group_10.group._0.repository.ThanhVien_GroupRepository;
 import group_10.group._0.repository.UsersRepository;
+import group_10.group._0.repository.AccessToGroupRepository;
+import group_10.group._0.repository.BaiVietRepository;
+import group_10.group._0.entity.BaiViet;
+import group_10.group._0.entity.ThanhVienNhom;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,6 +40,9 @@ public class GroupService {
     ThanhVien_GroupRepository thanhVienGroupRepository;
     AuthenticationService authenticationService;
     ThanhVien_GroupService thanhVienGroupService;
+    BaiVietService baiVietService;
+    BaiVietRepository baiVietRepository;
+    AccessToGroupRepository accessToGroupRepository;
 
     public GroupResponse createGroup(GroupRequest request, String token)  {
         Integer maNguoiTao;
@@ -79,6 +88,38 @@ public class GroupService {
         nhom.setNgayCapNhat(Instant.now());
 
         return groupMapper.toResponse(groupRepository.save(nhom));
+    }
+
+    @Transactional
+    public void deleteGroup(Integer idGroup, String token) {
+        Integer maNguoiThaoTac;
+        
+        try {
+            maNguoiThaoTac = authenticationService.getMaNguoiDungFromToken(token);
+        } catch (ParseException | JOSEException e) {
+            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+        }
+
+        Nhom nhom = groupRepository.findById(idGroup)
+                .orElseThrow(() -> new AppExceptions(ErrorCode.GROUP_NOT_EXISTED));
+
+        if (!nhom.getMaNguoiTao().getMaNguoiDung().equals(maNguoiThaoTac)) {
+             throw new RuntimeException("Chỉ người tạo nhóm mới có quyền xóa nhóm");
+        }
+
+        List<BaiViet> dsBaiViet = baiVietRepository.findByMaNhom_Id(idGroup);
+        if (dsBaiViet != null) {
+            dsBaiViet.forEach(bv -> baiVietService.deleteBaiViet(bv.getId()));
+        }
+
+        List<ThanhVienNhom> dsThanhVien = thanhVienGroupRepository.findByMaNhom_Id(idGroup);
+        if (dsThanhVien != null) {
+            dsThanhVien.forEach(tv -> thanhVienGroupService.deleteThanhVien(tv.getId()));
+        }
+
+        accessToGroupRepository.deleteByMaNhom_Id(idGroup);
+        
+        groupRepository.deleteById(idGroup);
     }
 
 
