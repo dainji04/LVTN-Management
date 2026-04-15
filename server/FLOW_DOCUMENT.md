@@ -4,6 +4,43 @@
  
 ---
 
+## 0. 🔐 Luồng Đăng ký
+
+```
+1. POST /users/register     → Tạo tài khoản mới
+2. Server kiểm tra email chưa tồn tại
+3. Tạo user mới, trả về thông tin user
+```
+
+**Request:**
+```json
+{
+  "email": "user@example.com",
+  "matKhau": "password123",
+  "hoTen": "Nguyen Van A",
+  "ngaySinh": "1990-01-01",
+  "gioiTinh": "NAM"
+}
+```
+
+**Response:**
+```json
+{
+  "code": 201,
+  "message": "User created successfully",
+  "data": {
+    "maNguoiDung": 1,
+    "email": "user@example.com",
+    "hoTen": "Nguyen Van A",
+    "anhDaiDien": null,
+    "ngaySinh": "1990-01-01",
+    "gioiTinh": "NAM"
+  }
+}
+```
+
+---
+
 ## 1. 🔐 Luồng Đăng nhập
 
 ```
@@ -22,8 +59,10 @@ const res = await fetch('/users/login', {
 });
 const data = await res.json();
 const token = data.data.token;
+const refreshToken = data.data.refreshToken; // Lưu refresh token
 const userId = data.data.thongTinUser.maNguoiDung;
 localStorage.setItem('token', token);
+localStorage.setItem('refreshToken', refreshToken);
  
 const eventSource = new EventSource(
     `https://api-social.dainji.id.vn/thongbao/subscribe/${userId}`
@@ -33,7 +72,19 @@ eventSource.addEventListener('notification', (e) => {
     xuLyThongBao(thongBao);
 });
 ```
- 
+
+**Refresh Token (khi token hết hạn):**
+```javascript
+const refreshToken = localStorage.getItem('refreshToken');
+const res = await fetch('/auth/refresh', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: refreshToken })
+});
+const data = await res.json();
+localStorage.setItem('token', data.data.token);
+```
+
 ---
 
 ## 2. 🔔 Luồng Thông báo Realtime (SSE)
@@ -260,25 +311,180 @@ await fetch('/thongbao/123/read', {
 
 ```
 1. POST /bai-viet              → Tạo bài viết (kèm ảnh nếu có)
-2. GET  /bai-viet              → Lấy tất cả bài viết (newsfeed)
-3. GET  /bai-viet/user/{id}   → Lấy bài viết của 1 user (trang cá nhân)
+2. GET  /bai-viet              → Lấy tất cả bài viết (newsfeed, phân trang)
+3. GET  /bai-viet/{id}         → Lấy chi tiết bài viết
+4. GET  /bai-viet/user/{id}   → Lấy bài viết của 1 user (trang cá nhân, phân trang)
+5. PUT  /bai-viet/{id}         → Cập nhật bài viết
+6. DELETE /bai-viet/{id}       → Xóa bài viết
 ```
- 
+
+**Tạo bài viết:**
+```json
+POST /bai-viet
+{
+  "maNguoiDung": 1,
+  "noiDung": "Nội dung bài viết",
+  "danhSachAnh": ["url1", "url2"] // optional
+}
+```
+
+**Cập nhật bài viết:**
+```json
+PUT /bai-viet/{id}
+{
+  "noiDung": "Nội dung mới",
+  "danhSachAnh": ["url_moi"] // Thay thế ảnh cũ
+}
+```
+
+**Lấy bài viết (phân trang):**
+```
+GET /bai-viet?page=0&size=10
+GET /bai-viet/user/1?page=0&size=5
+```
+
 ---
 
-## 5. 💬 Luồng Chat
-
-> Chat đi qua Spring Cloud Gateway: `/chat/...`
+## 5. 💬 Luồng Bình luận
 
 ```
-1. GET /chat/api/conversations?type=direct   → Lấy danh sách chat
-2. GET /chat/api/conversations/{id}/messages → Lấy tin nhắn
+1. POST /binh-luan             → Tạo bình luận
+2. GET  /binh-luan/bai-viet/{id} → Lấy bình luận của bài viết
+3. GET  /binh-luan/replies/{id}  → Lấy reply của bình luận
+4. PATCH /binh-luan/{id}        → Cập nhật bình luận
+5. DELETE /binh-luan/{id}       → Xóa bình luận
+```
+
+**Tạo bình luận:**
+```json
+POST /binh-luan
+{
+  "maNguoiDung": 1,
+  "maBaiDang": 10,
+  "noiDung": "Bình luận hay!",
+  "maBinhLuanCha": null // null nếu là bình luận gốc, có giá trị nếu là reply
+}
+```
+
+**Cập nhật bình luận:**
+```
+PATCH /binh-luan/5?noiDung=Nội dung mới
+```
+
+**Xóa bình luận:**
+```
+DELETE /binh-luan/5?nguoiXoaId=1
+```
+
+---
+
+## 6. ❤️ Luồng Lượt thích
+
+```
+1. POST /luot-thich/toggle     → Thích/Bỏ thích bài viết hoặc bình luận
+2. GET  /luot-thich/check      → Kiểm tra đã thích chưa
+3. GET  /luot-thich/danh-sach  → Danh sách người thích
+```
+
+**Toggle like:**
+```json
+POST /luot-thich/toggle
+{
+  "maNguoiDung": 1,
+  "maDoiTuong": 10,
+  "loaiDoiTuong": "BaiViet" // hoặc "BinhLuan"
+}
+```
+
+**Kiểm tra đã thích:**
+```
+GET /luot-thich/check?maNguoiDung=1&maDoiTuong=10&loaiDoiTuong=BaiViet
+```
+
+**Danh sách người thích:**
+```
+GET /luot-thich/danh-sach?maDoiTuong=10&loaiDoiTuong=BaiViet
+```
+
+---
+
+## 7. 👥 Luồng Theo dõi
+
+```
+1. POST /theo-doi              → Theo dõi người dùng (gửi thông báo)
+2. POST /theo-doi/khong-thong-bao → Theo dõi ngầm (không thông báo)
+3. GET  /theo-doi/user/{id}    → Thống kê theo dõi của user
+4. DELETE /theo-doi            → Hủy theo dõi
+```
+
+**Theo dõi:**
+```json
+POST /theo-doi
+{
+  "maNguoiTheoDoi": 1,
+  "maNguoiDuocTheoDoi": 2
+}
+```
+
+**Hủy theo dõi:**
+```json
+DELETE /theo-doi
+{
+  "maNguoiTheoDoi": 1,
+  "maNguoiDuocTheoDoi": 2
+}
+```
+
+**Thống kê:**
+```
+GET /theo-doi/user/1
+// Trả về: số người đang theo dõi, số người được theo dõi, danh sách
+```
+
+---
+
+## 8. 👤 Luồng Thông tin User
+
+```
+1. GET /users                  → Lấy tất cả users
+2. GET /users/{id}             → Lấy thông tin user
+3. PUT /users/{id}             → Cập nhật profile
+4. DELETE /users/{id}          → Xóa user
+```
+
+**Cập nhật user:**
+```json
+PUT /users/1
+{
+  "hoTen": "Tên mới",
+  "ngaySinh": "1990-01-01",
+  "gioiTinh": "NU",
+  "anhDaiDien": "url_anh_moi"
+}
+```
+
+---
+
+## 9. 💬 Luồng Chat
+
+> Chat service được proxy qua Spring Boot: `/chat/...` → forward đến Node.js chat service
+
+```
+1. GET /chat/api/conversations?type=direct   → Lấy danh sách cuộc trò chuyện
+2. GET /chat/api/conversations/{id}/messages → Lấy tin nhắn của cuộc trò chuyện
 3. Socket.IO (realtime) để gửi/nhận tin nhắn mới
+4. Các API khác của chat service được forward tự động
 ```
- 
+
+**Ví dụ proxy:**
+- `GET /chat/api/users` → gọi đến Node.js: `GET {nodejs.url}/api/users`
+- Tất cả headers (Authorization) được forward
+
+**Xem chi tiết API chat:** [Chat Service API](https://github.com/dainji04/LVTN-Management/blob/main/chat-service/API_TESTING.md)
+
 ---
 
-## 6. 🚪 Luồng Đăng xuất
+## 10. 🚪 Luồng Đăng xuất
 
 ```
 1. POST /auth/logout       → Vô hiệu hóa token trên server
@@ -286,7 +492,7 @@ await fetch('/thongbao/123/read', {
 3. eventSource.close()    → Đóng kết nối SSE
 4. Chuyển về trang login
 ```
- 
+
 ---
 
 ## ⚠️ Lưu ý quan trọng cho FE
@@ -296,3 +502,4 @@ await fetch('/thongbao/123/read', {
 | Gọi `/thongbao/subscribe/{userId}` | Ngay sau khi login thành công |
 | Đóng `eventSource` | Khi logout |
 | Gửi `Authorization: Bearer {token}` | Với mọi API cần xác thực |
+| Refresh token khi cần | Khi token hết hạn (401 response) |
