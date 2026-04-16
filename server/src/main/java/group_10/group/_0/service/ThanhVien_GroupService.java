@@ -10,7 +10,7 @@ import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.ThanhVien_GroupMapper;
 import group_10.group._0.repository.ThanhVien_GroupRepository;
-import group_10.group._0.repository.TheoDoiRepository;
+import group_10.group._0.repository.TheoDoiNhomRepository;
 import group_10.group._0.repository.UsersRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 public class ThanhVien_GroupService {
      ThanhVien_GroupMapper thanhVienGroupMapper;
      ThanhVien_GroupRepository thanhVienGroupRepository;
-     TheoDoiService theoDoiService;
+     TheoDoiNhomService theoDoiNhomService;
      UsersRepository usersRepository;
-     TheoDoiRepository theoDoiRepository;
+     TheoDoiNhomRepository theoDoiNhomRepository;
 
     public ThanhVien_GroupResponse createThanhVien(ThanhVien_GroupRequest request)
     {
@@ -64,12 +64,12 @@ public class ThanhVien_GroupService {
        ThanhVienNhom thanhVienNhom =  thanhVienGroupRepository.findById(id)
                .orElseThrow(()->new AppExceptions(ErrorCode.MEMBER_NOT_EXISTED));
 
-       Integer matheoDoi = theoDoiRepository.findIdByFollowerAndFollowed(
+       Integer matheoDoi = theoDoiNhomRepository.findIdByFollowerAndGroup(
                thanhVienNhom.getMaNguoiDung().getMaNguoiDung(),
                 thanhVienNhom.getMaNhom().getId());
 
         if (matheoDoi != null) {
-            theoDoiService.xoaTheoDoi(matheoDoi);
+            theoDoiNhomService.xoaTheoDoiNhom(matheoDoi);
         }
 
        thanhVienGroupRepository.deleteById(id);

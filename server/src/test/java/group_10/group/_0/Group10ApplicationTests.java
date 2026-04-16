@@ -621,7 +621,7 @@ class Group10ApplicationTests {
         mockMvc.perform(delete("/theo-doi/9999999")
                         .header("Authorization", "Bearer " + tokenA))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value(4006));
+                .andExpect(jsonPath("$.code").value(4007));
     }
 
     // =====================================================

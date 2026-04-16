@@ -35,7 +35,7 @@ public class AccessToGroupService {
     ThongBaoService thongBaoService;
     AuthenticationService authenticationService;
     UsersRepository usersRepository;
-    TheoDoiService theoDoiService;
+    TheoDoiNhomService theoDoiNhomService;
     GroupRepository groupRepository;
 
 
@@ -66,11 +66,11 @@ public class AccessToGroupService {
 
             thanhVienGroupService.createThanhVien(thanhVienGroup);
 
-            TheoDoiRequest theoDoiRequest = new TheoDoiRequest(
+            TheoDoiNhomRequest theoDoiRequest = new TheoDoiNhomRequest(
                     request.getMaNguoiDung(),
                     request.getMaNhom()
             );
-            theoDoiService.createTheoDoiKhongThongBao(theoDoiRequest);
+            theoDoiNhomService.createTheoDoiNhom(theoDoiRequest);
 
             List<ThanhVienNhom> dsNguoiDuyet = thanhVienGroupRepository.
                     findQuanTriVienByMaNhom(request.getMaNhom());
@@ -171,11 +171,11 @@ public class AccessToGroupService {
         );
         thanhVienGroupService.createThanhVien(thanhVienGroup);
 
-        TheoDoiRequest theoDoiRequest = new TheoDoiRequest(
+        TheoDoiNhomRequest theoDoiRequest = new TheoDoiNhomRequest(
                 yeuCauThamGiaNhom.getMaNguoiDung().getMaNguoiDung(),
                 yeuCauThamGiaNhom.getMaNhom().getId()
         );
-        theoDoiService.createTheoDoi(theoDoiRequest);
+        theoDoiNhomService.createTheoDoiNhom(theoDoiRequest);
 
         ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
                 maNguoiDuyet,
