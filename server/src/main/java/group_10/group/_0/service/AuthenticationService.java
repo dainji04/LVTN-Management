@@ -120,7 +120,7 @@ public class AuthenticationService {
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Can't create JWS object", e);
-            throw new RuntimeException(e);
+            throw new AppExceptions(ErrorCode.TOKEN_GENERATION_FAILED);
         }
     }
 

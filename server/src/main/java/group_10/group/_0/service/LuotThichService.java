@@ -4,6 +4,8 @@ import group_10.group._0.dto.request.LuotThichRequest;
 import group_10.group._0.dto.response.LuotThichResponse;
 import group_10.group._0.entity.LuotThich;
 import group_10.group._0.entity.Users;
+import group_10.group._0.exception.AppExceptions;
+import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.LuotThichMapper;
 import group_10.group._0.repository.BaiVietRepository;
 import group_10.group._0.repository.LuotThichRepository;
@@ -44,7 +46,7 @@ public class LuotThichService {
         } else {
             // Thích
             Users user = usersRepository.findById(request.getMaNguoiDung())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
             LuotThich luotThich = luotThichMapper.toLuotThich(request);
             luotThich.setMaNguoiDung(user); // Gán object user đã tìm thấy

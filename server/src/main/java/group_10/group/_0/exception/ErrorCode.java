@@ -21,6 +21,8 @@ public enum ErrorCode {
     SAI_MAT_KHAU(1002, "Email hoặc mật khẩu không chính xác", HttpStatus.UNAUTHORIZED), // Có thể đổi tên thành CREDENTIALS_INVALID
     UNAUTHORIZED(1003, "Bạn không có quyền thực hiện hành động này", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED(1004, "Không có quyền truy cập tài nguyên", HttpStatus.FORBIDDEN),
+    TOKEN_GENERATION_FAILED(1005, "Lỗi tạo JWT token", HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_VERIFICATION_FAILED(1006, "Lỗi xác thực token", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // ==========================================
     // 3. VALIDATION ERRORS (20xx)
@@ -49,7 +51,15 @@ public enum ErrorCode {
     BINHLUANCHA_NOT_EXISTED(4003, "Bình luận cha không tồn tại", HttpStatus.NOT_FOUND),
     GROUP_NOT_EXISTED(4004, "Nhóm không tồn tại", HttpStatus.NOT_FOUND),
     MEMBER_NOT_EXISTED(4005, "Thành viên không tồn tại", HttpStatus.NOT_FOUND),
-    FOLLOW_NOT_EXISTED(4006, "Chưa tồn tại theo dõi", HttpStatus.NOT_FOUND),
+    USER_NOT_IN_GROUP(4006, "Bạn không phải thành viên của nhóm này để đăng bài!", HttpStatus.FORBIDDEN),
+    FOLLOW_NOT_EXISTED(4007, "Chưa tồn tại theo dõi", HttpStatus.NOT_FOUND),
+    BINHLUAN_DELETE_FORBIDDEN(4008, "Bạn không có quyền xóa bình luận này!", HttpStatus.FORBIDDEN),
+    FRIEND_ALREADY_EXISTED(4009, "Đã là bạn bè rồi!", HttpStatus.CONFLICT),
+    FRIEND_REQUEST_ALREADY_SENT(4010, "Đã gửi lời mời rồi!", HttpStatus.CONFLICT),
+    FRIEND_REQUEST_NOT_EXISTED(4011, "Lời mời không tồn tại!", HttpStatus.NOT_FOUND),
+    FRIEND_REQUEST_NOT_ACCEPTED(4012, "Lời mời chưa được chấp nhận!", HttpStatus.FORBIDDEN),
+
+
 
     // ==========================================
     // 6. NOTIFICATION & OTHERS (50xx)

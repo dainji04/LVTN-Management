@@ -93,7 +93,7 @@ public class BaiVietService {
     // Lấy bài viết theo ID
     public BaiVietResponse getBaiVietById(Integer id) {
         BaiViet baiViet = baiVietRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại: " + id));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
 
         BaiVietResponse response = mapper.toBaiVietResponse(baiViet);
 
@@ -111,7 +111,7 @@ public class BaiVietService {
     // Lấy tất cả bài viết của 1 user
     public SliceResponse<BaiVietResponse> getBaiVietByUser(Integer maNguoiDung, int page, int size) {
         if (!usersRepository.existsById(maNguoiDung))
-            throw new RuntimeException("User không tồn tại: " + maNguoiDung);
+            throw new AppExceptions(ErrorCode.USER_NOT_EXISTED);
 
         Pageable pageable = PageRequest.of(page, size);
         Slice<BaiViet> slice = baiVietRepository
@@ -146,7 +146,7 @@ public class BaiVietService {
     // Tạo bài viết mới
     public BaiVietResponse createBaiViet(BaiVietRequest request) {
         Users user = usersRepository.findById(request.getMaNguoiDung())
-                .orElseThrow(() -> new RuntimeException("User không tồn tại: " + request.getMaNguoiDung()));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         BaiViet baiViet = mapper.toBaiViet(request);
         baiViet.setMaNguoiDung(user);
@@ -161,10 +161,10 @@ public class BaiVietService {
         if (request.getMaNhom() != null)
         {
             Nhom nhom = groupRepository.findById(request.getMaNhom())
-                    .orElseThrow(()->new RuntimeException("Nhóm không tồn tại: " + request.getMaNhom()));
+                    .orElseThrow(()->new AppExceptions(ErrorCode.GROUP_NOT_EXISTED));
 
             if (!(groupRepository.existsByUserIdAndGroupId(request.getMaNguoiDung(), request.getMaNhom())))
-                throw new RuntimeException("Bạn không phải thành viên của nhóm này để đăng bài!");
+                throw new AppExceptions(ErrorCode.USER_NOT_IN_GROUP);
 
 
             baiViet.setMaNhom(nhom);
@@ -248,7 +248,7 @@ public class BaiVietService {
                 .orElseThrow(()->new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         BaiViet baiViet = baiVietRepository.findById(idBaiViet)
-                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại: " + idBaiViet));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
 
         baiViet.setTrangThai(kqTrangThaiBaiViet);
         baiViet.setNgayCapNhat(Instant.now());
@@ -268,7 +268,7 @@ public class BaiVietService {
     // Cập nhật bài viết
     public BaiVietResponse updateBaiViet(Integer id, BaiVietRequest request) {
         BaiViet baiViet = baiVietRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại: " + id));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
 
         mapper.updateBaiViet(baiViet, request);
         baiViet.setDaSua(true);
@@ -294,7 +294,7 @@ public class BaiVietService {
     // Xóa bài viết
     public void deleteBaiViet(Integer id) {
         if (!baiVietRepository.existsById(id)) {
-            throw new RuntimeException("Bài viết không tồn tại: " + id);
+            throw new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED);
         }
         hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet"); // xóa ảnh trước
         baiVietRepository.deleteById(id);

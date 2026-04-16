@@ -45,7 +45,7 @@ public class UsersService {
 
     public UsersResponse getUserById(Integer id) {
         Users user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
         return mapper.toTaikhoanResponse(user);
         //        return toResponse(user); Cach ma mapper thuc su lam
     }
@@ -122,7 +122,7 @@ public class UsersService {
 
     public UsersResponse updateUser(Integer id, UsersUpdateRequest request) {
         Users user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         mapper.updateTaikhoan(user, request);
 
@@ -138,7 +138,7 @@ public class UsersService {
 
     public void deleteUser(Integer id) {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("User not found: " + id);
+            throw new AppExceptions(ErrorCode.USER_NOT_EXISTED);
         }
         repository.deleteById(id);
     }

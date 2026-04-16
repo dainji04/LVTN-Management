@@ -59,7 +59,7 @@ public class BinhLuanService {
 
     public SliceResponse<BinhLuanResponse> getByBaiViet(Integer maBaiDang, int page, int size) {
         BaiViet baiViet = baiVietRepository.findById(maBaiDang)
-                .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại!"));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
 
         Pageable pageable = PageRequest.of(page, size);
         Slice<BinhLuan> slice = binhLuanRepository.findByMaBaiDangOrderByNgayTaoAsc(baiViet, pageable);
@@ -77,7 +77,7 @@ public class BinhLuanService {
 
     public SliceResponse<BinhLuanResponse> getReplies(Integer maBinhLuanCha, int page, int size) {
         BinhLuan cha = binhLuanRepository.findById(maBinhLuanCha)
-                .orElseThrow(() -> new RuntimeException("Bình luận không tồn tại!"));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BINHLUANCHA_NOT_EXISTED));
 
         Pageable pageable = PageRequest.of(page, size);
         Slice<BinhLuan> slice = binhLuanRepository.findByMaBinhLuanChaOrderByNgayTaoAsc(cha, pageable);
@@ -102,7 +102,7 @@ public class BinhLuanService {
 
     public void deleteBinhLuan(Integer id, Integer nguoiXoaId) {
         BinhLuan binhLuan = binhLuanRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bình luận không tồn tại!"));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BINHLUANCHA_NOT_EXISTED));
 
         // Kiểm tra quyền xóa:
         // 1. Chủ bình luận có thể xóa bình luận của mình
@@ -111,7 +111,7 @@ public class BinhLuanService {
         boolean laChuBaiViet = binhLuan.getMaBaiDang().getMaNguoiDung().getMaNguoiDung().equals(nguoiXoaId);
 
         if (!laoChuBinhLuan && !laChuBaiViet)
-            throw new RuntimeException("Không có quyền xóa bình luận này!");
+            throw new AppExceptions(ErrorCode.BINHLUAN_DELETE_FORBIDDEN);
 
         // Giảm số bình luận
         BaiViet baiViet = binhLuan.getMaBaiDang();

@@ -6,6 +6,8 @@ import group_10.group._0.dto.response.BanBeResponse;
 import group_10.group._0.entity.LoiMoiKetBan;
 import group_10.group._0.entity.QuanHeBanBe;
 import group_10.group._0.entity.Users;
+import group_10.group._0.exception.AppExceptions;
+import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.BanBeMapper;
 import group_10.group._0.repository.LoiMoiKetBanRepository;
 import group_10.group._0.repository.QuanHeBanBeRepository;
@@ -42,18 +44,18 @@ public class QuanHeBanBeService {
     }
 
     public QuanHeBanBe addFriend(Integer id1, Integer id2, Integer loiMoiId) {
-        if (areFriends(id1, id2)) throw new RuntimeException("Đã là bạn bè rồi!");
+        if (areFriends(id1, id2)) throw new AppExceptions(ErrorCode.FRIEND_ALREADY_EXISTED);
 
         // Kiểm tra trạng thái lời mời
         LoiMoiKetBan loiMoi = loiMoiRepository.findById(loiMoiId)
-                .orElseThrow(() -> new RuntimeException("Lời mời không tồn tại!"));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.FRIEND_REQUEST_NOT_EXISTED));
         if (!"CHAP_NHAN".equals(loiMoi.getTrangThai()))
-            throw new RuntimeException("Lời mời chưa được chấp nhận!");
+            throw new AppExceptions(ErrorCode.FRIEND_REQUEST_NOT_ACCEPTED);
 
         Users user1 = usersRepository.findById(id1)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id1));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
         Users user2 = usersRepository.findById(id2)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id2));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         QuanHeBanBe quanHe = QuanHeBanBe.builder()
                 .maNguoiDung1(user1)
