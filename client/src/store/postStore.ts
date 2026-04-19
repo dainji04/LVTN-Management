@@ -113,13 +113,14 @@ export const usePostStore = defineStore("post", {
 
     updatePostContent(maBaiViet: number, noiDung: string): void {
       const idx = this.posts.findIndex((p) => p.maBaiViet === maBaiViet);
-      if (idx !== -1) {
-        this.posts[idx] = {
-          ...this.posts[idx],
-          noiDung,
-          daSua: true,
-        };
-      }
+      console.log(noiDung,idx);
+      // if (idx !== -1) {
+      //   this.posts[idx] = {
+      //     ...this.posts[idx],
+      //     noiDung,
+      //     daSua: true,
+      //   };
+      // }
     },
 
     async fetchPostsByUserId(userId: number, page = 1): Promise<void> {

@@ -266,7 +266,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import {
   CameraOutlined,
   EditOutlined,
@@ -289,7 +289,6 @@ import Post from '../components/Post.vue';
 import { useAuthStore } from '../store/authStore';
 import type { User } from '../types/userType';
 import axiosInstance from '../helpers/apiHelper';
-import type { PostItem } from '../types/postType';
 import { resolveMediaUrl } from '../helpers/mediaHelper';
 import { useI18n } from 'vue-i18n';
 import { usePostStore } from '../store/postStore';
@@ -298,7 +297,6 @@ const activeTab = ref('posts');
 const { t } = useI18n();
 const mainContentRef = ref<HTMLElement | null>(null);
 const defaultAvatar = 'https://testingbot.com/free-online-tools/random-avatar/500';
-const hasNextPosts = ref(true);
 const isLoadingPosts = ref(false);
 const postError = ref('');
 const SCROLL_THRESHOLD = 300;

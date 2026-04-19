@@ -36,7 +36,6 @@ declare module 'vue' {
     GroupSuggestItem: typeof import('./src/components/GroupSuggestItem.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     MessageBubble: typeof import('./src/components/MessageBubble.vue')['default']
-    Modal: typeof import('./src/components/Modal.vue')['default']
     ModalComment: typeof import('./src/components/ModalComment.vue')['default']
     ModalEditPost: typeof import('./src/components/ModalEditPost.vue')['default']
     ModalListLike: typeof import('./src/components/ModalListLike.vue')['default']
