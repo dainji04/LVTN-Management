@@ -12,5 +12,7 @@ public interface GroupRepository extends JpaRepository<Nhom,Integer> {
     @Query("SELECT COUNT(t) > 0 FROM ThanhVienNhom t WHERE t.maNguoiDung.maNguoiDung = :userId AND t.maNhom.id = :groupId")
     boolean existsByUserIdAndGroupId(@Param("userId") Integer userId, @Param("groupId") Integer groupId);
 
-
+    // Lấy danh sách Top Nhóm Năng Động (Nhiều thành viên nhất) làm mảng xếp hạng Leaderboard
+    @Query("SELECT n FROM Nhom n ORDER BY n.soThanhVien DESC")
+    java.util.List<Nhom> findTopGroupsByMembers(org.springframework.data.domain.Pageable pageable);
 }
