@@ -18,4 +18,5 @@ public class LuotThichResponse {
     String loaiDoiTuong;
     String camXuc;
     Instant ngayTao;
+    String anhDaiDien;
 }
