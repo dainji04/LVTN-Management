@@ -105,7 +105,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 ngay
                 .jwtID(UUID.randomUUID().toString())
-//                .claim("role", buildScope(taikhoan))
+                .claim("role", taikhoan.getRole().name())
                 .claim("id", taikhoan.getMaNguoiDung())
                 .build();
 
@@ -217,6 +217,23 @@ public class AuthenticationService {
 
         return maNguoiDung;
     }
+
+
+    // Hàm dùng để giải mã token và lấy ra role
+    public boolean getRole(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT = verifyToken(token, false);
+
+        String RoLeeeeee = signedJWT.getJWTClaimsSet().getClaim("role").toString();
+
+        if (!(RoLeeeeee.equals("ADMIN")))
+        {
+            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+        }
+
+        return true;
+    }
+
+
 
 }
 
