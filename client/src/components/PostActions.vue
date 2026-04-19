@@ -23,14 +23,14 @@
             <SendOutlined class="text-2xl" />
         </button>
 
-        <button
+        <!-- <button
             @click="handleBookmark"
             class="action-btn ml-auto hover:opacity-70 transition-opacity"
             :class="{ 'text-primary': isBookmarked }"
         >
             <BookOutlined v-if="!isBookmarked" class="text-2xl" />
             <BookFilled v-else class="text-2xl text-primary" />
-        </button>
+        </button> -->
     </div>
 </template>
 
