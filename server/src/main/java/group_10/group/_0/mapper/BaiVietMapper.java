@@ -27,8 +27,8 @@ public interface BaiVietMapper {
     // 2. Request -> Entity
     @Mapping(target = "id",           ignore = true)
     @Mapping(target = "maNguoiDung",  ignore = true) // Set thủ công Users object trong Service
-    // Map Integer maNhom từ Request vào ID của đối tượng Nhom trong Entity
-    @Mapping(target = "maNhom.id",    source = "maNhom")
+    // Bỏ qua tạo Nhom tự động từ MapStruct vì sẽ bị lỗi Transient Instance. Service đã chủ động tìm Nhom trong DB và gán vào.
+    @Mapping(target = "maNhom",       ignore = true)
     @Mapping(target = "trangThai",    ignore = true) // Set thủ công dựa trên logic canDuyetBaiDang của Group
     @Mapping(target = "daSua",        ignore = true)
     @Mapping(target = "luotThich",    ignore = true)

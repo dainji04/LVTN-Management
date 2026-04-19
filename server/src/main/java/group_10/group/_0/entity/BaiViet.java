@@ -31,7 +31,7 @@ public class BaiViet {
     private Users maNguoiDung;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaNhom") // Cho phép null nếu là bài đăng cá nhân
+    @JoinColumn(name = "MaNhom")
     private Nhom maNhom;
 
     @Size(max = 20)

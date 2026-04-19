@@ -44,6 +44,31 @@ public class GroupService {
     BaiVietRepository baiVietRepository;
     AccessToGroupRepository accessToGroupRepository;
 
+    public List<GroupResponse> findGroup(String key)
+    {
+        return groupRepository.searchByGroupName(key).stream().map(groupMapper::toResponse).toList();
+    }
+
+    public GroupResponse getGroupById(Integer id)
+    {
+        if (!(groupRepository.existsById(id)))
+        {throw new AppExceptions(ErrorCode.GROUP_NOT_EXISTED);}
+
+        return groupMapper.toResponse(groupRepository.thongtincuaGroupById(id));
+    }
+
+    public List<GroupResponse> getAllDSGroup()
+    {
+        return groupRepository.findAllGroups().stream().map(groupMapper::toResponse).toList();
+    }
+
+    public List<GroupResponse> getGroupsByUserId(Integer userId) {
+        if (!usersRepository.existsById(userId)) {
+            throw new AppExceptions(ErrorCode.USER_NOT_EXISTED);
+        }
+        return groupRepository.findGroupsByUserId(userId).stream().map(groupMapper::toResponse).toList();
+    }
+
     public GroupResponse createGroup(GroupRequest request, String token)  {
         Integer maNguoiTao;
 

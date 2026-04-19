@@ -697,6 +697,88 @@ class Group10ApplicationTests {
     }
 
     // =====================================================
+    // MODULE BÀI VIẾT KO LIÊN QUAN ĐẾN NHÓM
+    // =====================================================
+
+    static Integer baiVietCaNhanId;
+
+    @Test
+    @Order(70)
+    @DisplayName("TC-BVCN01 ✅ User A đăng bài cá nhân (không group) -> APPROVED")
+    void tc_BVCN01_dangBaiCaNhan() throws Exception {
+        String body = String.format("""
+                {
+                  "maNguoiDung": %s,
+                  "noiDung": "Bai viet ca nhan cua A",
+                  "danhSachAnh": []
+                }
+                """, extractUserId(tokenA));
+
+        MvcResult result = mockMvc.perform(post("/bai-viet")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.trangThai").value("APPROVED")) // Bài cá nhân duyệt tự động luôn
+                .andReturn();
+
+        baiVietCaNhanId = objectMapper.readTree(
+                result.getResponse().getContentAsString())
+                .path("data").path("maBaiViet").asInt();
+    }
+
+    @Test
+    @Order(71)
+    @DisplayName("TC-BVCN02 ✅ Xem chi tiết bài viết cá nhân")
+    void tc_BVCN02_xemChiTietBaiVietCaNhan() throws Exception {
+        mockMvc.perform(get("/bai-viet/" + baiVietCaNhanId)
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.maBaiViet").value(baiVietCaNhanId))
+                .andExpect(jsonPath("$.data.noiDung").value("Bai viet ca nhan cua A"));
+    }
+
+    @Test
+    @Order(72)
+    @DisplayName("TC-BVCN03 ✅ Cập nhật bài viết cá nhân")
+    void tc_BVCN03_capNhatBaiVietCaNhan() throws Exception {
+        String body = String.format("""
+                {
+                  "maNguoiDung": %s,
+                  "noiDung": "Noi dung bai ca nhan da update",
+                  "danhSachAnh": []
+                }
+                """, extractUserId(tokenA));
+
+        mockMvc.perform(put("/bai-viet/" + baiVietCaNhanId)
+                        .header("Authorization", "Bearer " + tokenA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.noiDung").value("Noi dung bai ca nhan da update"));
+    }
+
+    @Test
+    @Order(73)
+    @DisplayName("TC-BVCN04 ✅ Phân trang bài viết cá nhân")
+    void tc_BVCN04_layPhanTrangBVCaNhan() throws Exception {
+        mockMvc.perform(get("/bai-viet/user/" + extractUserId(tokenA) + "?page=0&size=10")
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content", hasSize(greaterThanOrEqualTo(1))));
+    }
+
+    @Test
+    @Order(74)
+    @DisplayName("TC-BVCN05 ✅ Xóa bài viết cá nhân")
+    void tc_BVCN05_xoaBaiVietCaNhan() throws Exception {
+        mockMvc.perform(delete("/bai-viet/" + baiVietCaNhanId)
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk());
+    }
+
+    // =====================================================
     // HELPER – Lấy maNguoiDung từ token (decode JWT claim "id")
     // =====================================================
     private Integer extractUserId(String jwtToken) {

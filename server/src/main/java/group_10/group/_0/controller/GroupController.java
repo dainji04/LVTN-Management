@@ -3,6 +3,7 @@ package group_10.group._0.controller;
 import group_10.group._0.dto.request.GroupRequest;
 import group_10.group._0.dto.response.ApiResponse;
 import group_10.group._0.dto.response.GroupResponse;
+import group_10.group._0.entity.Nhom;
 import group_10.group._0.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/group")
@@ -47,6 +49,42 @@ public class GroupController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Xóa nhóm thành công")
+                .build();
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Tìm kiếm nhóm", description = "Tìm kiếm danh sách nhóm dựa theo tên")
+    public ApiResponse<List<GroupResponse>> findGroup(@RequestParam("key") String key) {
+        return ApiResponse.<List<GroupResponse>>builder()
+                .code(200)
+                .data(groupService.findGroup(key))
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Lấy thông tin nhóm", description = "Lấy thông tin chi tiết của một nhóm dựa vào ID")
+    public ApiResponse<GroupResponse> getGroupById(@PathVariable("id") Integer id) {
+        return ApiResponse.<GroupResponse>builder()
+                .code(200)
+                .data(groupService.getGroupById(id))
+                .build();
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Lấy tất cả nhóm", description = "Lấy danh sách tất cả các nhóm hiện có")
+    public ApiResponse<List<GroupResponse>> getAllDSGroup() {
+        return ApiResponse.<List<GroupResponse>>builder()
+                .code(200)
+                .data(groupService.getAllDSGroup())
+                .build();
+    }
+
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Lấy danh sách nhóm theo người dùng", description = "Lấy danh sách các nhóm mà người dùng đã tham gia dựa vào ID người dùng")
+    public ApiResponse<List<GroupResponse>> getGroupsByUserId(@PathVariable("userId") Integer userId) {
+        return ApiResponse.<List<GroupResponse>>builder()
+                .code(200)
+                .data(groupService.getGroupsByUserId(userId))
                 .build();
     }
 }
