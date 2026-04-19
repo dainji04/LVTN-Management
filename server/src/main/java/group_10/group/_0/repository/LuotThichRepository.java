@@ -29,4 +29,6 @@ public interface LuotThichRepository extends JpaRepository<LuotThich, Integer> {
 
     List<LuotThich> findByMaNguoiDung_MaNguoiDungAndMaDoiTuongInAndLoaiDoiTuong(
             Integer maNguoiDung, List<Integer> maDoiTuong, String loaiDoiTuong);
+
+    void deleteByMaDoiTuongAndLoaiDoiTuong(Integer maDoiTuong, String loaiDoiTuong);
 }
