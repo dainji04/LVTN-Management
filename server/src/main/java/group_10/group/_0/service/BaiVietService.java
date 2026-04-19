@@ -14,12 +14,15 @@ import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.BaiVietMapper;
 import group_10.group._0.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -42,6 +45,7 @@ public class BaiVietService {
     TheoDoiRepository theoDoiRepository;
     AuthenticationService authenticationService;
     BaiVietMapper mapper;
+    BinhLuanRepository binhLuanRepository;
 
 
     // Lấy tất cả bài viết bằng phân trang
@@ -292,11 +296,22 @@ public class BaiVietService {
     }
 
     // Xóa bài viết
+    @Transactional
     public void deleteBaiViet(Integer id) {
-        if (!baiVietRepository.existsById(id)) {
-            throw new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED);
+        BaiViet baiViet = baiVietRepository.findById(id)
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
+
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        Users tk = usersRepository.findByEmail(email).orElseThrow(
+                () -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        // Kiểm tra quyền
+        if (!baiViet.getMaNguoiDung().getMaNguoiDung().equals(tk.getMaNguoiDung())) {
+            throw new AppExceptions(ErrorCode.UNAUTHORIZED);
         }
-        hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet"); // xóa ảnh trước
+
+        binhLuanRepository.deleteByMaBaiDang_Id(id);                              // 1. xóa bình luận
+        hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet");   // 2. xóa ảnh
         baiVietRepository.deleteById(id);
     }
 }
