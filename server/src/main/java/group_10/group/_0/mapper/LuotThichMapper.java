@@ -24,5 +24,6 @@ public interface LuotThichMapper {
     // 2. Từ Entity sang Response
     @Mapping(target = "maNguoiDung", source = "maNguoiDung.maNguoiDung")
     @Mapping(target = "hoTen", expression = "java(luotThich.getMaNguoiDung().getHo() + \" \" + luotThich.getMaNguoiDung().getTen())")
+    @Mapping(target = "anhDaiDien", source = "maNguoiDung.anhDaiDien")
     LuotThichResponse toLuotThichResponse(LuotThich luotThich);
 }
