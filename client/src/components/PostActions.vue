@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { HeartOutlined, HeartFilled, MessageOutlined, SendOutlined, BookOutlined, BookFilled } from '@ant-design/icons-vue';
+import { HeartOutlined, HeartFilled, MessageOutlined, SendOutlined } from '@ant-design/icons-vue';
 
 const props = defineProps<{
     initialLiked?: boolean;
@@ -53,7 +53,7 @@ const emit = defineEmits<{
 
 const isLiked = ref(props.initialLiked || false);
 const likeCount = ref(props.initialLikeCount || 0);
-const isBookmarked = ref(props.initialBookmarked || false);
+// const isBookmarked = ref(props.initialBookmarked || false);
 
 const handleLike = () => {
     isLiked.value = !isLiked.value;
@@ -73,10 +73,10 @@ const handleShare = () => {
     emit('share');
 };
 
-const handleBookmark = () => {
-    isBookmarked.value = !isBookmarked.value;
-    emit('bookmark', isBookmarked.value);
-};
+// const handleBookmark = () => {
+//     isBookmarked.value = !isBookmarked.value;
+//     emit('bookmark', isBookmarked.value);
+// };
 </script>
 
 <style scoped>
