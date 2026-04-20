@@ -51,10 +51,11 @@ public class GroupService {
 
     public GroupResponse getGroupById(Integer id)
     {
-        if (!(groupRepository.existsById(id)))
+        Nhom group = groupRepository.thongtincuaGroupById(id);
+        if (group == null || Boolean.TRUE.equals(group.getBiCam()))
         {throw new AppExceptions(ErrorCode.GROUP_NOT_EXISTED);}
 
-        return groupMapper.toResponse(groupRepository.thongtincuaGroupById(id));
+        return groupMapper.toResponse(group);
     }
 
     public List<GroupResponse> getAllDSGroup()
@@ -86,6 +87,7 @@ public class GroupService {
         group.setMaNguoiTao(user);
         group.setSoThanhVien(1);
         group.setNgayTao(Instant.now());
+        group.setBiCam(false);
 
         groupRepository.save(group);
 

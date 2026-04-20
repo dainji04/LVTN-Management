@@ -76,4 +76,8 @@ public class BaiViet {
     @Column(name = "NgayCapNhat")
     private Instant ngayCapNhat;
 
+    @ColumnDefault("b'0'")
+    @Column(name = "BiCam")
+    private Boolean biCam;
+
 }

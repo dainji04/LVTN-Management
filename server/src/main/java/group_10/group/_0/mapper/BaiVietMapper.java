@@ -36,6 +36,7 @@ public interface BaiVietMapper {
     @Mapping(target = "luotChiaSe",   ignore = true)
     @Mapping(target = "ngayTao",      ignore = true)
     @Mapping(target = "ngayCapNhat",  ignore = true)
+    @Mapping(target = "biCam",        ignore = true)
     BaiViet toBaiViet(BaiVietRequest request);
 
     // 3. Update Entity từ Request
@@ -50,5 +51,6 @@ public interface BaiVietMapper {
     @Mapping(target = "luotChiaSe",   ignore = true)
     @Mapping(target = "ngayTao",      ignore = true)
     @Mapping(target = "ngayCapNhat",  ignore = true)
+    @Mapping(target = "biCam",        ignore = true)
     void updateBaiViet(@MappingTarget BaiViet baiViet, BaiVietRequest request);
 }

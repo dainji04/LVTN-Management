@@ -13,6 +13,7 @@ public interface GroupMapper {
     @Mapping(target = "soThanhVien", ignore = true)
     @Mapping(target = "ngayTao", ignore = true)
     @Mapping(target = "ngayCapNhat", ignore = true)
+    @Mapping(target = "biCam",       ignore = true)
     Nhom toEntity(GroupRequest request);
 
     // 2. Map từ Entity sang Response
@@ -26,5 +27,6 @@ public interface GroupMapper {
     @Mapping(target = "soThanhVien", ignore = true)
     @Mapping(target = "ngayTao", ignore = true)
     @Mapping(target = "ngayCapNhat", ignore = true)
+    @Mapping(target = "biCam",       ignore = true)
     void updateEntityFromRequest(GroupRequest request, @MappingTarget Nhom entity);
 }

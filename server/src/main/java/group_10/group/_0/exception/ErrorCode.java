@@ -66,7 +66,9 @@ public enum ErrorCode {
     // ==========================================
     NOTIFICATION_NOT_EXISTED(5001, "Mã thông báo không tồn tại", HttpStatus.NOT_FOUND),
     ACCESS_NOT_EXISTED(5002, "Yêu cầu không tồn tại", HttpStatus.NOT_FOUND),
-    FOLLOW_IS_EXISTED(3003, "đã theo dõi", HttpStatus.CONFLICT);
+    FOLLOW_IS_EXISTED(3003, "đã theo dõi", HttpStatus.CONFLICT),
+    REPORT_IS_EXISTED(6003, "đối tượng đã được báo cáo", HttpStatus.NOT_FOUND),
+    REPORT_NOT_EXISTED(6004, "Báo cáo không tồn tại", HttpStatus.NOT_FOUND);
 
 
 

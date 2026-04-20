@@ -90,10 +90,13 @@ public class BaiVietService {
 //                .toList();
 //    }
 
-    // Lấy bài viết theo ID
     public BaiVietResponse getBaiVietById(Integer id) {
         BaiViet baiViet = baiVietRepository.findById(id)
                 .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
+
+        if (Boolean.TRUE.equals(baiViet.getBiCam())) {
+            throw new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED);
+        }
 
         BaiVietResponse response = mapper.toBaiVietResponse(baiViet);
 
@@ -156,6 +159,7 @@ public class BaiVietService {
         baiViet.setLuotChiaSe(0);
         baiViet.setNgayTao(Instant.now());
         baiViet.setNgayCapNhat(Instant.now());
+        baiViet.setBiCam(false);
 
         //xử lý nhom
         if (request.getMaNhom() != null)

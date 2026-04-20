@@ -37,7 +37,7 @@ public class UsersService {
     UsersMapper mapper;
 
     public List<UsersResponse> getAllUsers() {
-        return repository.findAll()
+        return repository.findByBiCamFalse()
                 .stream()
                 .map(mapper::toTaikhoanResponse)
                 .toList();
@@ -46,6 +46,9 @@ public class UsersService {
     public UsersResponse getUserById(Integer id) {
         Users user = repository.findById(id)
                 .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        if (Boolean.TRUE.equals(user.getBiCam())) {
+            throw new AppExceptions(ErrorCode.USER_NOT_EXISTED);
+        }
         return mapper.toTaikhoanResponse(user);
         //        return toResponse(user); Cach ma mapper thuc su lam
     }

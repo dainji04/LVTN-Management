@@ -17,4 +17,7 @@ public interface BaoCaoRepository extends JpaRepository<BaoCao, Integer> {
 
     // Kiểm tra xem User A đã báo cáo đối tượng B chưa để tránh báo cáo spam trùng lặp
     boolean existsByNguoiBaoCao_MaNguoiDungAndLoaiDoiTuongAndIdDoiTuong(Integer maNguoiDung, String loaiDoiTuong, Integer idDoiTuong);
+
+    // Đếm số lượng báo cáo theo trạng thái
+    long countByTrangThai(String trangThai);
 }
