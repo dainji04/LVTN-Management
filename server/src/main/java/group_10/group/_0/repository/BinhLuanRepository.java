@@ -21,4 +21,7 @@ public interface BinhLuanRepository extends JpaRepository<BinhLuan, Integer> {
 
     List<BinhLuan> findByMaBinhLuanChaOrderByNgayTaoAsc(BinhLuan maBinhLuanCha);
 
+    void deleteByMaBaiDang_Id(Integer maBaiDangId);
+
+
 }

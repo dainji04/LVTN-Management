@@ -14,18 +14,22 @@ import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.BaiVietMapper;
 import group_10.group._0.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,13 +46,23 @@ public class BaiVietService {
     TheoDoiRepository theoDoiRepository;
     AuthenticationService authenticationService;
     BaiVietMapper mapper;
+    BinhLuanRepository binhLuanRepository;
+    LuotThichRepository luotThichRepository;
 
+
+    private Users getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return usersRepository.findByEmail(email)
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+    }
 
     // Lấy tất cả bài viết bằng phân trang
     public SliceResponse<BaiVietResponse> getAllBaiViet_PhanTrang(int page, int size) {
+        Users currentUser = getCurrentUser();
+
+
         Pageable pageable = PageRequest.of(page, size);
         Slice<BaiViet> slice = baiVietRepository.findAllByOrderByNgayTaoDesc(pageable);
-
         List<BaiViet> danhSachBaiViet = slice.getContent();
 
         // 1. Thu thập ID bài viết
@@ -63,11 +77,20 @@ public class BaiVietService {
                         Collectors.mapping(HinhAnh::getDuongDan, Collectors.toList())
                 ));
 
+        // Batch fetch danh sách bài viết đã thích
+        Set<Integer> danhSachDaThich = luotThichRepository
+                .findByMaNguoiDung_MaNguoiDungAndMaDoiTuongInAndLoaiDoiTuong(
+                        currentUser.getMaNguoiDung(), ids, "BaiViet")
+                .stream()
+                .map(LuotThich::getMaDoiTuong)
+                .collect(Collectors.toSet());
+
         // 3. Map sang Response
         List<BaiVietResponse> content = danhSachBaiViet.stream()
                 .map(baiViet -> {
                     BaiVietResponse res = mapper.toBaiVietResponse(baiViet);
                     res.setDanhSachAnh(anhMap.getOrDefault(baiViet.getId(), List.of()));
+                    res.setDaThich(danhSachDaThich.contains(baiViet.getId()));
                     return res;
                 })
                 .toList();
@@ -91,6 +114,8 @@ public class BaiVietService {
 //    }
 
     public BaiVietResponse getBaiVietById(Integer id) {
+        Users currentUser = getCurrentUser();
+
         BaiViet baiViet = baiVietRepository.findById(id)
                 .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
 
@@ -100,7 +125,6 @@ public class BaiVietService {
 
         BaiVietResponse response = mapper.toBaiVietResponse(baiViet);
 
-        // Lấy danh sách ảnh từ HinhAnh
         List<String> danhSachAnh = hinhAnhRepository
                 .findByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet")
                 .stream()
@@ -108,11 +132,18 @@ public class BaiVietService {
                 .toList();
         response.setDanhSachAnh(danhSachAnh);
 
+        boolean daThich = luotThichRepository
+                .existsByMaNguoiDung_MaNguoiDungAndMaDoiTuongAndLoaiDoiTuong(
+                        currentUser.getMaNguoiDung(), id, "BaiViet");
+        response.setDaThich(daThich);
+
         return response;
     }
 
     // Lấy tất cả bài viết của 1 user
     public SliceResponse<BaiVietResponse> getBaiVietByUser(Integer maNguoiDung, int page, int size) {
+        Users currentUser = getCurrentUser();
+
         if (!usersRepository.existsById(maNguoiDung))
             throw new AppExceptions(ErrorCode.USER_NOT_EXISTED);
 
@@ -130,10 +161,18 @@ public class BaiVietService {
                         Collectors.mapping(HinhAnh::getDuongDan, Collectors.toList())
                 ));
 
+        Set<Integer> danhSachDaThich = luotThichRepository
+                .findByMaNguoiDung_MaNguoiDungAndMaDoiTuongInAndLoaiDoiTuong(
+                        currentUser.getMaNguoiDung(), ids, "BaiViet")
+                .stream()
+                .map(LuotThich::getMaDoiTuong)
+                .collect(Collectors.toSet());
+
         List<BaiVietResponse> content = slice.getContent().stream()
                 .map(baiViet -> {
                     BaiVietResponse res = mapper.toBaiVietResponse(baiViet);
                     res.setDanhSachAnh(anhMap.getOrDefault(baiViet.getId(), List.of()));
+                    res.setDaThich(danhSachDaThich.contains(baiViet.getId()));
                     return res;
                 })
                 .toList();
@@ -296,11 +335,22 @@ public class BaiVietService {
     }
 
     // Xóa bài viết
+    @Transactional
     public void deleteBaiViet(Integer id) {
-        if (!baiVietRepository.existsById(id)) {
-            throw new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED);
+        BaiViet baiViet = baiVietRepository.findById(id)
+                .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
+
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        Users tk = usersRepository.findByEmail(email).orElseThrow(
+                () -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        // Kiểm tra quyền
+        if (!baiViet.getMaNguoiDung().getMaNguoiDung().equals(tk.getMaNguoiDung())) {
+            throw new AppExceptions(ErrorCode.UNAUTHORIZED);
         }
-        hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet"); // xóa ảnh trước
+
+        binhLuanRepository.deleteByMaBaiDang_Id(id);                              // 1. xóa bình luận
+        hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet");   // 2. xóa ảnh
         baiVietRepository.deleteById(id);
     }
 }

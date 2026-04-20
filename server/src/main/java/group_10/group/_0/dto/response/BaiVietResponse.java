@@ -35,4 +35,5 @@ public class BaiVietResponse {
 
     String anhDaiDienNguoiDang;
     List<String> danhSachAnh;
+    Boolean daThich;
 }
