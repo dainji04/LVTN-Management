@@ -15,6 +15,10 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     Optional<Users> findByEmail(String email);
     boolean existsByEmail(String email);
 
+
+    @Query("SELECT u FROM Users u WHERE u.biCam = false OR u.biCam IS NULL")
+    List<Users> findAllActiveUsers();
+
     // Lấy mọi User sạch cho các API hiển thị thông thường
     List<Users> findByBiCamFalse();
 
