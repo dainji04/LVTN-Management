@@ -28,3 +28,18 @@ export interface PostListResponse {
   message: string;
   data: PostPagingData;
 }
+
+export interface CreatePostRequest {
+  maNguoiDung: number;
+  maNhom: number | null;
+  noiDung: string;
+  quyenRiengTu: string;
+  viTri: string | null;
+  mauNen: string | null;
+  danhSachCongTacVien: number[] | null;
+  danhSachAnh: string[] | null;
+}
+
+export interface EditPostRequest extends CreatePostRequest {
+  maBaiViet: number;
+}

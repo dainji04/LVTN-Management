@@ -41,7 +41,7 @@
         <div class="posts-container w-full">
           <Post
             v-for="post in postStore.posts"
-            :id="String(post.maBaiViet)"
+            :id="post.maBaiViet"
             :key="post.maBaiViet"
             :username="post.hoTen"
             :avatar="resolveMediaUrl(post.anhDaiDienNguoiDang) || defaultAvatar"
@@ -50,22 +50,24 @@
             :time-ago="formatTimeAgo(post.ngayTao)"
             :like-count="post.luotThich"
             :comment-count="post.luotBinhLuan"
+            :isOwner="isOwner(post.maNguoiDung)"
+            :quyen-rieng-tu="post.quyenRiengTu"
+            :vi-tri="post.viTri"
+            :mau-nen="post.mauNen"
+            :danh-sach-anh="post.danhSachAnh"
+            @deletePost="handleDeletePost"
           />
 
           <div v-if="postStore.loading" class="text-center text-gray-500 py-4">
-            {{ t("loadingPosts") }}
+            <PostSkeleton />
+            <PostSkeleton />
+            <PostSkeleton />
           </div>
           <div
             v-else-if="!postStore.hasNext && postStore.posts.length > 0"
             class="text-center text-gray-400 py-4"
           >
             {{ t("allPostsDisplayed") }}
-          </div>
-          <div
-            v-if="postStore.error"
-            class="text-center text-red-500 text-sm py-3"
-          >
-            {{ postStore.error }}
           </div>
         </div>
       </div>
@@ -151,12 +153,16 @@ import { onMounted, ref } from "vue";
 import { usePostStore } from "../store/postStore";
 import { resolveMediaUrl } from "../helpers/mediaHelper";
 import { useI18n } from "vue-i18n";
+import PostSkeleton from "../components/PostSkeleton.vue";
+import { useAuthStore } from "../store/authStore";
 
 const postStore = usePostStore();
+const authStore = useAuthStore();
 const { t } = useI18n();
 const mainContentRef = ref<HTMLElement | null>(null);
 const defaultAvatar = "https://testingbot.com/free-online-tools/random-avatar/100";
 const VIRTUAL_SCROLL_THRESHOLD = 350;
+
 
 onMounted(() => {
   postStore.fetchFirstPage();
@@ -191,6 +197,14 @@ const formatTimeAgo = (date: string): string => {
   }
 
   return `${Math.floor(diffMs / dayMs)} ${t("days")}`;
+};
+
+const handleDeletePost = (postId: number) => {
+  postStore.posts = postStore.posts.filter(post => post.maBaiViet !== postId);
+};
+
+const isOwner = (maNguoiDung: number) => {
+  return maNguoiDung === authStore.getUser?.maNguoiDung;
 };
 
 </script>

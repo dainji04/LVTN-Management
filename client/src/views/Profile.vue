@@ -8,7 +8,7 @@
     <main
       ref="mainContentRef"
       class="main-content w-full flex-1 overflow-y-auto bg-[#f5f5f5] px-2 sm:px-4"
-      @scroll.passive="handleProfileScroll"
+      @scroll.passive="handleScrollPosts"
     >
       <div class="max-w-6xl mx-auto w-full">
         <!-- Profile Header -->
@@ -16,7 +16,7 @@
           <!-- Cover Photo -->
           <div class="cover-photo relative h-40 sm:h-52 lg:h-64 bg-gray-300 rounded-t-lg overflow-hidden">
             <img
-              src="https://via.placeholder.com/1200x300"
+              :src="authStore.getUser?.anhNen"
               alt="Cover"
               class="w-full h-full object-cover"
             />
@@ -186,9 +186,9 @@
             <!-- Posts -->
             <div v-if="activeTab === 'posts'" class="space-y-4">
               <Post
-                v-for="post in displayPosts"
+                v-for="post in postStore.postsByUserId"
                 :key="post.maBaiViet"
-                :id="String(post.maBaiViet)"
+                :id="post.maBaiViet"
                 :username="post.hoTen"
                 :avatar="resolveMediaUrl(post.anhDaiDienNguoiDang) || defaultAvatar"
                 :image="resolveMediaUrl(post.danhSachAnh?.[0])"
@@ -200,7 +200,7 @@
               <div v-if="isLoadingPosts" class="text-center text-gray-500 py-2">{{ $t('loadingPosts') }}</div>
               <div v-if="postError" class="text-center text-red-500 text-sm py-2">{{ postError }}</div>
               <div
-                v-if="!isLoadingPosts && !hasNextPosts && userPosts.length > 0"
+                v-if="!isLoadingPosts && !postStore.hasNext && postStore.postsByUserId.length > 0"
                 class="text-center text-gray-400 text-sm py-2"
               >
                 {{ $t('allPostsDisplayed') }}
@@ -266,7 +266,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import {
   CameraOutlined,
   EditOutlined,
@@ -289,18 +289,14 @@ import Post from '../components/Post.vue';
 import { useAuthStore } from '../store/authStore';
 import type { User } from '../types/userType';
 import axiosInstance from '../helpers/apiHelper';
-import type { PostItem } from '../types/postType';
 import { resolveMediaUrl } from '../helpers/mediaHelper';
 import { useI18n } from 'vue-i18n';
+import { usePostStore } from '../store/postStore';
 
 const activeTab = ref('posts');
 const { t } = useI18n();
 const mainContentRef = ref<HTMLElement | null>(null);
 const defaultAvatar = 'https://testingbot.com/free-online-tools/random-avatar/500';
-const userPosts = ref<PostItem[]>([]);
-const postPage = ref(1);
-const postSize = 10;
-const hasNextPosts = ref(true);
 const isLoadingPosts = ref(false);
 const postError = ref('');
 const SCROLL_THRESHOLD = 300;
@@ -325,7 +321,6 @@ interface FriendResponse {
 }
 
 const friends = ref<FriendItem[]>([]);
-const displayPosts = computed(() => [...userPosts.value].reverse());
 
 const profileData = ref({
   username: 'tuyetnhi0823',
@@ -347,6 +342,7 @@ const profileData = ref({
 });
 
 const authStore = useAuthStore();
+const postStore = usePostStore();
 
 const formatTimeAgo = (date: string): string => {
   const createdAt = new Date(date);
@@ -367,65 +363,6 @@ const formatTimeAgo = (date: string): string => {
   }
 
   return `${Math.floor(diffMs / dayMs)} ${t('days')}`;
-};
-
-const fetchUserPosts = async (pageToLoad = 1) => {
-  if (isLoadingPosts.value || !hasNextPosts.value) return;
-
-  const currentUserId = authStore.getUser?.maNguoiDung;
-  if (!currentUserId) return;
-
-  isLoadingPosts.value = true;
-  postError.value = '';
-  try {
-    const response = await axiosInstance.get(`/bai-viet/user/${currentUserId}`, {
-      params: {
-        page: pageToLoad,
-        size: postSize,
-      },
-    });
-
-    const result = response.data;
-    if (result?.code !== 200 && result?.code !== 0) {
-      postError.value = result?.message || t('cannotLoadPosts');
-      return;
-    }
-
-    const rawData = result?.data;
-    const nextPosts: PostItem[] = Array.isArray(rawData)
-      ? rawData
-      : rawData?.content || [];
-
-    if (pageToLoad === 1) {
-      userPosts.value = nextPosts;
-    } else {
-      const merged = [...userPosts.value, ...nextPosts];
-      const uniqueMap = new Map<number, PostItem>();
-      merged.forEach((item) => uniqueMap.set(item.maBaiViet, item));
-      const uniquePosts = Array.from(uniqueMap.values());
-      if (uniquePosts.length === userPosts.value.length) {
-        hasNextPosts.value = false;
-      }
-      userPosts.value = uniquePosts;
-    }
-
-    postPage.value = Array.isArray(rawData) ? pageToLoad : (rawData?.page ?? pageToLoad);
-    if (Array.isArray(rawData)) {
-      hasNextPosts.value = nextPosts.length >= postSize;
-    } else {
-      hasNextPosts.value = !!rawData?.hasNext;
-    }
-  } catch (error: any) {
-    postError.value = error?.response?.data?.message || t('cannotLoadPosts');
-  } finally {
-    isLoadingPosts.value = false;
-  }
-};
-
-const fetchFirstUserPosts = async () => {
-  postPage.value = 1;
-  hasNextPosts.value = true;
-  await fetchUserPosts(1);
 };
 
 const formatDateTime = (date: string): string => {
@@ -457,15 +394,15 @@ const fetchFriends = async () => {
   }
 };
 
-const handleProfileScroll = async () => {
-  if (activeTab.value !== 'posts' || isLoadingPosts.value || !hasNextPosts.value) return;
+const handleScrollPosts = async () => {
+  if (activeTab.value !== 'posts' || isLoadingPosts.value || !postStore.hasNext) return;
 
   const el = mainContentRef.value;
   if (!el) return;
 
   const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
   if (distanceToBottom <= SCROLL_THRESHOLD) {
-    await fetchUserPosts(postPage.value + 1);
+    await postStore.fetchNextPageByUserId(authStore.getUser?.maNguoiDung || 0);
   }
 };
 
@@ -474,7 +411,7 @@ onMounted(() => {
   profileData.value.username = currentUser?.ho + ' ' + currentUser?.ten;
   profileData.value.avatar = currentUser?.anhDaiDien || 'https://testingbot.com/free-online-tools/random-avatar/500';
   profileData.value.bio = currentUser?.gioiThieu || 'Bạn hiện chưa có giới thiệu nào.';
-  fetchFirstUserPosts();
+  postStore.fetchFirstPageByUserId(currentUser?.maNguoiDung || 0);
   fetchFriends();
 
 });

@@ -9,3 +9,9 @@ body {
   font-family: "Roboto", sans-serif;
   scroll-behavior: smooth;
 }
+
+.anticon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
