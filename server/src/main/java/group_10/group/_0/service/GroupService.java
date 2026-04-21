@@ -5,12 +5,14 @@ import com.nimbusds.jose.JOSEException;
 import group_10.group._0.dto.request.GroupRequest;
 import group_10.group._0.dto.request.ThanhVien_GroupRequest;
 import group_10.group._0.dto.request.ThanhVien_GroupUpdateRequest;
+import group_10.group._0.dto.response.BaiVietResponse;
 import group_10.group._0.dto.response.GroupResponse;
 import group_10.group._0.dto.response.ThanhVien_GroupResponse;
 import group_10.group._0.entity.Nhom;
 import group_10.group._0.entity.Users;
 import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
+import group_10.group._0.mapper.BaiVietMapper;
 import group_10.group._0.mapper.GroupMapper;
 import group_10.group._0.repository.GroupRepository;
 import group_10.group._0.repository.ThanhVien_GroupRepository;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +46,7 @@ public class GroupService {
     BaiVietService baiVietService;
     BaiVietRepository baiVietRepository;
     AccessToGroupRepository accessToGroupRepository;
+    BaiVietMapper baiVietMapper;
 
     public List<GroupResponse> findGroup(String key)
     {
@@ -149,5 +153,15 @@ public class GroupService {
         groupRepository.deleteById(idGroup);
     }
 
+    public List<BaiVietResponse> dsBaiVietTheoGroup(Integer id)
+    {
+        if(!(groupRepository.existsById(id)))
+            throw new AppExceptions(ErrorCode.GROUP_NOT_EXISTED);
+
+        return baiVietRepository.findByMaNhom_Id(id)
+                .stream()
+                .map(baiVietMapper :: toBaiVietResponse)
+                .collect(Collectors.toList());
+    }
 
 }
