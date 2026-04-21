@@ -341,16 +341,15 @@ public class BaiVietService {
                 .orElseThrow(() -> new AppExceptions(ErrorCode.BAIVIET_NOT_EXISTED));
 
         var context = SecurityContextHolder.getContext();
-        String email = context.getAuthentication().getName();
-        Users tk = usersRepository.findByEmail(email).orElseThrow(
-                () -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        Users tk = getCurrentUser();
         // Kiểm tra quyền
         if (!baiViet.getMaNguoiDung().getMaNguoiDung().equals(tk.getMaNguoiDung())) {
             throw new AppExceptions(ErrorCode.UNAUTHORIZED);
         }
 
-        binhLuanRepository.deleteByMaBaiDang_Id(id);                              // 1. xóa bình luận
-        hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet");   // 2. xóa ảnh
-        baiVietRepository.deleteById(id);
+        luotThichRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet");    // 1. xóa lượt thích
+        binhLuanRepository.deleteByMaBaiDang_Id(id);                                        // 2. xóa bình luận
+        hinhAnhRepository.deleteByMaDoiTuongAndLoaiDoiTuong(id, "BaiViet");     // 3. xóa ảnh
+        baiVietRepository.deleteById(id);                                                  // 4. xóa bài viết
     }
 }
