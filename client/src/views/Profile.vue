@@ -188,14 +188,16 @@
               <Post
                 v-for="post in postStore.postsByUserId"
                 :key="post.maBaiViet"
+                :maNguoiDung="post.maNguoiDung"
                 :id="post.maBaiViet"
                 :username="post.hoTen"
                 :avatar="resolveMediaUrl(post.anhDaiDienNguoiDang) || defaultAvatar"
                 :image="resolveMediaUrl(post.danhSachAnh?.[0])"
-                :caption="post.noiDung"
+                :noiDung="post.noiDung"
                 :time-ago="formatTimeAgo(post.ngayTao)"
                 :like-count="post.luotThich"
                 :comment-count="post.luotBinhLuan"
+                @deletePost="handleDeletePost"
               />
               <div v-if="isLoadingPosts" class="text-center text-gray-500 py-2">{{ $t('loadingPosts') }}</div>
               <div v-if="postError" class="text-center text-red-500 text-sm py-2">{{ postError }}</div>
@@ -404,6 +406,10 @@ const handleScrollPosts = async () => {
   if (distanceToBottom <= SCROLL_THRESHOLD) {
     await postStore.fetchNextPageByUserId(authStore.getUser?.maNguoiDung || 0);
   }
+};
+
+const handleDeletePost = (postId: number) => {
+  postStore.postsByUserId = postStore.postsByUserId.filter(post => post.maBaiViet !== postId);
 };
 
 onMounted(() => {

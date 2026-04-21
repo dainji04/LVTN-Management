@@ -65,7 +65,7 @@
 
                     <!-- Groups Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                        <GroupCard v-for="group in filteredGroups" :key="group.id" :group="group" @join="handleJoinGroup" />
+                        <GroupCard v-for="group in groupStore.groups" :key="group.id" :group="group" @join="handleJoinGroup" />
                     </div>
                 </div>
 
@@ -131,7 +131,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import {
     PlusOutlined,
     SearchOutlined,
@@ -145,12 +145,15 @@ import GroupCard from '../components/GroupCard.vue';
 import { notificationHelper } from '../helpers/notificationHelper';
 import { useI18n } from 'vue-i18n';
 import type { Group } from '../types/groupType';
+import { useGroupStore } from '../store/groupStore';
+import type { GroupItem } from '../types/groupType';
 
 const { t } = useI18n();
 
 const activeTab = ref('discover');
 const searchQuery = ref('');
 const selectedCategory = ref('all');
+const groupStore = useGroupStore();
 
 const categories = [
     { key: 'all', label: t('all') },
@@ -161,86 +164,7 @@ const categories = [
     { key: 'sports', label: t('sports') },
 ];
 
-const groups = ref<Group[]>([
-    {
-        id: '1',
-        title: 'Cộng đồng ReactJS VN',
-        image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=300&fit=crop',
-        members: '12.8k',
-        memberAvatars: [
-            'https://testingbot.com/free-online-tools/random-avatar/100',
-            'https://testingbot.com/free-online-tools/random-avatar/101',
-            'https://testingbot.com/free-online-tools/random-avatar/102',
-        ],
-        moreMembers: 24,
-        category: 'technology',
-    },
-    {
-        id: '2',
-        title: 'Nhiếp Ảnh Đường Phố',
-        image: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&h=300&fit=crop',
-        members: '8.2k',
-        memberAvatars: [
-            'https://testingbot.com/free-online-tools/random-avatar/103',
-            'https://testingbot.com/free-online-tools/random-avatar/104',
-            'https://testingbot.com/free-online-tools/random-avatar/105',
-        ],
-        moreMembers: 15,
-        category: 'photography',
-    },
-    {
-        id: '3',
-        title: 'Jazz & Soul Việt Nam',
-        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
-        members: '5.6k',
-        memberAvatars: [
-            'https://testingbot.com/free-online-tools/random-avatar/106',
-            'https://testingbot.com/free-online-tools/random-avatar/107',
-            'https://testingbot.com/free-online-tools/random-avatar/108',
-        ],
-        moreMembers: 8,
-        category: 'all',
-    },
-    {
-        id: '4',
-        title: 'Hội Yêu Bếp & Đồ Ngọt',
-        image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop',
-        members: '25.1k',
-        memberAvatars: [
-            'https://testingbot.com/free-online-tools/random-avatar/109',
-            'https://testingbot.com/free-online-tools/random-avatar/110',
-            'https://testingbot.com/free-online-tools/random-avatar/111',
-        ],
-        moreMembers: 100,
-        category: 'cooking',
-    },
-    {
-        id: '5',
-        title: 'Ký Sự Du Lịch Bụi',
-        image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&h=300&fit=crop',
-        members: '18.9k',
-        memberAvatars: [
-            'https://testingbot.com/free-online-tools/random-avatar/112',
-            'https://testingbot.com/free-online-tools/random-avatar/113',
-            'https://testingbot.com/free-online-tools/random-avatar/114',
-        ],
-        moreMembers: 42,
-        category: 'travel',
-    },
-    {
-        id: '6',
-        title: 'Chạy Bộ Cho Sức Khỏe',
-        image: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=400&h=300&fit=crop',
-        members: '10.5k',
-        memberAvatars: [
-            'https://testingbot.com/free-online-tools/random-avatar/115',
-            'https://testingbot.com/free-online-tools/random-avatar/116',
-            'https://testingbot.com/free-online-tools/random-avatar/117',
-        ],
-        moreMembers: 33,
-        category: 'sports',
-    },
-]);
+const groups = ref<Group[]>([]);
 
 const suggestions = ref([
     {
@@ -265,26 +189,30 @@ const trendingTopics = ref([
     '#ReactConf2024',
 ]);
 
-const filteredGroups = computed(() => {
-    let result = groups.value;
+onMounted(() => {
+    groupStore.loadListGroup();
+})
 
-    // Filter by category
-    if (selectedCategory.value !== 'all') {
-        result = result.filter((group) => group.category === selectedCategory.value);
-    }
+// const filteredGroups = computed(() => {
+//     let result = groups.value;
 
-    // Filter by search query
-    if (searchQuery.value.trim()) {
-        const query = searchQuery.value.toLowerCase();
-        result = result.filter((group) =>
-            group.title.toLowerCase().includes(query)
-        );
-    }
+//     // Filter by category
+//     if (selectedCategory.value !== 'all') {
+//         result = result.filter((group) => group.category === selectedCategory.value);
+//     }
 
-    return result;
-});
+//     // Filter by search query
+//     if (searchQuery.value.trim()) {
+//         const query = searchQuery.value.toLowerCase();
+//         result = result.filter((group) =>
+//             group.title.toLowerCase().includes(query)
+//         );
+//     }
 
-const handleJoinGroup = (groupId: string) => {
+//     return result;
+// });
+
+const handleJoinGroup = (groupId: number) => {
     notificationHelper('success', t('joinGroup') + ' ' + t('loginSuccess'));
     // Handle join group logic here
     console.log('Joining group:', groupId);
