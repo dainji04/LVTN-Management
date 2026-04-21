@@ -2,6 +2,7 @@ package group_10.group._0.controller;
 
 import group_10.group._0.dto.request.GroupRequest;
 import group_10.group._0.dto.response.ApiResponse;
+import group_10.group._0.dto.response.BaiVietResponse;
 import group_10.group._0.dto.response.GroupResponse;
 import group_10.group._0.entity.Nhom;
 import group_10.group._0.service.GroupService;
@@ -87,4 +88,14 @@ public class GroupController {
                 .data(groupService.getGroupsByUserId(userId))
                 .build();
     }
+
+    @GetMapping("/{id}/baiviet")
+    @Operation(summary = "Lấy danh sách bài viết theo nhóm", description = "Lấy danh sách tất cả các bài viết thuộc một nhóm dựa vào ID nhóm")
+    public ApiResponse<List<BaiVietResponse>> getBaiVietByGroupId(@PathVariable("id") Integer id) {
+        return ApiResponse.<List<BaiVietResponse>>builder()
+                .code(200)
+                .data(groupService.dsBaiVietTheoGroup(id))
+                .build();
+    }
+
 }
