@@ -3,6 +3,8 @@ package group_10.group._0.repository;
 import group_10.group._0.entity.QuanHeBanBe;
 import group_10.group._0.entity.Users;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -45,5 +47,18 @@ public interface QuanHeBanBeRepository extends JpaRepository<QuanHeBanBe, Intege
        OR q.maNguoiDung2.maNguoiDung = :userId
     """)
     List<Users> findFriendUsers(@Param("userId") Integer userId);
+
+    @Query("""
+    SELECT u FROM Users u
+    WHERE u.maNguoiDung != :userId
+    AND (u.biCam = false OR u.biCam IS NULL)
+    AND u.maNguoiDung NOT IN (
+        SELECT q.maNguoiDung2.maNguoiDung FROM QuanHeBanBe q WHERE q.maNguoiDung1.maNguoiDung = :userId
+        UNION
+        SELECT q.maNguoiDung1.maNguoiDung FROM QuanHeBanBe q WHERE q.maNguoiDung2.maNguoiDung = :userId
+    )
+    ORDER BY RAND()
+    """)
+    Slice<Users> findNguoiChuaKetBan(@Param("userId") Integer userId, Pageable pageable);
 
 }
