@@ -37,7 +37,7 @@ public class UsersService {
     UsersMapper mapper;
 
     public List<UsersResponse> getAllUsers() {
-        return repository.findByBiCamFalse()
+        return repository.findAllActiveUsers()
                 .stream()
                 .map(mapper::toTaikhoanResponse)
                 .toList();
@@ -145,6 +145,8 @@ public class UsersService {
         }
         repository.deleteById(id);
     }
+
+
 
 
     public UsersResponse getMyInfo(){
