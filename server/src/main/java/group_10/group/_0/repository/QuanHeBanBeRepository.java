@@ -3,6 +3,8 @@ package group_10.group._0.repository;
 import group_10.group._0.entity.QuanHeBanBe;
 import group_10.group._0.entity.Users;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +30,14 @@ public interface QuanHeBanBeRepository extends JpaRepository<QuanHeBanBe, Intege
             "ORDER BY q.ngayTao DESC")
     List<QuanHeBanBe> findFriends(@Param("userId") Integer userId);
 
+    @Query("SELECT u FROM Users u WHERE " +
+            "LOWER(u.ho) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.bietDanh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "ORDER BY u.ngayTao DESC")
+    List<Users> searchUsers(@Param("keyword") String keyword, Pageable pageable);
+
     // Xóa bạn bè
     @Modifying
     @Transactional
@@ -45,5 +55,18 @@ public interface QuanHeBanBeRepository extends JpaRepository<QuanHeBanBe, Intege
        OR q.maNguoiDung2.maNguoiDung = :userId
     """)
     List<Users> findFriendUsers(@Param("userId") Integer userId);
+
+    @Query("""
+    SELECT u FROM Users u
+    WHERE u.maNguoiDung != :userId
+    AND (u.biCam = false OR u.biCam IS NULL)
+    AND u.maNguoiDung NOT IN (
+        SELECT q.maNguoiDung2.maNguoiDung FROM QuanHeBanBe q WHERE q.maNguoiDung1.maNguoiDung = :userId
+        UNION
+        SELECT q.maNguoiDung1.maNguoiDung FROM QuanHeBanBe q WHERE q.maNguoiDung2.maNguoiDung = :userId
+    )
+    ORDER BY RAND()
+    """)
+    Slice<Users> findNguoiChuaKetBan(@Param("userId") Integer userId, Pageable pageable);
 
 }

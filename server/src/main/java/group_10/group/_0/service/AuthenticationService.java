@@ -57,6 +57,7 @@ public class AuthenticationService {
     UsersMapper userMapper;
 
 
+    //Kiểm tra token có hợp lệ hay không
     public IntrospectResponse introspect(IntrospectRequest request)
             throws JOSEException, ParseException {
         var token = request.getToken();
@@ -74,13 +75,15 @@ public class AuthenticationService {
                 .build();
     }
 
+
+    //Xác thực người dùng và trả về token nếu hợp lệ
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = TKRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getMatKhau());
         if (!authenticated)
-            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+            throw new AppExceptions(ErrorCode.SAI_MAT_KHAU);
 
 
         var token = generateToken(user);
@@ -102,7 +105,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(tokenTime, ChronoUnit.SECONDS).toEpochMilli())) //Het han sau 1 ngay
                 .jwtID(UUID.randomUUID().toString())
-//                .claim("role", buildScope(taikhoan))
+                .claim("role", taikhoan.getRole().name())
                 .claim("id", taikhoan.getMaNguoiDung())
                 .build();
 
@@ -117,7 +120,7 @@ public class AuthenticationService {
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Can't create JWS object", e);
-            throw new RuntimeException(e);
+            throw new AppExceptions(ErrorCode.TOKEN_GENERATION_FAILED);
         }
     }
 
@@ -138,14 +141,14 @@ public class AuthenticationService {
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expityTime = (isRefresh)
+        Date expiryTime = (isRefresh)
                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(refreshTime, ChronoUnit.SECONDS).toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
 
         //Neu chu ky het han hoac khong duoc verified thi cut
-        if(!(verified && expityTime.after(new Date())))
+        if(!(verified && expiryTime.after(new Date())))
             throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
 
         if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
@@ -189,7 +192,7 @@ public class AuthenticationService {
         var email = signJWT.getJWTClaimsSet().getSubject();
 
         var taiKhoan = TKRepository.findByEmail(email)
-                .orElseThrow(() -> new AppExceptions(ErrorCode.UNAUTHENTICATED));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         var token = generateToken(taiKhoan);
 
@@ -214,6 +217,23 @@ public class AuthenticationService {
 
         return maNguoiDung;
     }
+
+
+    // Hàm dùng để giải mã token và lấy ra role
+    public boolean getRole(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT = verifyToken(token, false);
+
+        String RoLeeeeee = signedJWT.getJWTClaimsSet().getClaim("role").toString();
+
+        if (!(RoLeeeeee.equals("ADMIN")))
+        {
+            throw new AppExceptions(ErrorCode.UNAUTHENTICATED);
+        }
+
+        return true;
+    }
+
+
 
 }
 

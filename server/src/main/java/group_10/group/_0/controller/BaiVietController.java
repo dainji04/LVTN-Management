@@ -31,7 +31,7 @@ public class BaiVietController {
 
 
     @GetMapping
-    @Operation(summary = "Lấy tất cả bài viết", description = "Lấy tất cả bài viết theo giá trị mặc định trang 0, 10 bài viết (nếu để trống)")
+    @Operation(summary = "Lấy tất cả bài viết", description = "Lấy tất cả bài viết theo giá trị mặc định trang 0, 10 bài viết (nếu để trống): /bai-viet?page=1&size=5")
     public ApiResponse<SliceResponse<BaiVietResponse>> getAllBaiViet_PhanTrang(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -41,18 +41,6 @@ public class BaiVietController {
                 .build();
     }
 
-
-
-
-    // Lấy tất cả bài viết
-//    @GetMapping
-//    @Operation(summary = "Lấy tất cả bài viết", description = "Trả về danh sách toàn bộ bài viết kèm ảnh")
-//    public ApiResponse<List<BaiVietResponse>> getAllBaiViet() {
-//        return ApiResponse.<List<BaiVietResponse>>builder()
-//                .code(200)
-//                .data(baiVietService.getAllBaiViet())
-//                .build();
-//    }
 
     // Lấy bài viết theo ID
     @GetMapping("/{id}")
@@ -66,13 +54,26 @@ public class BaiVietController {
     }
 
     // Lấy tất cả bài viết của 1 user
+//    @GetMapping("/user/{maNguoiDung}")
+//    @Operation(summary = "Lấy bài viết theo user", description = "Trả về tất cả bài viết của 1 người dùng")
+//    public ApiResponse<List<BaiVietResponse>> getBaiVietByUser(
+//            @Parameter(description = "ID của người dùng") @PathVariable Integer maNguoiDung) {
+//        return ApiResponse.<List<BaiVietResponse>>builder()
+//                .code(200)
+//                .data(baiVietService.getBaiVietByUser(maNguoiDung))
+//                .build();
+//    }
+
+    // Lấy tất cả bài viết của 1 user theo phân trang
     @GetMapping("/user/{maNguoiDung}")
-    @Operation(summary = "Lấy bài viết theo user", description = "Trả về tất cả bài viết của 1 người dùng")
-    public ApiResponse<List<BaiVietResponse>> getBaiVietByUser(
-            @Parameter(description = "ID của người dùng") @PathVariable Integer maNguoiDung) {
-        return ApiResponse.<List<BaiVietResponse>>builder()
+    @Operation(summary = "Lấy bài viết theo user", description = "Trả về bài viết của 1 người dùng theo phân trang: user/5?page=1&size=5")
+    public ApiResponse<SliceResponse<BaiVietResponse>> getBaiVietByUser(
+            @PathVariable Integer maNguoiDung,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<SliceResponse<BaiVietResponse>>builder()
                 .code(200)
-                .data(baiVietService.getBaiVietByUser(maNguoiDung))
+                .data(baiVietService.getBaiVietByUser(maNguoiDung, page, size))
                 .build();
     }
 
@@ -109,6 +110,20 @@ public class BaiVietController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Xóa bài viết thành công")
+                .build();
+    }
+
+    // Quản trị viên duyệt/từ chối bài viết PENDING trong nhóm
+    @PutMapping("/xu-ly-dang-bai/{id}")
+    @Operation(summary = "Xử lý duyệt bài viết", description = "Admin/Moderator duyệt hoặc từ chối bài viết đang chờ duyệt trong nhóm")
+    public ApiResponse<BaiVietResponse> xuLyDangBaiGroup(
+            @Parameter(description = "ID của bài viết") @PathVariable Integer id,
+            @RequestParam String kqTrangThai,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return ApiResponse.<BaiVietResponse>builder()
+                .code(200)
+                .data(baiVietService.xuLyDangBaiGroup(kqTrangThai, id, token))
                 .build();
     }
 }

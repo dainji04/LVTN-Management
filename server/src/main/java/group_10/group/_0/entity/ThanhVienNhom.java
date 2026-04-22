@@ -21,6 +21,7 @@ import java.time.Instant;
 public class ThanhVienNhom {
     @Id
     @Column(name = "MaThanhVien", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull

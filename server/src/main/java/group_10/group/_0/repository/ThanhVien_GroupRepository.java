@@ -14,7 +14,7 @@ public interface ThanhVien_GroupRepository extends JpaRepository<ThanhVienNhom, 
 
     List<ThanhVienNhom> findByMaNhom_Id(Integer idGroup);
 
-    long countById(Integer idGroup);
+    long countByMaNhom_Id(Integer idGroup);
 
     @Query("SELECT tv FROM ThanhVienNhom tv WHERE tv.maNhom.id = :maNhom AND tv.vaiTro IN ('ADMIN', 'MODERATOR')")
     List<ThanhVienNhom> findQuanTriVienByMaNhom(@Param("maNhom") Integer maNhom);

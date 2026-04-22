@@ -7,8 +7,11 @@ import group_10.group._0.dto.request.UsersRequest;
 import group_10.group._0.dto.request.UsersUpdateRequest;
 import group_10.group._0.dto.response.ApiResponse;
 import group_10.group._0.dto.response.AuthenticationResponse;
+import group_10.group._0.dto.response.BanBeResponse;
 import group_10.group._0.dto.response.UsersResponse;
+import group_10.group._0.repository.QuanHeBanBeRepository;
 import group_10.group._0.service.AuthenticationService;
+import group_10.group._0.service.QuanHeBanBeService;
 import group_10.group._0.service.UsersService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +32,7 @@ public class UsersController {
 
     final UsersService usersService;
     final AuthenticationService authService;
+    final QuanHeBanBeService banBeService;
 
     //login
     @PostMapping("/login")
@@ -107,4 +111,14 @@ public class UsersController {
                 .message("Da xoa user")
                 .build();
     }
+
+    @GetMapping("/search")
+    @Operation(summary = "Tìm kiếm người dùng")
+    public ApiResponse<List<BanBeResponse>> searchUsers(@RequestParam String query) {
+        return ApiResponse.<List<BanBeResponse>>builder()
+                .code(200)
+                .data(banBeService.searchUsers(query))
+                .build();
+    }
+
 }

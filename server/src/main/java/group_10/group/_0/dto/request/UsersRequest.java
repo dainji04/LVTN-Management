@@ -45,7 +45,7 @@ public class UsersRequest {
     @Size(max = 100, message = "Anh dai dien tối đa 100 ký tự")
     String anhDaiDien;
 
-    @Size(max = 100, message = "Anh nen tối đa 100 ký tự")
+    @Size(max = 255, message = "Anh nen tối đa 100 ký tự")
     String anhNen;
 
     Instant ngaySinh;

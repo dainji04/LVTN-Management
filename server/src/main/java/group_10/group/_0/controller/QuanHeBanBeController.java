@@ -2,6 +2,8 @@ package group_10.group._0.controller;
 
 import group_10.group._0.dto.response.ApiResponse;
 import group_10.group._0.dto.response.BanBeResponse;
+import group_10.group._0.dto.response.GoiYKetBanResponse;
+import group_10.group._0.dto.response.SliceResponse;
 import group_10.group._0.service.QuanHeBanBeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,6 +85,17 @@ public class QuanHeBanBeController {
         return ApiResponse.<List<BanBeResponse>>builder()
                 .code(200)
                 .data(service.searchFriends(userId, query))
+                .build();
+    }
+
+    @GetMapping("/goi-y-ket-ban")
+    @Operation(summary = "Gợi ý kết bạn", description = "Lấy danh sách người chưa kết bạn theo phân trang")
+    public ApiResponse<SliceResponse<GoiYKetBanResponse>> goiYKetBan(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<SliceResponse<GoiYKetBanResponse>>builder()
+                .code(200)
+                .data(service.goiYKetBan(page, size))
                 .build();
     }
 

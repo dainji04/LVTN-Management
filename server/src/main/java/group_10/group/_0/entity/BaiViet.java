@@ -30,6 +30,14 @@ public class BaiViet {
     @JoinColumn(name = "MaNguoiDung", nullable = false)
     private Users maNguoiDung;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MaNhom")
+    private Nhom maNhom;
+
+    @Size(max = 20)
+    @Column(name = "TrangThai", length = 20)
+    private String trangThai; // PENDING, APPROVED, REJECTED
+
     @Size(max = 200)
     @Column(name = "NoiDung", length = 200)
     private String noiDung;
@@ -67,5 +75,9 @@ public class BaiViet {
 
     @Column(name = "NgayCapNhat")
     private Instant ngayCapNhat;
+
+    @ColumnDefault("b'0'")
+    @Column(name = "BiCam")
+    private Boolean biCam;
 
 }

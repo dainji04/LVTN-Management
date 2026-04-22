@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface AccessToGroupRepository extends JpaRepository<YeuCauThamGiaNhom, Integer> {
     List<YeuCauThamGiaNhom> findByMaNhom_IdAndTrangThai(Integer maNhom, String trangThai);
+
+    void deleteByMaNhom_Id(Integer maNhom);
 }

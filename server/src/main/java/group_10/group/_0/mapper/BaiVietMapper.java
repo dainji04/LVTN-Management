@@ -1,45 +1,56 @@
 package group_10.group._0.mapper;
 
 import group_10.group._0.dto.request.BaiVietRequest;
-import group_10.group._0.dto.request.UsersRequest;
 import group_10.group._0.dto.response.BaiVietResponse;
-import group_10.group._0.dto.response.UsersResponse;
 import group_10.group._0.entity.BaiViet;
-import group_10.group._0.entity.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.BeanMapping;
 
 
 @Mapper(componentModel = "spring")
 public interface BaiVietMapper {
-    // Entity -> Response
+
+    // 1. Entity -> Response
     @Mapping(target = "maBaiViet",    source = "id")
     @Mapping(target = "maNguoiDung",  source = "maNguoiDung.maNguoiDung")
-    @Mapping(target = "hoTen",        expression = "java(baiViet.getMaNguoiDung().getHo() + ' ' + baiViet.getMaNguoiDung().getTen())")
-    @Mapping(target = "anhDaiDienNguoiDang", source = "maNguoiDung.anhDaiDien")//Anh dai dien cua nguoi dang
-    @Mapping(target = "danhSachAnh", ignore = true) // set thủ công trong Service
+    // Map ID từ đối tượng Nhom sang Integer maNhom trong Response
+    @Mapping(target = "maNhom",       source = "maNhom.id")
+    @Mapping(target = "trangThai",    source = "trangThai")
+    @Mapping(target = "hoTen",        expression = "java(baiViet.getMaNguoiDung().getHo() + \" \" + baiViet.getMaNguoiDung().getTen())")
+    @Mapping(target = "anhDaiDienNguoiDang", source = "maNguoiDung.anhDaiDien")
+    @Mapping(target = "danhSachAnh",  ignore = true) // set thủ công trong Service
     BaiVietResponse toBaiVietResponse(BaiViet baiViet);
 
-    // Request -> Entity (maNguoiDung sẽ set thủ công trong Service)
+    // 2. Request -> Entity
     @Mapping(target = "id",           ignore = true)
-    @Mapping(target = "maNguoiDung",  ignore = true)
+    @Mapping(target = "maNguoiDung",  ignore = true) // Set thủ công Users object trong Service
+    // Bỏ qua tạo Nhom tự động từ MapStruct vì sẽ bị lỗi Transient Instance. Service đã chủ động tìm Nhom trong DB và gán vào.
+    @Mapping(target = "maNhom",       ignore = true)
+    @Mapping(target = "trangThai",    ignore = true) // Set thủ công dựa trên logic canDuyetBaiDang của Group
     @Mapping(target = "daSua",        ignore = true)
     @Mapping(target = "luotThich",    ignore = true)
     @Mapping(target = "luotBinhLuan", ignore = true)
     @Mapping(target = "luotChiaSe",   ignore = true)
     @Mapping(target = "ngayTao",      ignore = true)
     @Mapping(target = "ngayCapNhat",  ignore = true)
+    @Mapping(target = "biCam",        ignore = true)
     BaiViet toBaiViet(BaiVietRequest request);
 
-    // Update Entity từ Request
+    // 3. Update Entity từ Request
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id",           ignore = true)
     @Mapping(target = "maNguoiDung",  ignore = true)
+    @Mapping(target = "maNhom",       ignore = true) // Thường không cập nhật lại nhóm cho bài viết đã đăng
+    @Mapping(target = "trangThai",    ignore = true)
     @Mapping(target = "daSua",        ignore = true)
     @Mapping(target = "luotThich",    ignore = true)
     @Mapping(target = "luotBinhLuan", ignore = true)
     @Mapping(target = "luotChiaSe",   ignore = true)
     @Mapping(target = "ngayTao",      ignore = true)
     @Mapping(target = "ngayCapNhat",  ignore = true)
+    @Mapping(target = "biCam",        ignore = true)
     void updateBaiViet(@MappingTarget BaiViet baiViet, BaiVietRequest request);
 }

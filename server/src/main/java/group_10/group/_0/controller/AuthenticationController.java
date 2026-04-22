@@ -53,13 +53,13 @@ public class AuthenticationController {
                 .build();
     }
 
-    @PostMapping("/refresh")
-    @Operation(summary = "Làm mới token", description = "Dùng refresh token để lấy JWT token mới")
-    ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest request)
-            throws ParseException, JOSEException {
-        var result = service.refreshToken(request);
-        return ApiResponse.<AuthenticationResponse>builder()
-                .data(result)
-                .build();
-    }
+//    @PostMapping("/refresh")
+//    @Operation(summary = "Làm mới token", description = "Dùng refresh token để lấy JWT token mới")
+//    ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest request)
+//            throws ParseException, JOSEException {
+//        var result = service.refreshToken(request);
+//        return ApiResponse.<AuthenticationResponse>builder()
+//                .data(result)
+//                .build();
+//    }
 }
