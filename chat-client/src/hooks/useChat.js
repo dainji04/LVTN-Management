@@ -87,6 +87,7 @@ const useChat = (token) => {
   }, [activeConvId]);
 
   // Socket event handlers 
+
   const handleConnected = useCallback(({ onlineUsers: onlineList = [] }) => {
     setOnlineUsers(new Set(onlineList.map(String)));
     console.log("Socket connected. Online users:", onlineList);

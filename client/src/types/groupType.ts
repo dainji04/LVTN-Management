@@ -8,3 +8,15 @@ export interface Group {
   category: string;
 }
 
+export interface GroupItem {
+  id: number;
+  maNguoiTao: number;
+  tenNhom: string;
+  moTa: string;
+  anhBia: string;
+  anhDaiDien: string;
+  soThanhVien: number;
+  loaiNhom: string;
+  canDuyetDangBai: boolean;
+  ngayTao: string;
+}

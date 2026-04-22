@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Admin - Sổ Đen</title>
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Fraunces:wght@400;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="css/banned-users.css" />
+	</head>
+	<body>
+		<div class="wrap">
+			<div>
+				<h1>Sổ đen đối tượng bị khoá</h1>
+				<div class="subtitle">Tìm kiếm và mở khoá nhanh.</div>
+			</div>
+
+			<section class="panel">
+				<div class="grid">
+					<div>
+						<label for="baseUrl">API Base URL</label>
+						<input id="baseUrl" type="text" placeholder="http://localhost:8080" />
+					</div>
+					<div>
+						<label for="adminToken">Admin Token</label>
+						<input id="adminToken" type="password" placeholder="Bearer token" />
+					</div>
+				</div>
+			</section>
+
+			<section class="panel">
+				<div class="tabs">
+					<button class="tab-btn active" data-type="NGUOI_DUNG">
+						Users
+					</button>
+					<button class="tab-btn" data-type="NHOM">Groups</button>
+					<button class="tab-btn" data-type="BAI_VIET">Posts</button>
+				</div>
+			</section>
+
+			<section class="panel">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Thông tin</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody id="banTable"></tbody>
+				</table>
+				<div class="empty" id="emptyState">Chưa có dữ liệu.</div>
+			</section>
+		</div>
+
+		<script src="js/api.js"></script>
+		<script>
+			const baseUrlInput = document.getElementById("baseUrl");
+			const adminTokenInput = document.getElementById("adminToken");
+			const tableBody = document.getElementById("banTable");
+			const emptyState = document.getElementById("emptyState");
+			const tabButtons = document.querySelectorAll(".tab-btn");
+
+			baseUrlInput.value = Api.getBaseUrl();
+			adminTokenInput.value = Api.getToken("admin");
+
+			const endpoints = {
+				NGUOI_DUNG: "/admin/dashboard/banned-users",
+				NHOM: "/admin/dashboard/banned-groups",
+				BAI_VIET: "/admin/dashboard/banned-posts",
+			};
+
+			let currentType = "NGUOI_DUNG";
+
+			function syncSettings() {
+				Api.setBaseUrl(baseUrlInput.value);
+				Api.setToken("admin", adminTokenInput.value);
+			}
+
+			function renderList(items) {
+				tableBody.innerHTML = "";
+				if (!items || items.length === 0) {
+					emptyState.style.display = "block";
+					return;
+				}
+				emptyState.style.display = "none";
+
+				items.forEach((item) => {
+					const row = document.createElement("tr");
+					const id = item.id || item.idDoiTuong || item.objectId || "-";
+					const idCell = document.createElement("td");
+					idCell.textContent = id;
+					row.appendChild(idCell);
+
+					const infoCell = document.createElement("td");
+					const name = item.ten || item.name || item.tieuDe || item.title;
+					if (name) {
+						infoCell.textContent = name;
+					} else {
+						const pre = document.createElement("pre");
+						pre.textContent = Api.prettyJson(item);
+						infoCell.appendChild(pre);
+					}
+					row.appendChild(infoCell);
+
+					const actionCell = document.createElement("td");
+					const btn = document.createElement("button");
+					btn.className = "btn-unlock";
+					btn.textContent = "Mở khoá";
+					btn.addEventListener("click", () => unlockItem(id, row));
+					actionCell.appendChild(btn);
+					row.appendChild(actionCell);
+
+					tableBody.appendChild(row);
+				});
+			}
+
+			async function loadList() {
+				syncSettings();
+				try {
+					const response = await Api.request(endpoints[currentType], {
+						method: "GET",
+						tokenRole: "admin",
+					});
+					renderList(Array.isArray(response) ? response : response.data);
+				} catch (error) {
+					emptyState.textContent =
+						"Không tải được danh sách: " +
+						(error.payload?.message || error.message);
+					emptyState.style.display = "block";
+				}
+			}
+
+			async function unlockItem(id, row) {
+				if (!id) {
+					return;
+				}
+				syncSettings();
+				try {
+					await Api.request("/reports/unlock", {
+						method: "PUT",
+						tokenRole: "admin",
+						query: { loaiDoiTuong: currentType, idDoiTuong: id },
+					});
+					row.remove();
+					if (!tableBody.children.length) {
+						emptyState.textContent = "Không còn mục nào.";
+						emptyState.style.display = "block";
+					}
+				} catch (error) {
+					alert(
+						"Mở khoá thất bại: " +
+							(error.payload?.message || error.message)
+					);
+				}
+			}
+
+			tabButtons.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					tabButtons.forEach((item) => item.classList.remove("active"));
+					btn.classList.add("active");
+					currentType = btn.dataset.type;
+					loadList();
+				});
+			});
+
+			loadList();
+		</script>
+	</body>
+</html>

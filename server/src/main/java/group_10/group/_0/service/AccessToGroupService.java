@@ -4,6 +4,7 @@ package group_10.group._0.service;
 import com.nimbusds.jose.JOSEException;
 import group_10.group._0.dto.request.*;
 import group_10.group._0.dto.response.AccessToGroupResponse;
+import group_10.group._0.entity.Nhom;
 import group_10.group._0.entity.ThanhVienNhom;
 import group_10.group._0.entity.Users;
 import group_10.group._0.entity.YeuCauThamGiaNhom;
@@ -11,6 +12,7 @@ import group_10.group._0.exception.AppExceptions;
 import group_10.group._0.exception.ErrorCode;
 import group_10.group._0.mapper.AccessToGroupMapper;
 import group_10.group._0.repository.AccessToGroupRepository;
+import group_10.group._0.repository.GroupRepository;
 import group_10.group._0.repository.ThanhVien_GroupRepository;
 import group_10.group._0.repository.UsersRepository;
 import lombok.AccessLevel;
@@ -33,10 +35,60 @@ public class AccessToGroupService {
     ThongBaoService thongBaoService;
     AuthenticationService authenticationService;
     UsersRepository usersRepository;
-    TheoDoiService theoDoiService;
+    TheoDoiNhomService theoDoiNhomService;
+    GroupRepository groupRepository;
 
+
+    //người dùng
     public AccessToGroupResponse createRequestToGroup(AccessToGroupRequest request)
     {
+
+        Nhom nhom = groupRepository.findById(request.getMaNhom())
+                .orElseThrow(()->new AppExceptions(ErrorCode.GROUP_NOT_EXISTED));
+        if ("PUBLIC".equals(nhom.getLoaiNhom()))
+        {
+            YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupMapper.toEntity(request);
+            yeuCauThamGiaNhom.setTrangThai("CHAP_NHAN");
+            yeuCauThamGiaNhom.setYeuCauLuc(Instant.now());
+
+            accessToGroupRepository.save(yeuCauThamGiaNhom);
+
+            ThanhVien_GroupRequest thanhVienGroup = new ThanhVien_GroupRequest(
+                    request.getMaNguoiDung(),
+                    request.getMaNhom(),
+                    null,
+                    null
+            );
+
+
+//            thanhVienGroup.setDuocMoiBoi(null);
+//            thanhVienGroup.setChapNhanBoi(null);
+
+            thanhVienGroupService.createThanhVien(thanhVienGroup);
+
+            TheoDoiNhomRequest theoDoiRequest = new TheoDoiNhomRequest(
+                    request.getMaNguoiDung(),
+                    request.getMaNhom()
+            );
+            theoDoiNhomService.createTheoDoiNhom(theoDoiRequest);
+
+            List<ThanhVienNhom> dsNguoiDuyet = thanhVienGroupRepository.
+                    findQuanTriVienByMaNhom(request.getMaNhom());
+
+            dsNguoiDuyet.forEach(thanhVien -> {
+                ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
+                        request.getMaNguoiDung(),
+                        thanhVien.getMaNguoiDung().getMaNguoiDung(),
+                        "đã tham gia nhóm",
+                        yeuCauThamGiaNhom.getId(),
+                        "ACCESS TO GROUP"
+                );
+                thongBaoService.taoMoiThongBao(thongBaoRequest);
+            });
+
+            return accessToGroupMapper.toResponse(yeuCauThamGiaNhom);
+        }
+
         YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupMapper.toEntity(request);
         yeuCauThamGiaNhom.setTrangThai("DA_GUI");
         yeuCauThamGiaNhom.setYeuCauLuc(Instant.now());
@@ -45,7 +97,7 @@ public class AccessToGroupService {
         accessToGroupRepository.save(yeuCauThamGiaNhom);
 
         List<ThanhVienNhom> dsNguoiDuyet = thanhVienGroupRepository.
-                findQuanTriVienByMaNhom(yeuCauThamGiaNhom.getId());
+                findQuanTriVienByMaNhom(request.getMaNhom());
 
         dsNguoiDuyet.forEach(thanhVien -> {
             ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
@@ -65,6 +117,8 @@ public class AccessToGroupService {
 //    {
 //
 //    }
+
+    // quan tri vien
     public List<AccessToGroupResponse> DSYeuCauChuaXuLy(Integer idGroup)
     {
         return accessToGroupRepository.findByMaNhom_IdAndTrangThai(idGroup, "DA_GUI")
@@ -72,7 +126,7 @@ public class AccessToGroupService {
                 .map(accessToGroupMapper ::toResponse)
                 .toList();
     }
-
+//người dùng
     public void huyYeuCau(Integer idYeuCau)
     {
         if (!accessToGroupRepository.existsById(idYeuCau))
@@ -82,6 +136,7 @@ public class AccessToGroupService {
         accessToGroupRepository.deleteById(idYeuCau);
     }
 
+    //dung bởi quản trị viên (chap nhận)
     public void accept(Integer id,AccessToGroupUpdateRequest request,String token)
     {
         YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupRepository.findById(id)
@@ -111,16 +166,16 @@ public class AccessToGroupService {
         ThanhVien_GroupRequest thanhVienGroup = new ThanhVien_GroupRequest(
                 yeuCauThamGiaNhom.getMaNguoiDung().getMaNguoiDung(),
                 yeuCauThamGiaNhom.getMaNhom().getId(),
-                0,
+                null,
                 maNguoiDuyet
         );
         thanhVienGroupService.createThanhVien(thanhVienGroup);
 
-        TheoDoiRequest theoDoiRequest = new TheoDoiRequest(
+        TheoDoiNhomRequest theoDoiRequest = new TheoDoiNhomRequest(
                 yeuCauThamGiaNhom.getMaNguoiDung().getMaNguoiDung(),
                 yeuCauThamGiaNhom.getMaNhom().getId()
         );
-
+        theoDoiNhomService.createTheoDoiNhom(theoDoiRequest);
 
         ThongBaoRequest thongBaoRequest = new ThongBaoRequest(
                 maNguoiDuyet,
@@ -132,7 +187,7 @@ public class AccessToGroupService {
         thongBaoService.taoMoiThongBao(thongBaoRequest);
     }
 
-
+    //dung bởi quản trị viên (từ chối)
     public void reject(Integer id,AccessToGroupUpdateRequest request,String token)
     {
         YeuCauThamGiaNhom yeuCauThamGiaNhom = accessToGroupRepository.findById(id)
@@ -167,4 +222,5 @@ public class AccessToGroupService {
         );
         thongBaoService.taoMoiThongBao(thongBaoRequest);
     }
+
 }

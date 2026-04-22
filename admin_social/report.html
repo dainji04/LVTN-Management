@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Gửi Báo Cáo</title>
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Source+Serif+4:wght@400;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="css/report.css" />
+	</head>
+	<body>
+		<div class="wrap">
+			<header>
+				<h1>Báo cáo vi phạm</h1>
+				<div class="subtitle">
+					Gửi báo cáo nhanh để hệ thống xử lý nội dung vi phạm.
+				</div>
+			</header>
+
+			<section class="panel">
+				<div class="grid">
+					<div>
+						<label for="baseUrl">API Base URL</label>
+						<input id="baseUrl" type="text" placeholder="http://localhost:8080" />
+					</div>
+					<div>
+						<label for="userToken">User Token</label>
+						<input id="userToken" type="password" placeholder="Bearer token" />
+					</div>
+				</div>
+				<p class="hint">
+					Token được lưu ở localStorage để dùng lại trong các trang khác.
+				</p>
+			</section>
+
+			<section class="panel">
+				<div class="grid">
+					<div>
+						<label for="loaiDoiTuong">Loại đối tượng</label>
+						<select id="loaiDoiTuong">
+							<option value="NGUOI_DUNG">NGUOI_DUNG</option>
+							<option value="BAI_VIET">BAI_VIET</option>
+							<option value="NHOM">NHOM</option>
+						</select>
+					</div>
+					<div>
+						<label for="idDoiTuong">ID đối tượng</label>
+						<input id="idDoiTuong" type="number" placeholder="Ví dụ: 30" />
+					</div>
+				</div>
+				<div style="margin-top: 16px;">
+					<label for="lyDo">Lý do báo cáo</label>
+					<textarea
+						id="lyDo"
+						placeholder="Spam tin nhắn hoặc đăng nội dung nhạy cảm"
+					></textarea>
+				</div>
+				<div class="actions">
+					<button class="btn-primary" id="btnSubmit">Gửi báo cáo</button>
+					<button class="btn-ghost" id="btnReset">Làm mới</button>
+				</div>
+			</section>
+
+			<section class="panel" id="resultBox" style="display: none;">
+				<div class="toast" id="resultMessage"></div>
+				<pre id="resultPayload"></pre>
+			</section>
+		</div>
+
+		<script src="js/api.js"></script>
+		<script>
+			const baseUrlInput = document.getElementById("baseUrl");
+			const userTokenInput = document.getElementById("userToken");
+			const loaiDoiTuongInput = document.getElementById("loaiDoiTuong");
+			const idDoiTuongInput = document.getElementById("idDoiTuong");
+			const lyDoInput = document.getElementById("lyDo");
+			const resultBox = document.getElementById("resultBox");
+			const resultMessage = document.getElementById("resultMessage");
+			const resultPayload = document.getElementById("resultPayload");
+
+			baseUrlInput.value = Api.getBaseUrl();
+			userTokenInput.value = Api.getToken("user");
+
+			function showResult(message, payload) {
+				resultBox.style.display = "block";
+				resultMessage.textContent = message;
+				resultPayload.textContent = payload ? Api.prettyJson(payload) : "";
+			}
+
+			function syncSettings() {
+				Api.setBaseUrl(baseUrlInput.value);
+				Api.setToken("user", userTokenInput.value);
+			}
+
+			function errorMessage(error) {
+				if (error && error.payload && error.payload.code === 6003) {
+					return "Đối tượng này đã được bạn báo cáo trước đó.";
+				}
+				return error?.payload?.message || error?.message || "Có lỗi xảy ra.";
+			}
+
+			document.getElementById("btnSubmit").addEventListener("click", async () => {
+				syncSettings();
+				const body = {
+					loaiDoiTuong: loaiDoiTuongInput.value,
+					idDoiTuong: Number(idDoiTuongInput.value),
+					lyDo: lyDoInput.value.trim(),
+				};
+
+				if (!body.idDoiTuong || !body.lyDo) {
+					showResult("Vui lòng điền đầy đủ ID và lý do.", null);
+					return;
+				}
+
+				try {
+					const response = await Api.request("/reports", {
+						method: "POST",
+						tokenRole: "user",
+						body,
+					});
+					showResult("Gửi báo cáo thành công.", response);
+				} catch (error) {
+						showResult("Gửi báo cáo thất bại.", errorMessage(error));
+				}
+			});
+
+			document.getElementById("btnReset").addEventListener("click", () => {
+				loaiDoiTuongInput.value = "NGUOI_DUNG";
+				idDoiTuongInput.value = "";
+				lyDoInput.value = "";
+				resultBox.style.display = "none";
+			});
+		</script>
+	</body>
+</html>

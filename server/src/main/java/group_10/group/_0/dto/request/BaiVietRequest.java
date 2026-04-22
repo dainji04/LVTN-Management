@@ -20,6 +20,8 @@ public class BaiVietRequest {
     @NotNull(message = "MaNguoiDung không được để trống")
     Integer maNguoiDung;
 
+    Integer maNhom;
+
     @NotBlank(message = "NoiDung không được để trống")
     String noiDung;
 

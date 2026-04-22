@@ -32,8 +32,8 @@
                                     <span>{{ $t('deletePost') }}</span>
                                 </div>
                             </a-menu-item>
-                            <a-menu-item key="3">
-                                <div v-if="!isOwner" @click="handleEditPost" class="flex items-center gap-2">
+                            <!-- <a-menu-item key="3">
+                                <div v-if="isOwner" @click="handleEditPost" class="flex items-center gap-2">
                                     <EditOutlined />
                                     <span>{{ $t('editPost') }}</span>
                                 </div>
@@ -43,7 +43,7 @@
                                     <DeleteOutlined />
                                     <span>{{ $t('deletePost') }}</span>
                                 </div>
-                            </a-menu-item>
+                            </a-menu-item> -->
                         </a-menu>
                     </template>
                 </a-dropdown>
@@ -54,7 +54,7 @@
         <div v-if="image" class="post-image">
             <img
                 :src="image"
-                :alt="caption"
+                :alt="post.noiDung"
                 class="w-full object-cover"
             />
         </div>
@@ -77,7 +77,7 @@
             <div class="font-semibold mb-2" @click="seeListLikeOfPost">{{ currentLikeCount }} {{ $t('commentLikes') }}</div>
             <div class="mb-2">
                 <span class="font-semibold mr-2">{{ username }}</span>
-                <span>{{ caption }}</span>
+                <span>{{ post.noiDung }}</span>
             </div>
             <button
                 v-if="commentCount > 0"
@@ -101,7 +101,7 @@
     <ModalEditPost
         :open="editModalOpen"
         :post-id="id"
-        :caption="caption"
+        :caption="post.noiDung"
         :avatar="avatar"
         :username="username"
         :image="image"
@@ -110,6 +110,7 @@
         :mau-nen="mauNen"
         :danh-sach-anh="danhSachAnh ?? null"
         @update:open="setEditModalOpen"
+        @update:postUpdated="handlePostUpdated"
     />
 
     <ModalComment
@@ -118,7 +119,7 @@
         :username="username"
         :avatar="avatar"
         :image="image"
-        :caption="caption"
+        :caption="post.noiDung"
         :time-ago="timeAgo"
         :like-count="currentLikeCount"
         :comment-count="commentCount"
@@ -133,7 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons-vue';
 import PostActions from './PostActions.vue';
 import Swal from 'sweetalert2';
@@ -152,17 +153,17 @@ const props = defineProps<{
     username: string;
     avatar: string;
     image?: string;
-    caption: string;
+    noiDung: string;
     timeAgo: string;
     likeCount: number;
     commentCount: number;
     liked?: boolean;
     bookmarked?: boolean;
-    isOwner?: boolean;
     quyenRiengTu?: string;
     viTri?: string | null;
     mauNen?: string | null;
     danhSachAnh?: string[] | null;
+    maNguoiDung: number;
 }>();
 
 const emit = defineEmits<{
@@ -179,6 +180,8 @@ const postStore = usePostStore();
 const commentInput = ref('');
 const currentLikeCount = ref(props.likeCount);
 const authStore = useAuthStore();
+
+const post = ref(JSON.parse(JSON.stringify(props)));
 
 const commentCount = ref(props.commentCount);
 
@@ -287,6 +290,15 @@ const setListLikeModalOpen = (v: boolean) => {
 
 const seeListLikeOfPost = () => {
     listLikeModalOpen.value = true;
+};
+
+const isOwner = computed(() => {
+    return authStore.getUser?.maNguoiDung == props.maNguoiDung;
+});
+
+const handlePostUpdated = (value: string) => {
+    console.log(value);
+    post.value.noiDung = value;
 };
 
 </script>

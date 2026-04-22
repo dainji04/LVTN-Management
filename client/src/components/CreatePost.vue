@@ -5,7 +5,7 @@
         class="w-10 h-10 shrink-0 rounded-full overflow-hidden bg-orange-200 border border-gray-200"
       >
         <img
-          src="https://via.placeholder.com/40"
+          :src="user?.anhDaiDien"
           alt="Avatar"
           class="w-full h-full object-cover"
         />
@@ -28,22 +28,11 @@
           class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 text-gray-500 transition-colors cursor-pointer"
         >
           <span class="text-sm font-medium hidden sm:block"></span>
-          <a-upload
-            v-model:file-list="fileList"
-            name="file"
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-            :headers="{
-              authorization: 'authorization-text',
-            }"
-            @change="handleChange"
-          >
-            <a-button>
-              <PictureOutlined class="text-primary text-xl" />
-              Ảnh/Video
-            </a-button>
-          </a-upload>
+          <PictureOutlined class="text-primary text-xl" />
+          {{ $t('images/videos') }}
+          
         </button>
-
+        
         <button
           class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 text-gray-500 transition-colors cursor-pointer"
         >
@@ -71,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import {
   PictureOutlined,
   PaperClipOutlined,
@@ -84,13 +73,19 @@ import { useI18n } from "vue-i18n";
 import { usePostStore } from "../store/postStore";
 import { message } from 'ant-design-vue';
 import type { UploadChangeParam } from 'ant-design-vue';
+import type { User } from "../types/userType";
+import { useGroupStore } from "../store/groupStore";
 
 const {t} = useI18n();
 const postContent = ref("");
 const authStore = useAuthStore();
 const postStore = usePostStore();
+const groupStore = useGroupStore();
 
-const fileList = ref([]);
+const user = computed(() => {
+  return authStore.getUser as User;
+});
+
 
 const handlePost = async () => {
   if (!postContent.value.trim()) return;
@@ -106,7 +101,7 @@ const handlePost = async () => {
     }
     const requestBody: CreatePostRequest = {
       maNguoiDung: authStore.getUser?.maNguoiDung,
-      maNhom: null,
+      maNhom: groupStore.group?.id || null,
       noiDung: postContent.value.trim(),
       quyenRiengTu: 'friends',
       viTri: null,
@@ -114,6 +109,7 @@ const handlePost = async () => {
       danhSachCongTacVien: null,
       danhSachAnh: null,
     }
+    
     const isCreatePostSuccess = await postStore.createPost(requestBody);
     if (isCreatePostSuccess) {
       Swal.fire({
@@ -133,15 +129,15 @@ const handlePost = async () => {
   }
 };
 
-const handleChange = (info: UploadChangeParam) => {
-  if (info.file.status !== 'uploading') {
-    console.log(info.file, info.fileList);
-  }
-  if (info.file.status === 'done') {
-    message.success(`${info.file.name} file uploaded successfully`);
-  } else if (info.file.status === 'error') {
-    message.error(`${info.file.name} file upload failed.`);
-  }
-};
+// const handleChange = (info: UploadChangeParam) => {
+//   if (info.file.status !== 'uploading') {
+//     console.log(info.file, info.fileList);
+//   }
+//   if (info.file.status === 'done') {
+//     message.success(`${info.file.name} file uploaded successfully`);
+//   } else if (info.file.status === 'error') {
+//     message.error(`${info.file.name} file upload failed.`);
+//   }
+// };
 
 </script>

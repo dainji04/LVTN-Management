@@ -75,10 +75,8 @@ export const usePostStore = defineStore("post", {
     async createPost(post: CreatePostRequest): Promise<boolean> {
       try {
         const response = await axiosInstance.post('/bai-viet', post);
-        if (response.data.code !== 200) {
-          throw new Error(response.data.message);
-        }
-        return true;
+        
+        return response.data.code === 200 || response.data.code === 201;
       } catch (error) {
         console.error(error);
         return false;

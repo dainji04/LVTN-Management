@@ -28,19 +28,16 @@ public class TheoDoiService {
     TheoDoiMapper theoDoiMapper;
     ThongBaoService thongBaoService;
 
-    public void xoaTheoDoi(Integer id)
-    {
-        if (!theoDoiRepository.existsById(id))
-        {
-            throw new AppExceptions(ErrorCode.NOTIFICATION_NOT_EXISTED);
+    public void xoaTheoDoi(Integer id) {
+        if (!theoDoiRepository.existsById(id)) {
+            throw new AppExceptions(ErrorCode.FOLLOW_NOT_EXISTED);
         }
         theoDoiRepository.deleteById(id);
     }
 
-    public SoLuongTheoDoiResponse soLuongFollow(Integer maUser)
-    {
+    public SoLuongTheoDoiResponse soLuongFollow(Integer maUser) {
         Users users = usersRepository.findById(maUser)
-                .orElseThrow( () -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
 
         long TongTheoDoi = theoDoiRepository.countByMaNguoiDuocTheoDoi(maUser);
         long TongDuocTheoDoi = theoDoiRepository.countByMaNguoiTheoDoi(users);
@@ -56,31 +53,41 @@ public class TheoDoiService {
                 .build();
     }
 
-    public TheoDoiResponse createTheoDoiKhongThongBao(TheoDoiRequest request)
-    {
-       TheoDoi theoDoi = theoDoiMapper.toEntity(request);
+    public TheoDoiResponse createTheoDoiKhongThongBao(TheoDoiRequest request) {
 
-       Users nguoiTheoDoi = usersRepository.findById(request.getMaNguoiTheoDoi())
-               .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
-       theoDoi.setMaNguoiTheoDoi(nguoiTheoDoi);
+        Integer existingId = theoDoiRepository.findIdByFollowerAndFollowed(
+                request.getMaNguoiTheoDoi(), request.getMaNguoiDuocTheoDoi());
+        if (existingId != null) {
+            return theoDoiMapper.toResponse(theoDoiRepository.findById(existingId).get());
+        }
+
+        TheoDoi theoDoi = theoDoiMapper.toEntity(request);
+
+        Users nguoiTheoDoi = usersRepository.findById(request.getMaNguoiTheoDoi())
+                .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
+        theoDoi.setMaNguoiTheoDoi(nguoiTheoDoi);
 
         Users nguoiDuocTheoDoi = usersRepository.findById(request.getMaNguoiDuocTheoDoi())
                 .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
         theoDoi.setMaNguoiDuocTheoDoi(nguoiDuocTheoDoi.getMaNguoiDung());
 
-       return theoDoiMapper.toResponse(theoDoiRepository.save(theoDoi));
+        return theoDoiMapper.toResponse(theoDoiRepository.save(theoDoi));
     }
 
-    public TheoDoi getTheoDoiByID(Integer id)
-    {
-        if (!theoDoiRepository.existsById(id))
-        {
+    public TheoDoi getTheoDoiByID(Integer id) {
+        if (!theoDoiRepository.existsById(id)) {
             throw new AppExceptions(ErrorCode.FOLLOW_NOT_EXISTED);
         }
         return theoDoiRepository.findById(id).get();
     }
 
     public void createTheoDoi(TheoDoiRequest request) {
+
+        if (theoDoiRepository.existsByMaNguoiTheoDoi_MaNguoiDungAndMaNguoiDuocTheoDoi(
+                request.getMaNguoiTheoDoi(), request.getMaNguoiDuocTheoDoi())) {
+            return;
+        }
+
         TheoDoi theoDoi = theoDoiMapper.toEntity(request);
         Users nguoiTheoDoi = usersRepository.findById(request.getMaNguoiTheoDoi())
                 .orElseThrow(() -> new AppExceptions(ErrorCode.USER_NOT_EXISTED));
@@ -93,8 +100,7 @@ public class TheoDoiService {
                 save.getMaNguoiDuocTheoDoi(),
                 "bắt đầu theo dõi ",
                 save.getId(),
-                "theo dõi"
-        );
+                "theo dõi");
         thongBaoService.taoMoiThongBao(thongBaoRequest);
     }
 }

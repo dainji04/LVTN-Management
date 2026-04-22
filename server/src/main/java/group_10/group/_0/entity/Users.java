@@ -1,5 +1,6 @@
 package group_10.group._0.entity;
 
+import group_10.group._0.Enum.ROLE;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -39,7 +40,7 @@ public class Users {
     private String anhDaiDien;
 
     @Size(max = 100)
-    @Column(name = "AnhNen", length = 100)
+    @Column(name = "AnhNen", length = 255)
     private String anhNen;
 
     @Column(name = "NgaySinh")
@@ -84,4 +85,7 @@ public class Users {
     @Column(name = "GioiTinh")
     String gioiTinh;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Role", length = 20)
+    private ROLE role;
 }

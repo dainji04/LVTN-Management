@@ -243,17 +243,15 @@ const handlePost = async () => {
     };
 
     const response = await axiosInstance.post('/bai-viet', payload);
-    if (response.data?.code !== 200 && response.data?.code !== 0) {
+    if (response.data?.code == 200 || response.data?.code == 201) {
+      notificationHelper('success', t('createPostSuccess'));
+      postContent.value = '';
+      selectedImage.value = null;
+      privacyKey.value = 'friends';
+      privacySetting.value = t('friends');
+    } else {
       notificationHelper('error', response.data?.message || t('createPostFailed'));
-      return;
     }
-
-    notificationHelper('success', t('createPostSuccess'));
-
-    postContent.value = '';
-    selectedImage.value = null;
-    privacyKey.value = 'friends';
-    privacySetting.value = t('friends');
   } catch (error: any) {
     notificationHelper(
       'error',

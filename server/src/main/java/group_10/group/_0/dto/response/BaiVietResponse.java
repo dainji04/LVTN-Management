@@ -17,6 +17,10 @@ public class BaiVietResponse {
 
     Integer maBaiViet;
     Integer maNguoiDung;  // chỉ trả ID, không trả cả object Users
+
+    Integer maNhom;
+    String trangThai;
+
     String hoTen;         // ho + ten của người đăng
     String noiDung;
     Boolean daSua;
@@ -31,4 +35,5 @@ public class BaiVietResponse {
 
     String anhDaiDienNguoiDang;
     List<String> danhSachAnh;
+    Boolean daThich;
 }

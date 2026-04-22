@@ -1,0 +1,42 @@
+name: Deploy VueJS to Server
+
+# Kịch bản này sẽ tự động chạy khi có code mới đẩy lên nhánh "main"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Lấy mã nguồn về máy chủ của GitHub
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Cài đặt môi trường Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Hoặc phiên bản Node bạn đang dùng
+
+    # 3. Cài đặt thư viện và Build Vue.js
+    # (Lưu ý: Thay đổi đường dẫn cd vào thư mục frontend của bạn, ví dụ: cd client)
+    - name: Install dependencies and Build
+      run: |
+        cd client
+        npm install
+        npm run build
+
+    # 4. Đẩy thư mục dist đã build lên server qua FTP/SFTP
+    - name: Deploy to Server
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # Đường dẫn tới thư mục dist vừa build xong
+        local-dir: ./client/dist/
+        # Đường dẫn thư mục trên server mà domain đang trỏ tới (ví dụ: /domains/social.dainji.id.vn/)
+        server-dir: ./

@@ -19,6 +19,7 @@ import java.time.Instant;
 public class Nhom {
     @Id
     @Column(name = "MaNhom", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
@@ -59,5 +60,9 @@ public class Nhom {
 
     @Column(name = "NgayCapNhat")
     private Instant ngayCapNhat;
+
+    @ColumnDefault("b'0'")
+    @Column(name = "BiCam")
+    private Boolean biCam;
 
 }

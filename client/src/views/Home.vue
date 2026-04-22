@@ -41,12 +41,13 @@
         <div class="posts-container w-full">
           <Post
             v-for="post in postStore.posts"
+            :maNguoiDung="post.maNguoiDung"
             :id="post.maBaiViet"
             :key="post.maBaiViet"
             :username="post.hoTen"
             :avatar="resolveMediaUrl(post.anhDaiDienNguoiDang) || defaultAvatar"
             :image="resolveMediaUrl(post.danhSachAnh?.[0])"
-            :caption="post.noiDung"
+            :noiDung="post.noiDung"
             :time-ago="formatTimeAgo(post.ngayTao)"
             :like-count="post.luotThich"
             :comment-count="post.luotBinhLuan"
