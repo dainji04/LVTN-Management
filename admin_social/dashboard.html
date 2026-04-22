@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Fraunces:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Admin Dashboard</h1>
+          <div class="subtitle">Bảng xep hang va thong ke tong quan</div>
+        </div>
+        <a class="btn-secondary" href="stats-posts.html">Thong ke bai viet 7 ngay</a>
+      </header>
+
+      <section class="panel">
+        <div class="grid">
+          <div>
+            <label for="baseUrl">API Base URL</label>
+            <input id="baseUrl" type="text" placeholder="http://localhost:8080" />
+          </div>
+          <div>
+            <label for="adminToken">Admin Token</label>
+            <input id="adminToken" type="password" placeholder="Bearer token" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="btnLoad">Tai du lieu</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Thong ke tong quan</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Chi so</th>
+              <th>Gia tri</th>
+            </tr>
+          </thead>
+          <tbody id="overviewTable"></tbody>
+        </table>
+        <div class="empty" id="overviewEmpty">Chua co du lieu.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Bang xep hang</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Hang</th>
+              <th>Ten</th>
+              <th>Diem</th>
+              <th>Ghi chu</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardTable"></tbody>
+        </table>
+        <div class="empty" id="leaderboardEmpty">Chua co du lieu.</div>
+      </section>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+      const baseUrlInput = document.getElementById("baseUrl");
+      const adminTokenInput = document.getElementById("adminToken");
+      const overviewTable = document.getElementById("overviewTable");
+      const leaderboardTable = document.getElementById("leaderboardTable");
+      const overviewEmpty = document.getElementById("overviewEmpty");
+      const leaderboardEmpty = document.getElementById("leaderboardEmpty");
+
+      baseUrlInput.value = Api.getBaseUrl();
+      adminTokenInput.value = Api.getToken("admin");
+
+      function syncSettings() {
+        Api.setBaseUrl(baseUrlInput.value);
+        Api.setToken("admin", adminTokenInput.value);
+      }
+
+      function createCell(text) {
+        const td = document.createElement("td");
+        td.textContent = text === undefined || text === null ? "-" : text;
+        return td;
+      }
+
+      function renderOverview(data) {
+        overviewTable.innerHTML = "";
+        if (!data || Object.keys(data).length === 0) {
+          overviewEmpty.style.display = "block";
+          return;
+        }
+        overviewEmpty.style.display = "none";
+        Object.entries(data).forEach(([key, value]) => {
+          const row = document.createElement("tr");
+          row.appendChild(createCell(key));
+          row.appendChild(createCell(value));
+          overviewTable.appendChild(row);
+        });
+      }
+
+      function renderLeaderboard(items) {
+        leaderboardTable.innerHTML = "";
+        if (!items || items.length === 0) {
+          leaderboardEmpty.style.display = "block";
+          return;
+        }
+        leaderboardEmpty.style.display = "none";
+        items.forEach((item, index) => {
+          const row = document.createElement("tr");
+          row.appendChild(createCell(item.rank || index + 1));
+          row.appendChild(createCell(item.ten || item.name || item.username));
+          row.appendChild(createCell(item.diem || item.score || item.points));
+          row.appendChild(createCell(item.ghiChu || item.note || ""));
+          leaderboardTable.appendChild(row);
+        });
+      }
+
+      async function loadDashboard() {
+        syncSettings();
+        try {
+          const [overviewRes, leaderboardRes] = await Promise.all([
+            Api.request("/admin/dashboard/overview", { tokenRole: "admin" }),
+            Api.request("/admin/dashboard/leaderboards", { tokenRole: "admin" }),
+          ]);
+          const overviewData = overviewRes.data || overviewRes;
+          const leaderboardData = Array.isArray(leaderboardRes)
+            ? leaderboardRes
+            : leaderboardRes.data || [];
+          renderOverview(overviewData);
+          renderLeaderboard(leaderboardData);
+        } catch (error) {
+          overviewEmpty.textContent =
+            "Khong tai duoc du lieu: " +
+            (error.payload?.message || error.message);
+          overviewEmpty.style.display = "block";
+          leaderboardEmpty.textContent = "";
+          leaderboardEmpty.style.display = "block";
+        }
+      }
+
+      document.getElementById("btnLoad").addEventListener("click", loadDashboard);
+      loadDashboard();
+    </script>
+  </body>
+</html>

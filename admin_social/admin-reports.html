@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Admin - Duyệt Báo Cáo</title>
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Crimson+Text:wght@400;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="css/admin-reports.css" />
+	</head>
+	<body>
+		<div class="wrap">
+			<header>
+				<div>
+					<h1>Danh sách báo cáo chờ xử lý</h1>
+					<div class="subtitle">Admin Dashboard • Luồng xét duyệt</div>
+				</div>
+				<button class="btn-load" id="btnRefresh">Tải danh sách</button>
+			</header>
+
+			<section class="panel">
+				<div class="grid">
+					<div>
+						<label for="baseUrl">API Base URL</label>
+						<input id="baseUrl" type="text" placeholder="http://localhost:8080" />
+					</div>
+					<div>
+						<label for="adminToken">Admin Token</label>
+						<input id="adminToken" type="password" placeholder="Bearer token" />
+					</div>
+				</div>
+			</section>
+
+			<section class="panel">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Đối tượng</th>
+							<th>Người tố cáo</th>
+							<th>Lý do</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody id="reportTable"></tbody>
+				</table>
+				<div class="empty" id="emptyState">Chưa có báo cáo nào.</div>
+			</section>
+		</div>
+
+		<script src="js/api.js"></script>
+		<script>
+			const baseUrlInput = document.getElementById("baseUrl");
+			const reportTable = document.getElementById("reportTable");
+			const emptyState = document.getElementById("emptyState");
+
+			baseUrlInput.value = Api.getBaseUrl();
+
+			const adminTokenInput = localStorage.getItem("admin") ; 
+
+
+			function syncSettings() {
+				Api.setBaseUrl(baseUrlInput.value);
+				// Api.setToken("admin", adminTokenInput.value);
+			}
+
+			function objectLink(loaiDoiTuong, id) {
+				if (loaiDoiTuong === "BAI_VIET") {
+					return "/post/" + id;
+				}
+				if (loaiDoiTuong === "NHOM") {
+					return "/group/" + id;
+				}
+				return "/user/" + id;
+			}
+
+			function createCell(text) {
+				const td = document.createElement("td");
+				td.textContent = text || "-";
+				return td;
+			}
+
+			function renderReports(items) {
+				reportTable.innerHTML = "";
+				if (!items || items.length === 0) {
+					emptyState.style.display = "block";
+					return;
+				}
+				emptyState.style.display = "none";
+				items.forEach((item) => {
+					const row = document.createElement("tr");
+					row.appendChild(createCell(item.id || item.idBaoCao));
+
+					const objectCell = document.createElement("td");
+					const loai = item.loaiDoiTuong || "-";
+					const idDoiTuong = item.idDoiTuong || item.doiTuongId || "-";
+					const link = document.createElement("a");
+					link.href = objectLink(loai, idDoiTuong);
+					link.textContent = loai + " #" + idDoiTuong;
+					link.target = "_blank";
+					objectCell.appendChild(link);
+					objectCell.appendChild(document.createElement("br"));
+					const tag = document.createElement("span");
+					tag.className = "tag";
+					tag.textContent = loai;
+					objectCell.appendChild(tag);
+					row.appendChild(objectCell);
+
+					row.appendChild(
+						createCell(
+							item.tenNguoiBaoCao || item.nguoiBaoCao || item.reporterName
+						)
+					);
+					row.appendChild(createCell(item.lyDo || item.reason));
+
+					const actionCell = document.createElement("td");
+					const banBtn = document.createElement("button");
+					banBtn.className = "btn-ban";
+					banBtn.textContent = "BAN";
+					banBtn.addEventListener("click", () =>
+						updateReport(item.id || item.idBaoCao, "DA_XU_LY", row, banBtn, ignoreBtn)
+					);
+					const ignoreBtn = document.createElement("button");
+					ignoreBtn.className = "btn-ignore";
+					ignoreBtn.textContent = "IGNORE";
+					ignoreBtn.style.marginLeft = "8px";
+					ignoreBtn.addEventListener("click", () =>
+						updateReport(item.id || item.idBaoCao, "BO_QUA", row, banBtn, ignoreBtn)
+					);
+					actionCell.appendChild(banBtn);
+					actionCell.appendChild(ignoreBtn);
+					row.appendChild(actionCell);
+
+					reportTable.appendChild(row);
+				});
+			}
+
+			async function loadReports() {
+				syncSettings();
+				try {
+					const response = await Api.request("/reports", {
+						method: "GET",
+						tokenRole: "admin",
+					});
+					const items = Array.isArray(response)
+						? response
+						: response.data || response.items || [];
+					const pending = items.filter((item) =>
+						item.trangThai ? item.trangThai === "CHUA_XU_LY" : true
+					);
+					renderReports(pending);
+				} catch (error) {
+					console.log("Error loading reports:", error);
+					emptyState.textContent =
+						"Không tải được danh sách: " +
+						(error.payload?.message || error.message);
+					emptyState.style.display = "block";
+				}
+			}
+
+			async function updateReport(id, trangThai, row, banBtn, ignoreBtn) {
+				if (!id) {
+					return;
+				}
+				syncSettings();
+				if (banBtn) banBtn.disabled = true;
+				if (ignoreBtn) ignoreBtn.disabled = true;
+				try {
+					await Api.request("/reports/" + id, {
+						method: "PUT",
+						tokenRole: "admin",
+						body: { trangThai },
+					});
+					row.remove();
+					if (!reportTable.children.length) {
+						emptyState.textContent = "Không còn báo cáo nào.";
+						emptyState.style.display = "block";
+					}
+				} catch (error) {
+					alert(
+						"Cập nhật thất bại: " +
+							(error.payload?.message || error.message)
+					);
+				} finally {
+					if (banBtn) banBtn.disabled = false;
+					if (ignoreBtn) ignoreBtn.disabled = false;
+				}
+			}
+
+			document
+				.getElementById("btnRefresh")
+				.addEventListener("click", loadReports);
+
+			loadReports();
+		</script>
+	</body>
+</html>
