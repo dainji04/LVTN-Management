@@ -2,10 +2,10 @@ const jwt = require('jsonwebtoken');
 const requestContext = require('../utils/requestContext.js');
 
 class AuthMiddleware {
-  // Verify JWT token from request
+
   static verifyToken(req, res, next) {
     try {
-      // Get token from header
+ 
       const authHeader = req.headers.authorization;
       
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -15,15 +15,12 @@ class AuthMiddleware {
         });
       }
 
-      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      const token = authHeader.substring(7); // Remove 'Bearer '
 
-      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
-      // Add user info to request
       req.user = {
         userId: decoded.id,
-        // email: decoded.email
       };
 
       const store = requestContext.get();
@@ -56,7 +53,6 @@ class AuthMiddleware {
     }
   }
 
-  // Verify socket authentication
   static verifySocketToken(socket, next) {
     try {
       const token = socket.handshake.auth.token;
@@ -70,6 +66,7 @@ class AuthMiddleware {
       socket.userId = decoded.id;
       socket.userEmail = decoded.email;
       socket.token = `Bearer ${token}`;
+      
       requestContext.run(
       {
         token: `Bearer ${token}`,

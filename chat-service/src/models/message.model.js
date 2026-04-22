@@ -1,12 +1,8 @@
-// models/Message.js  —  Chat Service
-// Đã xóa toàn bộ JOIN với bảng Users.
-// Thông tin user được lấy qua userServiceClient (gọi User Service API).
-
 const db = require('../config/cloud.config.js');
 const userServiceClient = require('../helpers/userServiceClient.js');
 
 class Message {
-  // Tạo tin nhắn mới
+  
   static async create({
     maCuocTroChuyen,
     maNguoiGui,
@@ -33,7 +29,6 @@ class Message {
     return result.insertId;
   }
 
-  // Lấy tin nhắn theo ID
   static async getById(messageId) {
     const [rows] = await db.execute(
       `SELECT * FROM TinNhan WHERE MaTinNhan = ? AND DaXoa = 0`,
@@ -168,7 +163,7 @@ class Message {
     );
   }
 
-  // Batch load reactions cho nhiều tin nhắn cùng lúc — tránh N+1
+// Batch load reactions cho nhiều tin nhắn cùng lúc — tránh N+1
 // Thay thế cho việc gọi getReactions() trong vòng lặp
 // Thêm vào class Message
 static async getReactionsByMessageIds(messageIds) {

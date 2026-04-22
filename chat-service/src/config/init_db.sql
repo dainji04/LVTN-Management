@@ -1,17 +1,3 @@
--- ============================================================
--- Chat Service Database
--- Tách từ SocialMedia (SocialMedia_Gr10)
--- ============================================================
--- Các bảng: CuocTroChuyen, TinNhan, NguoiThamGiaTroChuyen, CamXucTinNhan
---
--- LƯU Ý MICROSERVICES:
---   Tất cả FOREIGN KEY tham chiếu tới bảng Users đã được XÓA.
---   Cột MaNguoiDung (INT) vẫn được giữ lại và đánh index để
---   truy vấn hiệu quả.
---   Việc validate user hợp lệ phải thực hiện qua REST API / gRPC
---   của User Service trước khi ghi dữ liệu vào Chat Service.
--- ============================================================
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;

@@ -29,7 +29,7 @@ const useWebSocket = ({
   onMessageReaction
 } = {}) => {
 
-  // ─── Wrap tất cả callbacks thành stable version ─────────────────────
+  // Wrap tất cả callbacks thành stable version 
   // Nhờ vậy socket listener không bao giờ bị stale dù useChat re-render
   const stableOnConnected           = useStableCallback(onConnected);
   const stableOnNewMessage          = useStableCallback(onNewMessage);
@@ -43,7 +43,7 @@ const useWebSocket = ({
   const stableOnDisconnect          = useStableCallback(onDisconnect);
   const stableOnMessageReaction      = useStableCallback(onMessageReaction);
 
-  // ─── Chỉ connect + register listeners 1 lần duy nhất ───────────────
+  // Chỉ connect + register listeners 1 lần duy nhất
   // Không cần re-run khi callback thay đổi vì đã dùng useRef bên trong
   useEffect(() => {
     socketService.connect(token);
@@ -63,10 +63,8 @@ const useWebSocket = ({
     ].filter(Boolean);
 
     return () => unsubs.forEach((unsub) => unsub());
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token]);
   // token là dependency duy nhất — khi token đổi thì reconnect với token mới
-
-  // ─── Stable emit helpers ─────────────────────────────────────────────
 
   const sendMessage = useCallback((payload) => {
     socketService.sendMessage(payload);

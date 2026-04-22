@@ -1,8 +1,6 @@
-  // helpers/userServiceClient.js
 // 3 lớp bảo vệ: Redis cache → Circuit Breaker → Graceful Degradation
-
 const axios   = require('axios');
-const redis   = require('../config/redis.config');   // ioredis instance
+const redis   = require('../config/redis.config');  
 const requestContext = require('../utils/requestContext.js'); 
 
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL;
@@ -215,9 +213,7 @@ const userServiceClient = {
     return result;
   } catch (err) {
     console.error(`[UserServiceClient] Lỗi kiểm tra bạn bè:`, err.message);
-    // ⚠️ Nếu API lỗi: trả về false (an toàn) hoặc true (lạc quan)?
-    // Tuỳ vào business logic của bạn
-    return false; // An toàn: mặc định từ chối
+    return false; // mặc định không phải bạn bè nếu có lỗi
   }
 },
 

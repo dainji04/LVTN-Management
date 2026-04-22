@@ -1,12 +1,7 @@
-// models/Conversation.js  —  Chat Service
-// Đã xóa toàn bộ JOIN với bảng Users.
-// Thông tin user được lấy qua userServiceClient (gọi User Service API).
-
 const db = require('../config/cloud.config.js');
 const userServiceClient = require('../helpers/userServiceClient.js');
 
 class Conversation {
-  // Tạo cuộc trò chuyện mới
   static async create({ ten, anhDaiDien, maNguoiTao }) {
     const [result] = await db.execute(
       `INSERT INTO CuocTroChuyen (Ten, AnhDaiDien, MaNguoiTao, SoLuongThanhVien, SoLuongTinNhan, NgayTao, NgayCapNhat)
@@ -16,7 +11,7 @@ class Conversation {
     return result.insertId;
   }
 
-  // Lấy danh sách cuộc trò chuyện của user
+  
   static async getByUserId(userId) {
     // Bước 1: Lấy dữ liệu thuần từ Chat DB (không JOIN Users)
     const [rows] = await db.execute(
@@ -156,7 +151,6 @@ class Conversation {
   }
 
   // Lấy danh sách thành viên
-  // Trả về mảng [{ MaNguoiDung, VaiTro, NgayThamGia, DuocThemBoi, ...userInfo }]
   static async getMembers(conversationId) {
     const [rows] = await db.execute(
       `SELECT MaNguoiDung, VaiTro, NgayThamGia, DuocThemBoi
@@ -257,7 +251,7 @@ class Conversation {
     );
   }
 
-  // Tìm kiếm nhóm theo tên (chỉ trong Chat DB, không cần User Service)
+// Tìm kiếm nhóm theo tên (chỉ trong Chat DB, không cần User Service)
 // Thêm vào class Conversation
 static async searchGroups(userId, keyword) {
   const [rows] = await db.execute(

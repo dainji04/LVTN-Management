@@ -12,10 +12,9 @@ class ChatService {
 
   // User kết nối
   async handleUserConnect(socket, userId) {
-    this.onlineUsers.set(userId, socket.id);
-    
+
     // // Cập nhật trạng thái online
-    // await User.updateLastActivity(userId);
+    this.onlineUsers.set(userId, socket.id);
     
     // Join vào các rooms của conversations
     const conversations = await Conversation.getByUserId(userId);
@@ -31,10 +30,8 @@ class ChatService {
 
   // User ngắt kết nối
   async handleUserDisconnect(userId) {
+
     this.onlineUsers.delete(userId);
-    
-    // // Cập nhật last activity
-    // await User.updateLastActivity(userId);
     
     // Thông báo offline
     this.broadcastUserStatus(userId, 'offline');
@@ -42,7 +39,6 @@ class ChatService {
     console.log(`User ${userId} disconnected`);
   }
 
-  // Broadcast trạng thái user
   broadcastUserStatus(userId, status) {
     if (status === 'online') 
       this.io.emit('user_online', {
@@ -347,7 +343,6 @@ class ChatService {
       // Lấy lại tin nhắn sau khi sửa
       const updatedMessage = await Message.getById(messageId);
 
-      // Broadcast cho tất cả members trong conversation
       this.io.to(`conversation_${message.MaCuocTroChuyen}`).emit('message_edited', {
         conversationId: message.MaCuocTroChuyen,
         message: updatedMessage,
@@ -373,18 +368,14 @@ class ChatService {
         throw new Error('Tin nhắn không tồn tại hoặc đã bị xóa');
       }
 
-      // Chỉ người gửi hoặc admin nhóm mới được xóa
       const isSender = message.MaNguoiGui === userId;
-      // const isAdmin  = await Conversation.isAdmin(message.MaCuocTroChuyen, userId);
 
       if (!isSender) {
         throw new Error('Bạn không có quyền xóa tin nhắn này');
       }
 
-      // Soft delete
       await Message.delete(messageId);
 
-      // Broadcast cho tất cả members
       this.io.to(`conversation_${message.MaCuocTroChuyen}`).emit('message_deleted', {
         conversationId: message.MaCuocTroChuyen,
         messageId,
@@ -400,10 +391,10 @@ class ChatService {
     }
   }
 
-  // Lấy online users
   getOnlineUsers() {
     return Array.from(this.onlineUsers.keys());
   }
+
 }
 
 module.exports = ChatService;

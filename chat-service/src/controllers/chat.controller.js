@@ -1,20 +1,10 @@
-// controllers/chat.controller.js  —  Chat Service
-//
-// Các endpoint phục vụ:
-//   Tab "Tin nhắn"  → getDirectConversations
-//   Tab "Nhóm"      → getGroupConversations
-//   Tìm nhóm       → searchGroups          (trong Chat DB)
-//   Tìm bạn bè     → KHÔNG nằm ở đây      (thuộc User Service)
-//   Chi tiết / gửi / sửa / xóa tin nhắn
-
 const Conversation      = require('../models/conversation.model.js');
 const Message           = require('../models/message.model.js');
 const userServiceClient = require('../helpers/userServiceClient.js');
 
 class ChatController {
 
-  // ─── Tab "Tin nhắn" ────────────────────────────────────────────────────────
-  // GET /chat/conversations/direct
+  // Tab "Tin nhắn" 
   static async getDirectConversations(req, res) {
     try {
       const userId = req.user.userId;
@@ -27,8 +17,7 @@ class ChatController {
     }
   }
 
-  // ─── Tab "Nhóm" ────────────────────────────────────────────────────────────
-  // GET /chat/conversations/groups
+  // Tab "Nhóm" 
   static async getGroupConversations(req, res) {
     try {
       const userId = req.user.userId;
@@ -40,8 +29,7 @@ class ChatController {
     }
   }
 
-  // ─── Tìm kiếm nhóm (Chat DB) ───────────────────────────────────────────────
-  // GET /chat/conversations/groups/search?q=...
+  // Tìm kiếm nhóm (Chat DB) 
   // Tìm theo tên nhóm trong Chat DB — không cần gọi User Service
   static async searchGroups(req, res) {
     try {
@@ -60,8 +48,7 @@ class ChatController {
     }
   }
 
-  // ─── Chi tiết conversation ─────────────────────────────────────────────────
-  // GET /chat/conversations/:id
+  //Chi tiết conversation 
   static async getConversation(req, res) {
     try {
       const { id } = req.params;
@@ -84,9 +71,7 @@ class ChatController {
     }
   }
 
-  // ─── Tạo conversation 1-1 với bạn bè ──────────────────────────────────────
-  // POST /chat/conversations/direct
-  // Body: { targetUserId, friendName }
+  //Tạo conversation 1-1 với bạn bè
   static async createDirectConversation(req, res) {
     try {
       const userId = req.user.userId;
@@ -96,7 +81,6 @@ class ChatController {
         return res.status(400).json({ error: 'Thiếu targetUserId' });
       }
 
-      // Xác nhận quan hệ bạn bè qua User Service trước khi tạo
       const ok = await userServiceClient.areFriends(userId, targetUserId);
       if (!ok) {
         return res.status(403).json({ error: 'Chỉ có thể nhắn tin với bạn bè' });
@@ -112,8 +96,7 @@ class ChatController {
     }
   }
 
-  // ─── Lấy tin nhắn ──────────────────────────────────────────────────────────
-  // GET /chat/conversations/:id/messages?limit=50&offset=0
+  // Lấy tin nhắn 
   static async getMessages(req, res) {
     try {
       const { id } = req.params;
@@ -126,14 +109,13 @@ class ChatController {
         return res.status(403).json({ error: 'Không có quyền truy cập' });
       }
 
-      // Lấy messages (đã batch-fetch user info bên trong model)
       const messages = await Message.getByConversationId(id, limit, offset);
 
       if (messages.length === 0) {
         return res.json({ success: true, data: [] });
       }
 
-      // ── FIX N+1: Load toàn bộ reactions 1 query, không dùng loop ──────────
+      //  FIX N+1: Load toàn bộ reactions 1 query, không dùng loop 
       const messageIds = messages.map(m => m.MaTinNhan);
       const allReactions = await Message.getReactionsByMessageIds(messageIds);
 
@@ -160,13 +142,10 @@ class ChatController {
   }
 
   // ─── Sửa tin nhắn ──────────────────────────────────────────────────────────
-  // PATCH /chat/messages/:id
-  // Body: { content }
   static async updateMessage(req, res) {
     try {
       const { id }    = req.params;
       const { content } = req.body;
-      // FIX: Luôn lấy userId từ JWT token, không bao giờ từ req.body
       const userId    = req.user.userId;
 
       if (!content || content.trim().length === 0) {
@@ -191,12 +170,9 @@ class ChatController {
   }
 
   // ─── Xóa tin nhắn ──────────────────────────────────────────────────────────
-  // DELETE /chat/messages/:id
   static async deleteMessage(req, res) {
     try {
       const { id } = req.params;
-      // FIX: Bỏ fallback sang req.body — nếu không có token thì middleware
-      //      auth đã chặn trước rồi, không cần || req.body.userId
       const userId = req.user.userId;
 
       const message = await Message.getById(id);
@@ -215,9 +191,7 @@ class ChatController {
     }
   }
 
-  // ─── Thêm / cập nhật reaction ──────────────────────────────────────────────
-  // POST /chat/messages/:id/reactions
-  // Body: { camXuc }
+  //Thêm / cập nhật reaction
   static async addReaction(req, res) {
     try {
       const { id }     = req.params;
@@ -237,8 +211,6 @@ class ChatController {
     }
   }
 
-  // ─── Xóa reaction ──────────────────────────────────────────────────────────
-  // DELETE /chat/messages/:id/reactions
   static async removeReaction(req, res) {
     try {
       const { id } = req.params;

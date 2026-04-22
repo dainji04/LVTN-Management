@@ -14,7 +14,7 @@ const pool = mysql.createPool({
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   ssl: {
-    rejectUnauthorized: false // Cho phép kết nối qua SSL
+    rejectUnauthorized: false
   }
 });
 

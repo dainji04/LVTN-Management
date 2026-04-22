@@ -9,16 +9,16 @@ module.exports = (io) => {
   io.use(AuthMiddleware.verifySocketToken);
 
   function withContext(socket, handler) {
-  return (...args) =>
-    requestContext.run(
-      {
-        token: socket.token,
-        userId: socket.userId,
-        requestId: Date.now()
-      },
-      () => handler(...args)
-    );
-}
+    return (...args) =>
+      requestContext.run(
+        {
+          token: socket.token,
+          userId: socket.userId,
+          requestId: Date.now()
+        },
+        () => handler(...args)
+      );
+  }
 
   io.on("connection", async (socket) => {
 
