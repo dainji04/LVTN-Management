@@ -5,10 +5,10 @@
     </template>
     <div class="group w-[calc(100%-256px)] grid gap-4">
       <div class="group-header w-full flex items-center flex-col">
-        <div class="background-group bg-primary w-full h-[400px] relative">
+        <div class="background-group w-full h-[400px] relative" :style="{ backgroundImage: `url(${group?.anhBia || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPQDHr44w7T579OHXCSVyqpb_vztOyuN3K6Q&s'})` }">
           <div class="absolute bottom-5 left-5">
             <h1 class="name-group text-4xl font-bold mb-2 text-white">
-              Cộng đồng ReactJS VN
+              {{ group?.tenNhom }}
             </h1>
             <div>
               <div class="flex items-center gap-2">
@@ -98,12 +98,21 @@ import {
 } from "@ant-design/icons-vue";
 import SideBar from "../components/SideBar.vue";
 import AuthLayout from "../layouts/authLayout.vue";
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import CreatePost from "../components/CreatePost.vue";
 import GroupSuggestItem from "../components/GroupSuggestItem.vue";
 import AboutGroup from "../components/AboutGroup.vue";
 import RulesGroup from "../components/RulesGroup.vue";
-// Dữ liệu mô phỏng cho 3 nhóm
+import { useGroupStore } from "../store/groupStore";
+import { useRoute } from "vue-router";
+import type { GroupItem } from "../types/groupType";
+
+const route = useRoute();
+const groupStore = useGroupStore();
+
+const groupId = ref(0);
+const group = ref<GroupItem | null>(null);
+
 const suggestedGroups = ref([
   {
     id: 1,
@@ -128,5 +137,14 @@ const suggestedGroups = ref([
   },
 ]);
 
-const isPrivate = ref(false);
+onMounted(async () => {
+  groupId.value = parseInt(route.params.idGroup as string);
+
+  await groupStore.getDetailGroup(groupId.value);
+  group.value = groupStore.group;
+});
+
+const isPrivate = computed(() => {
+  return group.value?.loaiNhom === 'private';
+});
 </script>

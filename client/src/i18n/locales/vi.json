@@ -251,5 +251,8 @@
   "likes": "lượt thích",
   "likedByTitle": "Lượt thích",
   "loadingLikes": "Đang tải...",
-  "noLikesYet": "Chưa có lượt thích nào"
+  "noLikesYet": "Chưa có lượt thích nào",
+  "everyoneCanSee": "Mọi người đều có thể thấy thành viên và bài viết trong nhóm.",
+  "onlyMembersCanSee": "Chỉ các thành viên của nhóm mới có thể thấy thành viên và bài viết trong nhóm.",
+  "learnMore": "Tìm hiểu thêm"
 }

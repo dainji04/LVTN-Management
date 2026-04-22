@@ -28,6 +28,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     'update:open': [value: boolean];
+    'update:postUpdated': [value: string];
 }>();
 
 const { t } = useI18n();
@@ -94,9 +95,9 @@ async function submitEdit(): Promise<void> {
             throw new Error('api');
         }
 
-        postStore.updatePostContent(props.postId, text);
         emit('update:open', false);
-
+        emit('update:postUpdated', text);
+        
         await Swal.fire({
             title: t('success'),
             text: t('editPostSuccess'),
