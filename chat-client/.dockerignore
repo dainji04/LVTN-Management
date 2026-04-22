@@ -1,0 +1,34 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment variables
+.env
+.env.production
+.env.local
+
+# Git
+.git
+.gitignore
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+LICENSE
