@@ -30,6 +30,14 @@ public interface QuanHeBanBeRepository extends JpaRepository<QuanHeBanBe, Intege
             "ORDER BY q.ngayTao DESC")
     List<QuanHeBanBe> findFriends(@Param("userId") Integer userId);
 
+    @Query("SELECT u FROM Users u WHERE " +
+            "LOWER(u.ho) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.bietDanh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "ORDER BY u.ngayTao DESC")
+    List<Users> searchUsers(@Param("keyword") String keyword, Pageable pageable);
+
     // Xóa bạn bè
     @Modifying
     @Transactional

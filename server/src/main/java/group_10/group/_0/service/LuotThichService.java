@@ -32,6 +32,15 @@ public class LuotThichService {
 
     // Toggle like (thích/bỏ thích)
     public boolean toggleLike(LuotThichRequest request) {
+
+
+        String camXuc = request.getCamXuc();
+        if (camXuc == null || camXuc.equalsIgnoreCase("true") || camXuc.equalsIgnoreCase("false")) {
+            camXuc = "LIKE";
+        }
+        request.setCamXuc(camXuc);
+
+
         Optional<LuotThich> existing = luotThichRepository
                 .findByMaNguoiDung_MaNguoiDungAndMaDoiTuongAndLoaiDoiTuong(
                         request.getMaNguoiDung(),

@@ -114,6 +114,24 @@ public class QuanHeBanBeService {
                 .toList();
     }
 
+    public List<BanBeResponse> searchUsers(String query) {
+        Pageable pageable = PageRequest.of(0, 20);
+        return quanHeBanBeRepository.searchUsers(query, pageable).stream()
+                .map(user -> BanBeResponse.builder()
+                        .maNguoiDung(user.getMaNguoiDung())
+                        .ho(user.getHo())
+                        .ten(user.getTen())
+                        .bietDanh(user.getBietDanh())
+                        .anhDaiDien(user.getAnhDaiDien())
+                        .email(user.getEmail())
+                        .hoatDongLanCuoi(user.getHoatDongLanCuoi())
+                        .ngayKetBan(null)
+                        .build()
+                )
+                .toList();
+    }
+
+
     public List<BanBeResponse> searchFriends(Integer userId, String query) {
         String keyword = query.toLowerCase();
         return quanHeBanBeRepository.findFriends(userId).stream().map(q ->
