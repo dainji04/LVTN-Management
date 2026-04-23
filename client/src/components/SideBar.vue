@@ -10,15 +10,20 @@
     <SidebarNavItem to="/search" :icon="SearchOutlined" :label="$t('search')" />
     <SidebarNavItem to="/groups" :icon="TeamOutlined" :label="$t('groups')" />
     <SidebarNavItem
+      to="/friends"
+      :icon="UsergroupAddOutlined"
+      :label="$t('friends')"
+    />
+    <!-- <SidebarNavItem
       to="/explore"
       :icon="CompassOutlined"
       :label="$t('explore')"
-    />
-    <SidebarNavItem
+    /> -->
+    <!-- <SidebarNavItem
       to="/reels"
       :icon="PlayCircleOutlined"
       :label="$t('reels')"
-    />
+    /> -->
     <SidebarNavItem
       to="/messages"
       :icon="MessageOutlined"
@@ -66,6 +71,7 @@ import {
   PlusCircleOutlined,
   UserOutlined,
   TeamOutlined,
+  UsergroupAddOutlined,
 } from "@ant-design/icons-vue";
 import SidebarNavItem from "../components/SidebarNavItem.vue";
 import ActionUser from "./ActionUser.vue";

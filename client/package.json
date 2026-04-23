@@ -13,6 +13,7 @@
     "@vueuse/integrations": "^14.2.1",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.13.5",
+    "lodash": "^4.18.1",
     "pinia": "^3.0.4",
     "sweetalert2": "^11.26.24",
     "vee-validate": "^4.15.1",
@@ -23,6 +24,7 @@
     "vue-use": "^0.2.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.24",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.2",
     "@vue/tsconfig": "^0.8.1",

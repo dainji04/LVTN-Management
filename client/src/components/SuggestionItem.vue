@@ -22,7 +22,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import axiosInstance from "../helpers/apiHelper";
+
+interface GoiYKetBanResponse {
+  maNguoiDung: number;
+  ho: string;
+  ten: string;
+  bietDanh: string;
+  anhDaiDien: string;
+  email: string;
+}
+
+interface ApiRecommendationsResponse {
+  code: number;
+  message: string;
+  data: {
+    content: GoiYKetBanResponse[];
+    hasNext: boolean;
+    page: number;
+    size: number;
+  };
+}
 
 const props = defineProps<{
   username: string;
@@ -37,8 +58,22 @@ const emit = defineEmits<{
 
 const isFollowing = ref(props.initialFollowing || false);
 
+const listRecommendations = ref<GoiYKetBanResponse[]>([]);
+
+const getRecommendations = async() => {
+  const response = await axiosInstance.get<ApiRecommendationsResponse>('/ban-be/goi-y-ket-ban', {
+    params: { page: 0, size: 4 },
+  });
+  listRecommendations.value = response.data.data.content;
+};
+
 const handleFollow = () => {
   isFollowing.value = !isFollowing.value;
   emit("follow", props.username, isFollowing.value);
 };
+
+onMounted(() => {
+  getRecommendations();
+});
+
 </script>

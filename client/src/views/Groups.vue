@@ -26,7 +26,7 @@
                                 {{ $t('yourGroups') }}
                             </Button>
                         </div>
-                        <Button type="primary">
+                        <Button type="primary" @click="showCreateModal = true">
                             <template #icon>
                                 <PlusOutlined class="mr-1" />
                             </template>
@@ -128,6 +128,12 @@
             </div>
         </template>
     </AuthLayout>
+
+    <!-- Create Group Modal -->
+    <ModalCreateGroup
+      v-model:open="showCreateModal"
+      @created="handleGroupCreated"
+    />
 </template>
 
 <script lang="ts" setup>
@@ -142,6 +148,8 @@ import AuthLayout from '../layouts/authLayout.vue';
 import SideBar from '../components/SideBar.vue';
 import Button from '../components/Button.vue';
 import GroupCard from '../components/GroupCard.vue';
+import ModalCreateGroup from '../components/ModalCreateGroup.vue';
+import type { CreateGroupPayload } from '../components/ModalCreateGroup.vue';
 import { notificationHelper } from '../helpers/notificationHelper';
 import { useI18n } from 'vue-i18n';
 import type { Group } from '../types/groupType';
@@ -154,6 +162,7 @@ const activeTab = ref('discover');
 const searchQuery = ref('');
 const selectedCategory = ref('all');
 const groupStore = useGroupStore();
+const showCreateModal = ref(false);
 
 const categories = [
     { key: 'all', label: t('all') },
@@ -193,6 +202,7 @@ onMounted(() => {
     groupStore.loadListGroup();
 })
 
+
 // const filteredGroups = computed(() => {
 //     let result = groups.value;
 
@@ -214,8 +224,13 @@ onMounted(() => {
 
 const handleJoinGroup = (groupId: number) => {
     notificationHelper('success', t('joinGroup') + ' ' + t('loginSuccess'));
-    // Handle join group logic here
     console.log('Joining group:', groupId);
+};
+
+const handleGroupCreated = (payload: CreateGroupPayload) => {
+    notificationHelper('success', t('createGroupSuccess'));
+    console.log('Group created:', payload);
+    groupStore.loadListGroup();
 };
 </script>
 

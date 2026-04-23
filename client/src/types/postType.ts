@@ -14,6 +14,7 @@ export interface PostItem {
   ngayCapNhat: string;
   anhDaiDienNguoiDang: string;
   danhSachAnh: string[];
+  daThich: boolean;
 }
 
 export interface PostPagingData {

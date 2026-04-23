@@ -55,6 +55,7 @@
             :quyen-rieng-tu="post.quyenRiengTu"
             :vi-tri="post.viTri"
             :mau-nen="post.mauNen"
+            :liked="post.daThich"
             :danh-sach-anh="post.danhSachAnh"
             @deletePost="handleDeletePost"
           />
@@ -92,24 +93,16 @@
             </div>
             <div class="space-y-3">
               <SuggestionItem
-                username="minhvn"
-                avatar="https://testingbot.com/free-online-tools/random-avatar/100"
-                description="Bàm ngọc đụ vì nhân"
-              />
-              <SuggestionItem
-                username="huy123"
-                avatar="https://testingbot.com/free-online-tools/random-avatar/100"
-                description="Bàm ngọc đụ vì nhân"
-              />
-              <SuggestionItem
-                username="vy.xinh"
-                avatar="https://testingbot.com/free-online-tools/random-avatar/100"
-                description="Bàm ngọc đụ vì nhân"
+                v-for="recommendation in listRecommendations"
+                :key="recommendation.maNguoiDung"
+                :username="recommendation.ho + ' ' + recommendation.ten"
+                :avatar="recommendation.anhDaiDien"
+                :description="recommendation.bietDanh""
               />
             </div>
           </div>
           <!-- Suggestions Section 2 -->
-          <div class="mb-6">
+          <!-- <div class="mb-6">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold text-gray-500 text-sm">
                 {{ $t("suggestionsForYou") }}
@@ -122,7 +115,7 @@
                 description="Bàm ngọc đụ vì nhân"
               />
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Footer Links -->
@@ -156,6 +149,8 @@ import { resolveMediaUrl } from "../helpers/mediaHelper";
 import { useI18n } from "vue-i18n";
 import PostSkeleton from "../components/PostSkeleton.vue";
 import { useAuthStore } from "../store/authStore";
+import friendHelper from "../helpers/friendHelper";
+import type { GoiYKetBanResponse } from "../types/friendType";
 
 const postStore = usePostStore();
 const authStore = useAuthStore();
@@ -164,9 +159,12 @@ const mainContentRef = ref<HTMLElement | null>(null);
 const defaultAvatar = "https://testingbot.com/free-online-tools/random-avatar/100";
 const VIRTUAL_SCROLL_THRESHOLD = 350;
 
+// list recommendations
+const listRecommendations = ref<GoiYKetBanResponse[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
   postStore.fetchFirstPage();
+  listRecommendations.value = await friendHelper.getRecommendations(0, 4);
 });
 
 const handleScroll = async () => {
@@ -207,6 +205,7 @@ const handleDeletePost = (postId: number) => {
 const isOwner = (maNguoiDung: number) => {
   return maNguoiDung === authStore.getUser?.maNguoiDung;
 };
+
 
 </script>
 

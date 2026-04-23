@@ -98,6 +98,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/friends",
+    name: "Friends",
+    component: () => import("./views/Friends.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     redirect: "/",

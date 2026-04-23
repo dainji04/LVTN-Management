@@ -197,6 +197,7 @@
                 :time-ago="formatTimeAgo(post.ngayTao)"
                 :like-count="post.luotThich"
                 :comment-count="post.luotBinhLuan"
+                :liked="post.daThich"
                 @deletePost="handleDeletePost"
               />
               <div v-if="isLoadingPosts" class="text-center text-gray-500 py-2">{{ $t('loadingPosts') }}</div>

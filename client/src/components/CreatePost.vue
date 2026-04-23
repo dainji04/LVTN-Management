@@ -71,16 +71,16 @@ import { useAuthStore } from "../store/authStore";
 import Swal from "sweetalert2";
 import { useI18n } from "vue-i18n";
 import { usePostStore } from "../store/postStore";
-import { message } from 'ant-design-vue';
-import type { UploadChangeParam } from 'ant-design-vue';
 import type { User } from "../types/userType";
-import { useGroupStore } from "../store/groupStore";
+
+const props = defineProps<{
+  groupId: number | null;
+}>();
 
 const {t} = useI18n();
 const postContent = ref("");
 const authStore = useAuthStore();
 const postStore = usePostStore();
-const groupStore = useGroupStore();
 
 const user = computed(() => {
   return authStore.getUser as User;
@@ -101,7 +101,7 @@ const handlePost = async () => {
     }
     const requestBody: CreatePostRequest = {
       maNguoiDung: authStore.getUser?.maNguoiDung,
-      maNhom: groupStore.group?.id || null,
+      maNhom: props.groupId || null,
       noiDung: postContent.value.trim(),
       quyenRiengTu: 'friends',
       viTri: null,

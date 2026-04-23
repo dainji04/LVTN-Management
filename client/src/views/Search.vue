@@ -22,7 +22,7 @@
               type="text"
               :placeholder="t('searchFriendsPlaceholder')"
               class="w-full pl-12 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-sm outline-none transition-all focus:border-primary focus:bg-white focus:shadow-sm"
-              @keyup.enter="handleSearch"
+              @input="handleSearch"
             />
             <button
               v-if="searchQuery.trim()"
@@ -114,6 +114,8 @@ import { useAuthStore } from '../store/authStore';
 import axiosInstance from '../helpers/apiHelper';
 import { resolveMediaUrl } from '../helpers/mediaHelper';
 import { useI18n } from 'vue-i18n';
+import { useDebounceFn } from '@vueuse/core';
+
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -137,7 +139,7 @@ const searchInputRef = ref<HTMLInputElement | null>(null);
 
 const defaultAvatar = 'https://testingbot.com/free-online-tools/random-avatar/100';
 
-async function handleSearch() {
+const handleSearch = useDebounceFn(async() => {
   const query = searchQuery.value.trim();
   if (!query) return;
 
@@ -148,7 +150,7 @@ async function handleSearch() {
   hasSearched.value = true;
 
   try {
-    const response = await axiosInstance.get('/ban-be/search', {
+    const response = await axiosInstance.get('/users/search', {
       params: { userId, query },
     });
 
@@ -163,7 +165,7 @@ async function handleSearch() {
   } finally {
     loading.value = false;
   }
-}
+}, 300);
 
 async function handleAddFriend(targetUserId: number) {
   const currentUserId = authStore.getUser?.maNguoiDung;
@@ -172,13 +174,7 @@ async function handleAddFriend(targetUserId: number) {
   sendingIds.value.add(targetUserId);
 
   try {
-    const response = await axiosInstance.post('/ban-be/add', null, {
-      params: {
-        id1: currentUserId,
-        id2: targetUserId,
-        loiMoiId: currentUserId,
-      },
-    });
+    const response = await axiosInstance.post(`/loi-moi-ket-ban/gui?nguoiGuiId=${currentUserId}&nguoiNhanId=${targetUserId}`);
 
     const data = response.data;
     if (data.code === 200 || data.code === 0 || data.code === 201) {

@@ -53,16 +53,19 @@
       </div>
       <div class="grid grid-cols-[5fr_2fr] gap-4">
         <div class="flex flex-col gap-4">
-          <CreatePost class="" />
+          <CreatePost :group-id="groupId" class="" />
           <Post
-            id="1"
-            username="quang"
-            avatar="https://testingbot.com/free-online-tools/random-avatar/300"
-            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRypbU3w47GYrpMjBwWbSwrsacu1UfaY4DGLw&s"
-            caption="Hôm nay trời đẹp quá"
-            time-ago="2 giờ"
-            :like-count="100"
-            :comment-count="10"
+            v-for="post in groupStore.groupPosts"
+            :key="post.maBaiViet"
+            :id="post.maBaiViet"
+            :username="post.hoTen"
+            :avatar="post.anhDaiDienNguoiDang"
+            :image="post.danhSachAnh?.[0]"
+            :noiDung="post.noiDung"
+            :time-ago="post.ngayTao"
+            :like-count="post.luotThich"
+            :comment-count="post.luotBinhLuan"
+            :liked="post.daThich"
           />
         </div>
         <div class="flex flex-col gap-6">
@@ -142,6 +145,7 @@ onMounted(async () => {
 
   await groupStore.getDetailGroup(groupId.value);
   group.value = groupStore.group;
+  await groupStore.loadListGroupPosts(groupId.value);
 });
 
 const isPrivate = computed(() => {
